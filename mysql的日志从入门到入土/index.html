@@ -1,0 +1,533 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>mysql的日志从入门到入土 | 张三的个人电脑</title><meta name="author" content="zs"><meta name="copyright" content="zs"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="mysql的日志从入门到入土 一条更新语句的执行流程是什么（引入redolog和binlog） update T set c&#x3D;c+1 where ID&#x3D;2;  mysql的更新流程和SQL语句的基本执行链路是一样的：连接器-&gt;分析器-&gt;优化器-&gt;执行器-&gt;存储引擎  通过连接器，先连接数据库。 清空查询缓存：在一个表上有更新的时候，跟这个表有关的查询缓存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql的日志从入门到入土">
+<meta property="og:url" content="https://zhuansunpengcheng.gitee.io/mysql%E7%9A%84%E6%97%A5%E5%BF%97%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/index.html">
+<meta property="og:site_name" content="张三的个人电脑">
+<meta property="og:description" content="mysql的日志从入门到入土 一条更新语句的执行流程是什么（引入redolog和binlog） update T set c&#x3D;c+1 where ID&#x3D;2;  mysql的更新流程和SQL语句的基本执行链路是一样的：连接器-&gt;分析器-&gt;优化器-&gt;执行器-&gt;存储引擎  通过连接器，先连接数据库。 清空查询缓存：在一个表上有更新的时候，跟这个表有关的查询缓存">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg">
+<meta property="article:published_time" content="2022-10-30T11:42:20.249Z">
+<meta property="article:modified_time" content="2022-10-30T10:42:15.991Z">
+<meta property="article:author" content="zs">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="binlog">
+<meta property="article:tag" content="redolog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhuansunpengcheng.gitee.io/mysql%E7%9A%84%E6%97%A5%E5%BF%97%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'mysql的日志从入门到入土',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-10-30 10:42:15'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="张三的个人电脑" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">张三的个人电脑</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">mysql的日志从入门到入土</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-10-30T11:42:20.249Z" title="发表于 2022-10-30 11:42:20">2022-10-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-10-30T10:42:15.991Z" title="更新于 2022-10-30 10:42:15">2022-10-30</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="mysql的日志从入门到入土"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="mysql的日志从入门到入土"><a href="#mysql的日志从入门到入土" class="headerlink" title="mysql的日志从入门到入土"></a>mysql的日志从入门到入土</h1><hr>
+<h2 id="一条更新语句的执行流程是什么（引入redolog和binlog）"><a href="#一条更新语句的执行流程是什么（引入redolog和binlog）" class="headerlink" title="一条更新语句的执行流程是什么（引入redolog和binlog）"></a>一条更新语句的执行流程是什么（引入redolog和binlog）</h2><blockquote>
+<p>update T set c&#x3D;c+1 where ID&#x3D;2;</p>
+</blockquote>
+<p>mysql的更新流程和SQL语句的基本执行链路是一样的：连接器-&gt;分析器-&gt;优化器-&gt;执行器-&gt;存储引擎</p>
+<p><img src="/mysql%E7%9A%84%E6%97%A5%E5%BF%97%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F.assets/image-20221012203451881.png" alt="image-20221012203451881"></p>
+<p>通过连接器，先连接数据库。</p>
+<p>清空查询缓存：在一个表上有更新的时候，跟这个表有关的查询缓存会失效。这也就是我们一般不建议使用查询缓存的原因（在mysql8.0中，已经把查询缓存整个模块都删掉了）。</p>
+<p>分析器会通过词法和语法解析知道这是一条更新语句。</p>
+<p>优化器决定要使用哪个索引。</p>
+<p>执行器负责具体执行，找到这一行，然后更新。</p>
+<h2 id="更新过程中涉及到的重要的日志模块（redolog和binlog）"><a href="#更新过程中涉及到的重要的日志模块（redolog和binlog）" class="headerlink" title="更新过程中涉及到的重要的日志模块（redolog和binlog）"></a>更新过程中涉及到的重要的日志模块（redolog和binlog）</h2><p>与查询流程不一样的是，更新流程还涉及两个重要的日志模块，它们正是我们今天要讨论的主角：redo log（重做日志）和 binlog（归档日志）</p>
+<h3 id="什么是redolog"><a href="#什么是redolog" class="headerlink" title="什么是redolog"></a>什么是redolog</h3><p>作者举了《孔乙己》中一个赊账的例子，孔乙己来到酒店喝酒，老板会先把孔乙己的酒钱记录在一个粉板上，然后等不忙的时候，在累加到账本上。</p>
+<p>这里的粉板就是redolog，账本就是磁盘；</p>
+<p>考虑这个场景，当很多很多的人来喝酒的时候，老板一般有两种方式记账（当数据库更新一条记录的时候，一般有两种方式）：</p>
+<ul>
+<li>直接掏出账本，在账本上加加减减。（直接操作磁盘的数据，进行更新）</li>
+<li>另一种做法是先在粉板上记下这次的账，等打烊以后再把账本翻出来核算（先记录到redolog，等mysql空闲的时候，刷到磁盘）。</li>
+</ul>
+<p>在酒店生意红火的时候，老板一定选择后者，因为前者操作实在是太麻烦了。</p>
+<ul>
+<li>首先，你得找到这个人的赊账总额那条记录。你想想，密密麻麻几十页，掌柜要找到那个名字，可能还得带上老花镜慢慢找。（磁盘的随机IO读）</li>
+<li>找到之后再拿出算盘计算，最后再将结果写回到账本上（磁盘的随机写）</li>
+</ul>
+<p>粉板（redolog）就完美的解决了这两个问题：</p>
+<ul>
+<li>首先说找记录：mysql的所有记录都是从数据页中查的，如果要更新的数据所在的数据页在内存中，可以直接找到，如果不在内存中，会先从磁盘把这个数据库加载到内存中。（这个步骤没法省，redolog优化的地方并不在于这里，这里会有<strong>changebuffer</strong>优化（后面说））</li>
+<li>找到记录之后，然后说更新记录：更新的结果是写到redolog中，而不是写到磁盘中，就避免了磁盘的随机IO，虽然redolog也是写到磁盘中的，但是由于组提交的存在，一次磁盘的写入是大量的顺序IO；（redolog是顺序写，并且可以组提交，还有别的一些优化，收益最大是是这两个因素；）</li>
+</ul>
+<h3 id="redo-log有什么用"><a href="#redo-log有什么用" class="headerlink" title="redo log有什么用"></a>redo log有什么用</h3><p>有了 redo log，InnoDB 就可以保证即使数据库发生异常重启，之前提交的记录都不会丢失，这个能力称为 <strong>crash-safe</strong>。</p>
+<h3 id="为什么要引入redolog"><a href="#为什么要引入redolog" class="headerlink" title="为什么要引入redolog"></a>为什么要引入redolog</h3><p>因为最开始 MySQL 里并没有 InnoDB 引擎。MySQL 自带的引擎是 MyISAM，但是 MyISAM 没有 crash-safe 的能力，<strong>binlog</strong> 日志只能用于归档。而 InnoDB 是另一个公司以插件形式引入 MySQL 的，既然只依靠 binlog 是没有 crash-safe 能力的，所以 InnoDB 使用另外一套日志系统——也就是 redo log 来实现 crash-safe 能力。</p>
+<p>mysql要保证数据的持久性，保证持久性就需要将数据写到磁盘，但是写到磁盘的话，涉及到</p>
+<ul>
+<li>刷页，因为mysql所有的操作是针对数据页操作的，而一个简单的更新，可能就要刷整整一个数据页</li>
+<li>随机IO，一个事务所更新的涉及到的数据页可能不止一个，而且数据页可能不相连，就涉及到随机IO</li>
+</ul>
+<p>这俩问题，咋办呢？就引入了redolog，一个更新不刷页（先记录到redolog日志中），这样就避免了上面两个问题</p>
+<ul>
+<li>redolog将随机IO改成了顺序IO，而且避免了每次更新都刷盘（刷盘也是要刷的，但是是组提交）</li>
+</ul>
+<h3 id="redolog的结构"><a href="#redolog的结构" class="headerlink" title="redolog的结构"></a>redolog的结构</h3><p>redolog是循环写的文件，InnoDB 的 redo log 是固定大小的，比如可以配置为一组 4 个文件，每个文件的大小是 1GB，那么总共就可以记录 4GB 的操作。从头开始写，写到末尾就又回到开头循环写，如下面这个图所示。</p>
+<img src="mysql的日志从入门到入土.assets/image-20221027161923607.png" alt="image-20221027161923607" style="zoom: 50%;" />
+
+<p>write pos 是当前记录的位置，一边写一边后移，写到第 3 号文件末尾后就回到 0 号文件开头。checkpoint 是当前要擦除的位置，也是往后推移并且循环的，擦除记录前要把记录更新到数据文件。</p>
+<p>write pos 和 checkpoint 之间的是还空着的部分，可以用来记录新的操作。如果 write pos 追上 checkpoint，表示满了，这时候不能再执行新的更新，得停下来先擦掉一些记录，把 checkpoint 推进一下。</p>
+<h3 id="redolog一般设置多大"><a href="#redolog一般设置多大" class="headerlink" title="redolog一般设置多大"></a>redolog一般设置多大</h3><p>redo log 太小的话，会导致很快就被写满，然后不得不强行刷 redo log，这样 WAL 机制的能力就发挥不出来了。所以，如果是现在常见的几个 TB 的磁盘的话，就不要太小气了，直接将 redo log 设置为 4 个文件、每个文件 1GB 吧。</p>
+<ul>
+<li>innodb_log_file_size：该参数指定了每个redo日志文件的大小，在MySQL 5.7.21这个版本中的默认值为48MB，</li>
+<li>innodb_log_files_in_group：该参数指定redo日志文件的个数，默认值为2，最大值为100。</li>
+</ul>
+<h3 id="binlog是什么"><a href="#binlog是什么" class="headerlink" title="binlog是什么"></a>binlog是什么</h3><p>我们知道mysql是由两部分组成，server层和引擎层，上面介绍的redolog就是innodb引擎独有的日志，而MySQL的server层也有自己的日志，叫做binlog；</p>
+<p>为什么要有两个日志呢</p>
+<p>因为mysql在5.5版本之前，默认的存储引擎是MyISAM，但是MyISAM并没有<strong>Crash-Safe</strong>的能力，而server层自带的binlog又只有归档的能力，也不具备<strong>Crash-Safe</strong>的能力，所以才会有后来的innodb以插件的形式引入mysql中，作为mysql的引擎，并使用了redo log，实现了Crash-Safe的能力</p>
+<p>除了以上的原因，binlog和redolog还有其他的区别，解释了为什么存在两个日志</p>
+<ul>
+<li>这两个日志的使用方不一样：redolog是innodb引擎所特有的，只有innodb才能用；而binlog是mysql的server层有的，所有的引擎都可以使用；</li>
+<li>这两个日志记录的内容不一样：redolog是物理日志，记录的是在某个数据页上做了什么修改；而binlog是逻辑日志，简单的说就是sql语句。</li>
+<li>这两个日志的记录方式不一样：redolog是循环写，redolog文件写满了，会从头重新写；binlog是追加写；binlog文件写满了，会切割，在新文件中继续写</li>
+</ul>
+<h3 id="binlog有什么用"><a href="#binlog有什么用" class="headerlink" title="binlog有什么用"></a>binlog有什么用</h3><p>主要是归档（归档之后可以用于数据恢复）和主从同步</p>
+<h3 id="binlog的结构"><a href="#binlog的结构" class="headerlink" title="binlog的结构"></a>binlog的结构</h3><p>在磁盘的上的结构，binlog默认是存放在<strong>MySQL服务器的数据目录</strong>下，就像是这样（可以修改binlog的存放路径和binlog的文件名）：</p>
+<pre class="line-numbers language-mysql" data-language="mysql"><code class="language-mysql">xxx-bin.000001
+xxx-bin.000002
+xxx-bin.000003
+xxx-bin.000004
+...<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>除了真正存储binlog日志的文件外，MySQL服务器还会在相同的路径下生成一个关于binlog的索引文件，它的名称就是：</p>
+<pre class="line-numbers language-mysql" data-language="mysql"><code class="language-mysql">xxx-bin.index<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>这个索引文件是一个文本文件，我们可以直接打开：</p>
+<pre class="line-numbers language-mysql" data-language="mysql"><code class="language-mysql">shell&gt; cat xxx-bin.index
+.&#x2F;xxx-bin.000001
+.&#x2F;xxx-bin.000001
+.&#x2F;xxx-bin.000001
+.&#x2F;xxx-bin.000001<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>可以看到，这个索引文件只是简单的将各个binlog文件的路径存储了起来而已。</p>
+<p>binlog 有两种格式，一种是 statement，一种是 row。可能你在其他资料上还会看到有第三种格式，叫作 mixed，其实它就是前两种格式的混合。</p>
+<p><strong>statement</strong></p>
+<p><strong>row</strong></p>
+<p><strong>mix</strong></p>
+<h2 id="mysql的WAL机制"><a href="#mysql的WAL机制" class="headerlink" title="mysql的WAL机制"></a>mysql的WAL机制</h2><p>WAL 的全称是 Write-Ahead Logging，它的关键点就是先写日志，再写磁盘。</p>
+<p>WAL 机制是减少磁盘写，可是每次提交事务都要写 redo log 和 binlog，这磁盘读写次数也没变少呀？</p>
+<p>现在你就能理解了，WAL 机制主要得益于两个方面：</p>
+<ul>
+<li>redo log 和 binlog 都是顺序写，磁盘的顺序写比随机写速度要快；</li>
+<li>组提交机制，可以大幅度降低磁盘的 IOPS 消耗。怎么降低的呢？<a href="#%E7%BB%84%E6%8F%90%E4%BA%A4%EF%BC%88%E5%8F%8C1%E9%85%8D%E7%BD%AE%EF%BC%8CLSN%EF%BC%89">点我去看：组提交（双1配置，LSN）</a></li>
+</ul>
+<h2 id="日志的写入流程（二阶段提交）"><a href="#日志的写入流程（二阶段提交）" class="headerlink" title="日志的写入流程（二阶段提交）"></a>日志的写入流程（二阶段提交）</h2><h3 id="redolog和binlog的整体写入流程（二阶段提交）"><a href="#redolog和binlog的整体写入流程（二阶段提交）" class="headerlink" title="redolog和binlog的整体写入流程（二阶段提交）"></a>redolog和binlog的整体写入流程（二阶段提交）</h3><pre class="mermaid">sequenceDiagram
+client->>server:更新ID=2这一行
+server->>innodb:获取ID=2这一行
+innodb->>innodb:ID=2这一行是否在内存页中
+innodb->>server:在内存中，直接返回ID=2的行数据
+innodb->>disk:不在内存中\n从磁盘中加载ID=2这一行的数据页
+disk->>innodb:返回ID=2所在的数据页
+innodb->>server:返回ID=2的行数据
+server->>server:对ID=2的数据，进行更新操作
+server->>innodb:写入更新后的数据
+innodb->>innodb:更新内存
+innodb->>innodb:记录redolog，处于prepare状态
+innodb->>server:更新成功
+server->>server:记录binlog
+server->>innodb:提交事务
+innodb->>innodb:redolog提交，处于commit状态
+innodb->>server:更新完成
+server->>client:更新完成</pre>
+
+<h4 id="为什么要有两阶段提交（反证法）"><a href="#为什么要有两阶段提交（反证法）" class="headerlink" title="为什么要有两阶段提交（反证法）"></a>为什么要有两阶段提交（反证法）</h4><p>为什么必须要有两阶段提交呢？我们知道两阶段提交是为了保证分布式事务的数据一致性的， 那么mysql是要保证什么数据的一致性。</p>
+<p>很显然：是为了保证redolog和binlog的数据一致性</p>
+<p>那么为什么要保证redolog和binlog的数据一致性呢？这就涉及到redolog和binlog的作用是什么呢？对！是为了崩溃恢复。</p>
+<p>那么我们看看没有两阶段提交会怎么样？</p>
+<p>1、<strong>先写redolog后写binlog</strong>。假设redolog写完了，binlog没写完，mysql崩了。重启之后，因为redolog完整，数据恢复；但是binlog不完整， binlog 里面就没有记录这个语句。然后你会发现，如果需要用这个 binlog 来恢复临时库的话，由于这个语句的 binlog 丢失，这个临时库恢复出来数据与原库的值不同。 另外主备一致也是通过binlog同步的，binlog不完整，备库的数据就不对了。</p>
+<p>2、<strong>先写binlog后写redolog</strong>。如果在 binlog 写完之后 crash，由于 redo log 还没写，崩溃恢复以后这个事务无效，所以数据不变。但是 binlog 里面已经记录了数据变更的日志。所以，在之后用 binlog 来恢复的时候数据与原库的值不同。</p>
+<h3 id="redolog的写入流程"><a href="#redolog的写入流程" class="headerlink" title="redolog的写入流程"></a>redolog的写入流程</h3><pre class="mermaid">sequenceDiagram
+innodb->>innodb:dml成功\n更新内存\n开始记录redolog
+innodb->>redologbuffer:redolog记录到内存中
+redologbuffer->>pagecache:写入到文件系统的pagecache中(write)
+pagecache->>disk:持久化到磁盘文件(fsync)</pre>
+
+<p>我们看到redolog写盘是有三步的，先写redologbuffer，在write到pagecache中，在fsync到disk中；</p>
+<p>那么问题来了，这三步，对于mysql来说，究竟哪一步才算做redolog写入成功了呢？</p>
+<p>是写到redologbuffer就行了，还是必须要fsync之后才行呢？</p>
+<p>其实这是通过一个参数配置的：innodb_flush_log_at_trx_commit</p>
+<ul>
+<li>当innodb_flush_log_at_trx_commit&#x3D;0的时候，表示每次事务提交都只留在redologbuffer中；</li>
+<li>当innodb_flush_log_at_trx_commit&#x3D;1的时候，表示每次事务提交都会fsync持久化到磁盘中；</li>
+<li>当innodb_flush_log_at_trx_commit&#x3D;2的时候，表示每次事务提交都只是write到文件系统的pagecache中；</li>
+</ul>
+<p>顺丰的生产环境，配置的是：innodb_flush_log_at_trx_commit &#x3D; 1</p>
+<p><img src="/mysql%E7%9A%84%E6%97%A5%E5%BF%97%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F.assets/image-20221025170624433.png" alt="image-20221025170624433"></p>
+<p>redologbuffer有多大？超过了怎么办呢？</p>
+<ul>
+<li>redologbuffer有多大是通过innodb_log_buffer_size来控制的。show viriables like ‘innodb_log_buffer_size’</li>
+<li>超过了怎么办？不会超过的，为什么呢？<ul>
+<li>当redologbuffer中存的内容超过innodb_log_buffer_size一半的时候，就会触发write到文件系统的pagecache中</li>
+<li>所以不会超过的。</li>
+</ul>
+</li>
+</ul>
+<h3 id="binlog的写入流程"><a href="#binlog的写入流程" class="headerlink" title="binlog的写入流程"></a>binlog的写入流程</h3><pre class="mermaid">sequenceDiagram
+innodb->>server:当dml成功\n此时redolog处于prepare状态
+server->>server:开始记录binlog
+server->>binlogcache:将binlog记录到binlogcache中
+binlogcache->>binlogcache:binlog cache\n是在内存中的\n每个线程私有的
+binlogcache->>pagecache:将binlog写入到操作系统的pagecache中（write）
+pagecache->>disk:数据持久化到磁盘（fsync）\n这一步占用IOPS</pre>
+
+<p>我们看到binlog写盘是有三步的，先写binlogcache，在write到pagecache中，在fsync到disk中；</p>
+<p>那么问题来了，这三步，对于mysql来说，究竟哪一步才算做binlog写入成功了呢？</p>
+<p>是写到binlogcache就行了，还是必须要fsync之后才行呢？</p>
+<p>其实这是通过一个参数配置的：sync_binlog</p>
+<ul>
+<li>sync_binlog&#x3D;0的时候，表示每次事务提交都只write，不fsync</li>
+<li>sync_binlog&#x3D;1的时候，表示每次事务都会执行fsync</li>
+<li>sync_binlog&#x3D;N（N&gt;1）的时候，表示累计到N个事务之后，才fsync</li>
+</ul>
+<p>顺丰的生产环境，配置的是：sync_binlog &#x3D; 1</p>
+<p><img src="/mysql%E7%9A%84%E6%97%A5%E5%BF%97%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F.assets/image-20221025170608095.png" alt="image-20221025170608095"></p>
+<p>binlogcache有多大呢？超过了怎么办呢？</p>
+<ul>
+<li>show viriables like ‘binlog_cache_size’；表示单个线程内 binlog cache 所占内存的大小</li>
+<li>超过了会刷盘，但是并不是写到binlog文件中，而是暂存到磁盘中，写在临时文件中；</li>
+</ul>
+<h3 id="redolog和binlog的刷盘时机"><a href="#redolog和binlog的刷盘时机" class="headerlink" title="redolog和binlog的刷盘时机"></a>redolog和binlog的刷盘时机</h3><p><strong>redolog的刷盘时机</strong></p>
+<p>考虑一个极端的情况，当我们把innodb_flash_log_at_trx_commit设置为0的时候，此时redolog只会写到redologbuffer（redologbuffer是在mysql的内存中的），那么什么时候刷盘呢？</p>
+<ul>
+<li>刷盘时机1：InnoDB 有一个后台线程，每隔 1 秒，就会把 redo log buffer 中的日志，调用 write 写到文件系统的 page cache，然后调用 fsync 持久化到磁盘。</li>
+<li>刷盘时机2：当redologbuffer中的内容占用超过redolog_buffer_size大小的一半时候，后台线程会主动写盘</li>
+<li>刷盘时机3：当并行的其他事务提交的时候，会将redologbuffer中的所有内容都刷盘；<ul>
+<li>对于时机3：不能将innodb_flash_log_at_trx_commit配置设置为0，因为这个时候，事务提交的时候不会刷盘</li>
+<li>对于时机3：可能会把进行汇总的事务的redolog进行刷盘，会有问题吗？<ul>
+<li>不会，这个和崩溃恢复的流程有关。此时redolog是prepare阶段的，要想恢复的话，还得去找binlog呢。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>binlog的刷盘时机</strong></p>
+<p>binlog会有刷盘时机吗？sync_binlog不管设置成多少，都至少保证了binlog会写到文件系统的pagecache中，接下来就是操作系统的范畴了。</p>
+<p>详细的说，binlog的刷盘是在 “二阶段三步骤” 的第二步骤 sync state 中</p>
+<h3 id="在两阶段提交的不同时刻，MySQL-异常重启会出现什么现象。"><a href="#在两阶段提交的不同时刻，MySQL-异常重启会出现什么现象。" class="headerlink" title="在两阶段提交的不同时刻，MySQL 异常重启会出现什么现象。"></a>在两阶段提交的不同时刻，MySQL 异常重启会出现什么现象。</h3><p>在讨论这个问题的时候，简化一下二阶段提交，只看最基本的情况。</p>
+<p><img src="/mysql%E7%9A%84%E6%97%A5%E5%BF%97%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F.assets/image-20221027200815119.png" alt="image-20221027200815119"></p>
+<p><strong>时刻A</strong></p>
+<p>就是写入 redo log 处于 prepare 阶段之后、写 binlog 之前，发生了崩溃（crash）由于此时 binlog 还没写，redo log 也还没提交，所以崩溃恢复的时候，这个事务会回滚。这时候，binlog 还没写，所以也不会传到备库。到这里，大家都可以理解。</p>
+<p><strong>时刻B</strong></p>
+<p>就是 binlog 写完，redo log 还没 commit 前发生 crash，那崩溃恢复的时候 MySQL 会怎么处理呢？</p>
+<ul>
+<li>如果 redo log 里面的事务是完整的，也就是已经有了 commit 标识，则直接提交；</li>
+<li>如果 redo log 里面的事务只有完整的 prepare，则判断对应的事务 binlog 是否存在并完整：<ul>
+<li>a. 如果是，则提交事务；</li>
+<li>b. 否则，回滚事务。</li>
+</ul>
+</li>
+</ul>
+<h2 id="组提交（双1配置，LSN）"><a href="#组提交（双1配置，LSN）" class="headerlink" title="组提交（双1配置，LSN）"></a>组提交（双1配置，LSN）</h2><p>关于组提交，这篇文章是我见过讲的最好的一篇：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/567154450">https://zhuanlan.zhihu.com/p/567154450</a></p>
+<p>上文中提到的组提交的代码在\mysql-5.7.19\sql\binlog.cc</p>
+<p>这篇文章里面有一些图，可以帮助更好的理解：<a target="_blank" rel="noopener" href="https://blog.51cto.com/u_15080021/2642167">https://blog.51cto.com/u_15080021/2642167</a></p>
+<h3 id="双1配置"><a href="#双1配置" class="headerlink" title="双1配置"></a>双1配置</h3><p>我们看到mysql默认会把innodb_flash_log_at_trx_commit设置为1，sync_binlog设置为1，这就是通常我们所说的 MySQL 的<strong>“ 双 1 ”配置</strong>。</p>
+<p>也就是说，一个事务完整提交前，需要等待两次刷盘，一次是 redo log（prepare 阶段），一次是 binlog。</p>
+<p>那么问题来了，如果mysql的TPS是2万，也就意味着每秒要写4万次磁盘，但是单独测试磁盘的IOPS，也就在2万左右，怎么能承受住mysql的2万的TPS呢？</p>
+<p>这个时候就用到了组提交（group commit）</p>
+<h3 id="日志逻辑序列号（LSN）"><a href="#日志逻辑序列号（LSN）" class="headerlink" title="日志逻辑序列号（LSN）"></a>日志逻辑序列号（LSN）</h3><p>在介绍组提交之前，需要先了解日志逻辑序列号（log sequence number）LSN</p>
+<h4 id="什么是LSN"><a href="#什么是LSN" class="headerlink" title="什么是LSN"></a>什么是LSN</h4><ul>
+<li>每一个redolog的生成，都伴随着LSN的生成</li>
+<li>LSN是单调递增的</li>
+<li>LSN是用来对应redolog的一个一个的写入点（write pos）</li>
+<li>每当写入长度为length的redolog，LSN的值就会加上length</li>
+</ul>
+<h4 id="flushed-to-disk-lsn"><a href="#flushed-to-disk-lsn" class="headerlink" title="flushed_to_disk_lsn"></a>flushed_to_disk_lsn</h4><p>已经刷到磁盘的LSN</p>
+<p>系统第一次启动时，该变量的值和初始的<code>lsn</code>值是相同的。随着系统的运行，<code>redo</code>日志被不断写入<code>log buffer</code>，但是并不会立即刷新到磁盘，<code>lsn</code>的值就和<code>flushed_to_disk_lsn</code>的值拉开了差距。</p>
+<p>如果两者的值相同时，说明log buffer中的所有redo日志都已经刷新到磁盘中了。</p>
+<h4 id="current-flush-lsn"><a href="#current-flush-lsn" class="headerlink" title="current_flush_lsn"></a>current_flush_lsn</h4><p>当前正在刷的LSN</p>
+<h4 id="LSN有什么用"><a href="#LSN有什么用" class="headerlink" title="LSN有什么用"></a>LSN有什么用</h4><ul>
+<li>减少redolog组提交时候的刷盘次数，减少磁盘IO（看后面的组提交有详细的说明）</li>
+</ul>
+<h3 id="组提交"><a href="#组提交" class="headerlink" title="组提交"></a>组提交</h3><p>简单的记忆就是：两个阶段，三个步骤</p>
+<p>经过 5.6&#x2F;5.7&#x2F;8.0 的逐步优化，两阶段提交的逻辑优化为：</p>
+<ul>
+<li>Prepare 阶段基本不变，只是将redolog写入pagecache（并不刷盘）。</li>
+<li>Commit 阶段按步骤做流水线批处理，将锁粒度进一步拆细。Commit 阶段又拆为三个步骤：<ul>
+<li>flush stage：redo log 刷盘（多个事务 redo 合并刷盘），按事务进入的顺序将 binlog  写入pagecache（并不刷盘）。</li>
+<li>sync stage：对 binlog 刷盘（多个事务的 binlog 合并刷盘）。</li>
+<li>commit stage：各个线程按顺序做 InnoDB commit 操作。</li>
+</ul>
+</li>
+</ul>
+<p>三个步骤（stage）中，每个 stage 一个队列，第一个进入该队列的线程成为 leader，后续进入的线程会作为follower，并且一直阻塞直至leader完成提交（sql语句会阻塞）。leader 线程会领导队列中的所有线程执行该 stage 的任务，并带领所有 follower 进入到下一个 stage 去执行，当遇到下一个 stage 队列不为空的时候，leader 会变成 follower 注册到此队列中。</p>
+<pre class="mermaid">sequenceDiagram
+server->>innodb:更新数据
+note left of innodb:第一阶段
+innodb->>innodb:记录redolog
+innodb->>pagecache:redolog write \n 事务处于prepare
+pagecache->>innodb:write 成功
+innodb->>server:redolog prepare 成功
+note left of innodb:第二阶段第一步骤
+server->>server:记录binlog
+pagecache->>disk:redolog刷盘(【组提交】)
+server->>pagecache:binlog写到文件系统的cache
+pagecache->>server:binlog 成功
+note left of disk:第二阶段第二步骤
+pagecache->>disk:binlog刷盘（【组提交】）
+note left of innodb:第二阶段第三步骤
+server->>innodb:提交事务
+innodb->>innodb:事务处于commit
+innodb->>server:更新完成</pre>
+
+<h4 id="组提交“组”在了哪里"><a href="#组提交“组”在了哪里" class="headerlink" title="组提交“组”在了哪里"></a>组提交“组”在了哪里</h4><p>在第二阶段的第一步骤中，redolog进行了组提交刷盘</p>
+<p>在第二阶段的第二步骤中，binlog进行组提交刷盘</p>
+<p>那么具体是怎么“组”提交的呢？</p>
+<p>1、在第一阶段，事务线程不停地，刷刷刷的进来，写redolog，此时只写到pagecache中；</p>
+<p>2、在第二阶段的第一步骤中，有一个队列，假设叫【队列-1】，</p>
+<ul>
+<li>当前线程会先把【队列-1】清空，以便下一批有一个leader</li>
+<li>当前线程中直接对redolog进行刷盘。ha_flush_logs(NULL, true);</li>
+<li>第一个进来的线程作为leader，后续的线程作为follower，进入【队列-1】（也就是说队列-1和刷redolog并没有啥关系）</li>
+</ul>
+<p>3、redolog刷盘完成之后，leader对【队列-1】中的事务线程，进行循环，write binlog</p>
+<p>4、write bin完成之后，【队列-1】的leader进入第二阶段的第二步骤，会进入到【队列-2】</p>
+<p>5、在第二阶段的第二步骤中，【队列-2】的leader会等待（受<strong>binlog_group_commit_sync_delay</strong> 和 <strong>binlog_group_commit_sync_no_delay_count</strong>控制）</p>
+<p>6、等待之后，【队列-2】的leader开始对binlog进行刷盘（因为等待了一段时间，所以binlog这里也是组提交）</p>
+<p>7、fsync binlog之后，【队列-2】的leader进入第二阶段的第三步骤，会进入到【队列-3】</p>
+<p>8、【队列-3】的leader会按照串行化的方式，循环，一个一个的对事务线程进行COMMIT</p>
+<h4 id="组提交和LSN有啥关系"><a href="#组提交和LSN有啥关系" class="headerlink" title="组提交和LSN有啥关系"></a>组提交和LSN有啥关系</h4><p>首先明确：</p>
+<ul>
+<li>在innodb中，每条redolog都有自己的LSN，这是一个单调递增的值。</li>
+<li>每个事务的更新操作都会包含一条或者<strong>多条</strong>redo log</li>
+<li>各个事务在将redo log写入 redo log buffer (通过log_mutex保护)时，都会获取<strong>当前事务</strong>最大的LSN。</li>
+</ul>
+<p>在组提交的第二阶段的第一步骤中，redolog会被组提交刷盘，组提交刷盘的时候，会有下面的流程</p>
+<p>那么假设三个事务 tx1, tx2, tx3的最大LSN分别为 100 , 200 , 300  时，他们同时进行提交，如果tx3获取到了 log_mutex 互斥锁, 那么他会将小于 300 之前的redo log一起落盘，同时记录  <strong>flushed_to_disk_lsn</strong>&#x3D;300， 这样 tx1, tx2不用再次请求磁盘io。</p>
+<p>同时，如果存在 tx0 的 LSN0 &lt; 300，LSN0 也会落盘，即使tx0还没有提交。然后当tx0的事务开始提交的时候，发现redolog已经刷盘了（ flushed_to_disk_lsn &gt;&#x3D; lsn），就直接返回了，节省了时间。</p>
+<ol>
+<li>获取 log mutex互斥锁</li>
+<li>如果 flushed_to_disk_lsn &gt;&#x3D; lsn, 表示日志已经被刷盘，跳转 5 后进入等待状态</li>
+<li>如果 current_flush_lsn &gt;&#x3D; lsn, 表示日志正在刷盘中，跳转 5 后进入等待状态</li>
+<li>将小于 lsn 的日志刷盘 (sync)</li>
+<li>释放 log_mutex互斥锁</li>
+</ol>
+<h2 id="mysql的崩溃恢复Crash-Safe能力（redolog和binlog的重要作用）"><a href="#mysql的崩溃恢复Crash-Safe能力（redolog和binlog的重要作用）" class="headerlink" title="mysql的崩溃恢复Crash-Safe能力（redolog和binlog的重要作用）"></a>mysql的崩溃恢复Crash-Safe能力（redolog和binlog的重要作用）</h2><h3 id="崩溃恢复的具体步骤"><a href="#崩溃恢复的具体步骤" class="headerlink" title="崩溃恢复的具体步骤"></a>崩溃恢复的具体步骤</h3><p>1、mysql崩溃重启后，进行恢复</p>
+<p>2、判断redolog的状态，如果redolog&#x3D;commit，直接提交事务</p>
+<p>3、如果redolog&#x3D;prepare，则通过xid去找binlog</p>
+<p>4、binlog存在，并且binlog是完整的，提交事务</p>
+<p>5、binlog不存在，或者binlog存在，但是不完整，回滚事务</p>
+<h3 id="MySQL-怎么知道-binlog-是完整的"><a href="#MySQL-怎么知道-binlog-是完整的" class="headerlink" title="MySQL 怎么知道 binlog 是完整的"></a>MySQL 怎么知道 binlog 是完整的</h3><p>回答：一个事务的 binlog 是有完整格式的：</p>
+<ul>
+<li>statement 格式的 binlog，最后会有 COMMIT；</li>
+<li>row 格式的 binlog，最后会有一个 XID event。</li>
+</ul>
+<p>另外，在 MySQL 5.6.2 版本以后，还引入了 binlog-checksum 参数，用来验证 binlog 内容的正确性。对于 binlog 日志由于磁盘原因，可能会在日志中间出错的情况，MySQL 可以通过校验 checksum 的结果来发现。所以，MySQL 还是有办法验证事务 binlog 的完整性的。</p>
+<h3 id="redo-log-和-binlog-是怎么关联起来的"><a href="#redo-log-和-binlog-是怎么关联起来的" class="headerlink" title="redo log 和 binlog 是怎么关联起来的"></a>redo log 和 binlog 是怎么关联起来的</h3><p>它们有一个共同的数据字段，叫 XID。崩溃恢复的时候，会按顺序扫描 redo log：</p>
+<ul>
+<li>如果碰到既有 prepare、又有 commit 的 redo log，就直接提交；</li>
+<li>如果碰到只有 parepare、而没有 commit 的 redo log，就拿着 XID 去 binlog 找对应的事务。</li>
+</ul>
+<h3 id="如果只有binlog可以Crash-Safe吗？"><a href="#如果只有binlog可以Crash-Safe吗？" class="headerlink" title="如果只有binlog可以Crash-Safe吗？"></a>如果只有binlog可以Crash-Safe吗？</h3><p>不行，因为binlog是逻辑日志，binlog写完了，并不保证数据一定在磁盘中。</p>
+<p>在崩溃恢复的时候，顺序扫描binlog，发现日志是完整的，那么此时要执行这个binlog吗？</p>
+<ul>
+<li>执行：如果数据已经写到了磁盘，又执行一遍，那数据就不对了呀。</li>
+<li>不执行：如果数据没写到磁盘，不执行，数据就少了呀。</li>
+</ul>
+<p>综上，只用binlog是不可以的。</p>
+<h3 id="如果只有redolog可以Crash-Safe吗？"><a href="#如果只有redolog可以Crash-Safe吗？" class="headerlink" title="如果只有redolog可以Crash-Safe吗？"></a>如果只有redolog可以Crash-Safe吗？</h3><p>如果只从崩溃恢复的角度来讲是可以的。你可以把 binlog 关掉，这样就没有两阶段提交了，但系统依然是 crash-safe 的。</p>
+<p>但是呢，redolog是循环写的，所以只用redolog，mysql虽然可以crash-safe，但是不具备归档的能力了。</p>
+<h2 id="刷脏页"><a href="#刷脏页" class="headerlink" title="刷脏页"></a>刷脏页</h2><h3 id="正常运行中的实例，数据写入后的最终落盘，是从-redo-log-更新过来的还是从-buffer-pool-更新过来的呢？"><a href="#正常运行中的实例，数据写入后的最终落盘，是从-redo-log-更新过来的还是从-buffer-pool-更新过来的呢？" class="headerlink" title="正常运行中的实例，数据写入后的最终落盘，是从 redo log 更新过来的还是从 buffer pool 更新过来的呢？"></a>正常运行中的实例，数据写入后的最终落盘，是从 redo log 更新过来的还是从 buffer pool 更新过来的呢？</h3><p>这里涉及到了，“redo log 里面到底是什么”的问题。</p>
+<p>实际上，redo log 并没有记录数据页的完整数据，所以它并没有能力自己去更新磁盘数据页，也就不存在“数据最终落盘，是由 redo log 更新过去”的情况。</p>
+<ul>
+<li>如果是正常运行的实例的话，数据页被修改以后，跟磁盘的数据页不一致，称为脏页。最终数据落盘，就是把内存中的数据页写盘。这个过程，甚至与 redo log 毫无关系。</li>
+<li>在崩溃恢复场景中，InnoDB 如果判断到一个数据页可能在崩溃恢复的时候丢失了更新，就会将这个数据页加载到内存中，然后让 redo log 更新内存中的数据页内容。更新完成后，内存页变成脏页，就回到了第一种情况的状态。</li>
+</ul>
+<h2 id="changebuffer（对更新的优化，对比redolog）"><a href="#changebuffer（对更新的优化，对比redolog）" class="headerlink" title="changebuffer（对更新的优化，对比redolog）"></a>changebuffer（对更新的优化，对比redolog）</h2><h3 id="changebuffer的更新流程"><a href="#changebuffer的更新流程" class="headerlink" title="changebuffer的更新流程"></a>changebuffer的更新流程</h3><p>每一次更新都必须从内存中（不在内存中，就要从磁盘中load）获取到要更新的这一行吗？</p>
+<ul>
+<li>不是的；</li>
+<li>在mysql5.5之前，changebuffer叫做insert buffer，仅支持插入，在5.5之后，叫change buffer，支持了更新和删除；</li>
+<li>changebuffer只有普通索引才能用到，因为唯一索引要判定记录是否存在，所以查询一定要的</li>
+</ul>
+<pre class="mermaid">sequenceDiagram
+client->>server:执行dml语句
+server->>innodb:要执行dml语句
+innodb->>innodb:判断要执行的语句\n是否在内存中
+innodb->>cache:在内存中，直接操作内存
+cache->>innodb:操作完成，返回
+innodb->>server:操作完成，返回
+server->>client:操作完成
+innodb->>changebuffer:不在内存中，记录到change buffer
+changebuffer->>innodb:操作完成，返回
+innodb->>server:操作完成，返回
+server->>client:操作完成
+note over client,disk:记录到缓存中，什么时候刷到磁盘呢？
+changebuffer->>disk:后台线程定时刷
+changebuffer->>disk:changebuffer不足时
+changebuffer->>disk:数据库正常关闭时
+changebuffer->>disk:redolog写满时\n（此时数据库不可用）
+note over client,disk:记录在缓存中，查询的时候怎么办
+client->>server:请求查询某一条记录
+server->>innodb:查询某一条记录
+innodb->>innodb:判断要查询的语句\n是否在内存中
+cache->>innodb:在内存中，直接返回
+innodb->>server:操作完成，返回
+server->>client:操作完成
+disk->>cache:不在内存中，从disk加载到内存中
+cache->>innodb:获取内存中的这一条记录
+innodb->>innodb:判断这一条记录是否有更新
+innodb->>server:没有更新\n操作完成，返回
+changebuffer->>innodb:有更新，应用changebuffer的更新\n这一步叫merge
+innodb->>cache:将更新后的记录先记录到内存页中
+innodb->>server:操作完成，返回
+server->>client:操作完成</pre>
+
+<h3 id="普通索引和唯一索引的更新流程"><a href="#普通索引和唯一索引的更新流程" class="headerlink" title="普通索引和唯一索引的更新流程"></a>普通索引和唯一索引的更新流程</h3><p>在普通索引的更新流程（可以用changebuffer）</p>
+<pre class="mermaid">sequenceDiagram
+client->server:执行dml语句
+server->>innodb:要执行dml语句
+innodb->>innodb:判断要执行的语句\n是否在内存中
+innodb->>cache:在内存中，直接操作内存
+cache->>innodb:操作完成，返回
+innodb->>server:操作完成，返回
+server->>client:操作完成
+innodb->>changebuffer:不在内存中，记录到change buffer
+changebuffer->>innodb:操作完成，返回
+innodb->>server:操作完成，返回
+server->>client:操作完成</pre>
+
+<p>在唯一索引的更新流程（不可以用changebuffer）</p>
+<pre class="mermaid">sequenceDiagram
+client->server:执行dml语句
+server->>innodb:要执行dml语句
+innodb->>innodb:判断要执行的语句\n是否在内存中
+innodb->>cache:在内存中，直接操作内存
+cache->>innodb:操作完成，返回
+innodb->>server:操作完成，返回
+server->>client:操作完成
+innodb->>disk:不在内存中，从磁盘中加载到内存
+disk->>cache:从磁盘中加载到内存
+cache->>innodb:操作完成，返回
+innodb->>server:操作完成，返回
+server->>client:操作完成</pre>
+
+
+
+<h3 id="change-buffer-和-redo-log"><a href="#change-buffer-和-redo-log" class="headerlink" title="change buffer 和 redo log"></a>change buffer 和 redo log</h3><p>redo log 主要节省的是随机写磁盘的 IO 消耗（转成顺序写），而 change buffer 主要节省的则是随机读磁盘的 IO 消耗。</p>
+<h2 id="一些简单的问题"><a href="#一些简单的问题" class="headerlink" title="一些简单的问题"></a>一些简单的问题</h2><p>执行一个 update 语句以后，我再去执行 hexdump 命令直接查看 ibd 文件内容，为什么没有看到数据有改变呢？</p>
+<p>为什么 binlog cache 是每个线程自己维护的，而 redo log buffer 是全局共用的？</p>
+<p>事务执行期间，还没到提交阶段，如果发生 crash 的话，redo log 肯定丢了，这会不会导致主备不一致呢？</p>
+<p>如果 binlog 写完盘以后发生 crash，这时候还没给客户端答复就重启了。等客户端再重连进来，发现事务已经提交成功了，这是不是 bug？</p>
+<h2 id="主备一致（binlog的同步功能）"><a href="#主备一致（binlog的同步功能）" class="headerlink" title="主备一致（binlog的同步功能）"></a>主备一致（binlog的同步功能）</h2><h2 id="主备延迟"><a href="#主备延迟" class="headerlink" title="主备延迟"></a>主备延迟</h2><h2 id="主备切换"><a href="#主备切换" class="headerlink" title="主备切换"></a>主备切换</h2></article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/mysql/">mysql</a><a class="post-meta__tags" href="/tags/binlog/">binlog</a><a class="post-meta__tags" href="/tags/redolog/">redolog</a></div><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">zs</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#mysql%E7%9A%84%E6%97%A5%E5%BF%97%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F"><span class="toc-number">1.</span> <span class="toc-text">mysql的日志从入门到入土</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E6%9D%A1%E6%9B%B4%E6%96%B0%E8%AF%AD%E5%8F%A5%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%88%E5%BC%95%E5%85%A5redolog%E5%92%8Cbinlog%EF%BC%89"><span class="toc-number">1.1.</span> <span class="toc-text">一条更新语句的执行流程是什么（引入redolog和binlog）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E8%BF%87%E7%A8%8B%E4%B8%AD%E6%B6%89%E5%8F%8A%E5%88%B0%E7%9A%84%E9%87%8D%E8%A6%81%E7%9A%84%E6%97%A5%E5%BF%97%E6%A8%A1%E5%9D%97%EF%BC%88redolog%E5%92%8Cbinlog%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">更新过程中涉及到的重要的日志模块（redolog和binlog）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFredolog"><span class="toc-number">1.2.1.</span> <span class="toc-text">什么是redolog</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#redo-log%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8"><span class="toc-number">1.2.2.</span> <span class="toc-text">redo log有什么用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%BC%95%E5%85%A5redolog"><span class="toc-number">1.2.3.</span> <span class="toc-text">为什么要引入redolog</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#redolog%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">1.2.4.</span> <span class="toc-text">redolog的结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#redolog%E4%B8%80%E8%88%AC%E8%AE%BE%E7%BD%AE%E5%A4%9A%E5%A4%A7"><span class="toc-number">1.2.5.</span> <span class="toc-text">redolog一般设置多大</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#binlog%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.2.6.</span> <span class="toc-text">binlog是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#binlog%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8"><span class="toc-number">1.2.7.</span> <span class="toc-text">binlog有什么用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#binlog%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">1.2.8.</span> <span class="toc-text">binlog的结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mysql%E7%9A%84WAL%E6%9C%BA%E5%88%B6"><span class="toc-number">1.3.</span> <span class="toc-text">mysql的WAL机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A5%E5%BF%97%E7%9A%84%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BA%8C%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%EF%BC%89"><span class="toc-number">1.4.</span> <span class="toc-text">日志的写入流程（二阶段提交）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#redolog%E5%92%8Cbinlog%E7%9A%84%E6%95%B4%E4%BD%93%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B%EF%BC%88%E4%BA%8C%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%EF%BC%89"><span class="toc-number">1.4.1.</span> <span class="toc-text">redolog和binlog的整体写入流程（二阶段提交）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%9C%89%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%EF%BC%88%E5%8F%8D%E8%AF%81%E6%B3%95%EF%BC%89"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">为什么要有两阶段提交（反证法）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#redolog%E7%9A%84%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B"><span class="toc-number">1.4.2.</span> <span class="toc-text">redolog的写入流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#binlog%E7%9A%84%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B"><span class="toc-number">1.4.3.</span> <span class="toc-text">binlog的写入流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#redolog%E5%92%8Cbinlog%E7%9A%84%E5%88%B7%E7%9B%98%E6%97%B6%E6%9C%BA"><span class="toc-number">1.4.4.</span> <span class="toc-text">redolog和binlog的刷盘时机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E7%9A%84%E4%B8%8D%E5%90%8C%E6%97%B6%E5%88%BB%EF%BC%8CMySQL-%E5%BC%82%E5%B8%B8%E9%87%8D%E5%90%AF%E4%BC%9A%E5%87%BA%E7%8E%B0%E4%BB%80%E4%B9%88%E7%8E%B0%E8%B1%A1%E3%80%82"><span class="toc-number">1.4.5.</span> <span class="toc-text">在两阶段提交的不同时刻，MySQL 异常重启会出现什么现象。</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%84%E6%8F%90%E4%BA%A4%EF%BC%88%E5%8F%8C1%E9%85%8D%E7%BD%AE%EF%BC%8CLSN%EF%BC%89"><span class="toc-number">1.5.</span> <span class="toc-text">组提交（双1配置，LSN）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C1%E9%85%8D%E7%BD%AE"><span class="toc-number">1.5.1.</span> <span class="toc-text">双1配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A5%E5%BF%97%E9%80%BB%E8%BE%91%E5%BA%8F%E5%88%97%E5%8F%B7%EF%BC%88LSN%EF%BC%89"><span class="toc-number">1.5.2.</span> <span class="toc-text">日志逻辑序列号（LSN）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFLSN"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">什么是LSN</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#flushed-to-disk-lsn"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">flushed_to_disk_lsn</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#current-flush-lsn"><span class="toc-number">1.5.2.3.</span> <span class="toc-text">current_flush_lsn</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LSN%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8"><span class="toc-number">1.5.2.4.</span> <span class="toc-text">LSN有什么用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%84%E6%8F%90%E4%BA%A4"><span class="toc-number">1.5.3.</span> <span class="toc-text">组提交</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%84%E6%8F%90%E4%BA%A4%E2%80%9C%E7%BB%84%E2%80%9D%E5%9C%A8%E4%BA%86%E5%93%AA%E9%87%8C"><span class="toc-number">1.5.3.1.</span> <span class="toc-text">组提交“组”在了哪里</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%84%E6%8F%90%E4%BA%A4%E5%92%8CLSN%E6%9C%89%E5%95%A5%E5%85%B3%E7%B3%BB"><span class="toc-number">1.5.3.2.</span> <span class="toc-text">组提交和LSN有啥关系</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mysql%E7%9A%84%E5%B4%A9%E6%BA%83%E6%81%A2%E5%A4%8DCrash-Safe%E8%83%BD%E5%8A%9B%EF%BC%88redolog%E5%92%8Cbinlog%E7%9A%84%E9%87%8D%E8%A6%81%E4%BD%9C%E7%94%A8%EF%BC%89"><span class="toc-number">1.6.</span> <span class="toc-text">mysql的崩溃恢复Crash-Safe能力（redolog和binlog的重要作用）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B4%A9%E6%BA%83%E6%81%A2%E5%A4%8D%E7%9A%84%E5%85%B7%E4%BD%93%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.6.1.</span> <span class="toc-text">崩溃恢复的具体步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL-%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93-binlog-%E6%98%AF%E5%AE%8C%E6%95%B4%E7%9A%84"><span class="toc-number">1.6.2.</span> <span class="toc-text">MySQL 怎么知道 binlog 是完整的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#redo-log-%E5%92%8C-binlog-%E6%98%AF%E6%80%8E%E4%B9%88%E5%85%B3%E8%81%94%E8%B5%B7%E6%9D%A5%E7%9A%84"><span class="toc-number">1.6.3.</span> <span class="toc-text">redo log 和 binlog 是怎么关联起来的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E5%8F%AA%E6%9C%89binlog%E5%8F%AF%E4%BB%A5Crash-Safe%E5%90%97%EF%BC%9F"><span class="toc-number">1.6.4.</span> <span class="toc-text">如果只有binlog可以Crash-Safe吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E5%8F%AA%E6%9C%89redolog%E5%8F%AF%E4%BB%A5Crash-Safe%E5%90%97%EF%BC%9F"><span class="toc-number">1.6.5.</span> <span class="toc-text">如果只有redolog可以Crash-Safe吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%B7%E8%84%8F%E9%A1%B5"><span class="toc-number">1.7.</span> <span class="toc-text">刷脏页</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A3%E5%B8%B8%E8%BF%90%E8%A1%8C%E4%B8%AD%E7%9A%84%E5%AE%9E%E4%BE%8B%EF%BC%8C%E6%95%B0%E6%8D%AE%E5%86%99%E5%85%A5%E5%90%8E%E7%9A%84%E6%9C%80%E7%BB%88%E8%90%BD%E7%9B%98%EF%BC%8C%E6%98%AF%E4%BB%8E-redo-log-%E6%9B%B4%E6%96%B0%E8%BF%87%E6%9D%A5%E7%9A%84%E8%BF%98%E6%98%AF%E4%BB%8E-buffer-pool-%E6%9B%B4%E6%96%B0%E8%BF%87%E6%9D%A5%E7%9A%84%E5%91%A2%EF%BC%9F"><span class="toc-number">1.7.1.</span> <span class="toc-text">正常运行中的实例，数据写入后的最终落盘，是从 redo log 更新过来的还是从 buffer pool 更新过来的呢？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#changebuffer%EF%BC%88%E5%AF%B9%E6%9B%B4%E6%96%B0%E7%9A%84%E4%BC%98%E5%8C%96%EF%BC%8C%E5%AF%B9%E6%AF%94redolog%EF%BC%89"><span class="toc-number">1.8.</span> <span class="toc-text">changebuffer（对更新的优化，对比redolog）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#changebuffer%E7%9A%84%E6%9B%B4%E6%96%B0%E6%B5%81%E7%A8%8B"><span class="toc-number">1.8.1.</span> <span class="toc-text">changebuffer的更新流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%99%AE%E9%80%9A%E7%B4%A2%E5%BC%95%E5%92%8C%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95%E7%9A%84%E6%9B%B4%E6%96%B0%E6%B5%81%E7%A8%8B"><span class="toc-number">1.8.2.</span> <span class="toc-text">普通索引和唯一索引的更新流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#change-buffer-%E5%92%8C-redo-log"><span class="toc-number">1.8.3.</span> <span class="toc-text">change buffer 和 redo log</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.9.</span> <span class="toc-text">一些简单的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E5%A4%87%E4%B8%80%E8%87%B4%EF%BC%88binlog%E7%9A%84%E5%90%8C%E6%AD%A5%E5%8A%9F%E8%83%BD%EF%BC%89"><span class="toc-number">1.10.</span> <span class="toc-text">主备一致（binlog的同步功能）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E5%A4%87%E5%BB%B6%E8%BF%9F"><span class="toc-number">1.11.</span> <span class="toc-text">主备延迟</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2"><span class="toc-number">1.12.</span> <span class="toc-text">主备切换</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By zs</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/8.13.8/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
