@@ -1,0 +1,998 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>mycat的14中分片规则 | 张三的个人电脑</title><meta name="author" content="zs"><meta name="copyright" content="zs"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="mycat的14中分片规则参考文章https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;359262439 环境准备 mycat 有 三个实例（三个分片）  创建一个数据库：partition_db   create database partition_db DEFAULT CHARACTER SET utf8mb4;    分片规则1、取模分片&lt;tableRule name&#x3D;&quot;mod">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mycat的14中分片规则">
+<meta property="og:url" content="https://zhuansunpengcheng.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYCAT/mycat%E7%9A%8414%E4%B8%AD%E5%88%86%E7%89%87%E8%A7%84%E5%88%99/index.html">
+<meta property="og:site_name" content="张三的个人电脑">
+<meta property="og:description" content="mycat的14中分片规则参考文章https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;359262439 环境准备 mycat 有 三个实例（三个分片）  创建一个数据库：partition_db   create database partition_db DEFAULT CHARACTER SET utf8mb4;    分片规则1、取模分片&lt;tableRule name&#x3D;&quot;mod">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://smms.app/image/l9TKFCEASqHPMhg">
+<meta property="article:published_time" content="2022-10-31T10:57:46.443Z">
+<meta property="article:modified_time" content="2022-10-31T10:57:46.443Z">
+<meta property="article:author" content="zs">
+<meta property="article:tag" content="mycat">
+<meta property="article:tag" content="分片">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://smms.app/image/l9TKFCEASqHPMhg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhuansunpengcheng.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYCAT/mycat%E7%9A%8414%E4%B8%AD%E5%88%86%E7%89%87%E8%A7%84%E5%88%99/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'mycat的14中分片规则',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-10-31 10:57:46'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="张三的个人电脑" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">37</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">53</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">21</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://smms.app/image/l9TKFCEASqHPMhg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">张三的个人电脑</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">mycat的14中分片规则</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-10-31T10:57:46.443Z" title="发表于 2022-10-31 10:57:46">2022-10-31</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-10-31T10:57:46.443Z" title="更新于 2022-10-31 10:57:46">2022-10-31</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYCAT/">MYCAT</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="mycat的14中分片规则"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="mycat的14中分片规则"><a href="#mycat的14中分片规则" class="headerlink" title="mycat的14中分片规则"></a>mycat的14中分片规则</h1><h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/359262439">https://zhuanlan.zhihu.com/p/359262439</a></p>
+<h1 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h1><ul>
+<li><p>mycat 有 三个实例（三个分片）</p>
+</li>
+<li><p>创建一个数据库：partition_db</p>
+</li>
+</ul>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">create</span> <span class="token keyword">database</span> partition_db <span class="token keyword">DEFAULT</span> <span class="token keyword">CHARACTER</span> <span class="token keyword">SET</span> utf8mb4<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+
+<h1 id="分片规则"><a href="#分片规则" class="headerlink" title="分片规则"></a>分片规则</h1><h2 id="1、取模分片"><a href="#1、取模分片" class="headerlink" title="1、取模分片"></a>1、取模分片</h2><pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>mod-long<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>id<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>mod-long<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>mod-long<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionByMod<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>count<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>3<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>配置说明：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>count</td>
+<td>数据节点的数量</td>
+</tr>
+</tbody></table>
+<p>效果：</p>
+<p>用主键ID对3取模，数据会均匀的分散在3个分片上；</p>
+<p>问题：如果count配置了2，是什么情况？</p>
+<h2 id="2、范围分片"><a href="#2、范围分片" class="headerlink" title="2、范围分片"></a>2、范围分片</h2><p>根据指定的字段及其配置的范围与数据节点的对应情况， 来决定该数据属于哪一个分片 ， 配置如下：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>auto-sharding-long<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>id<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>rang-long<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>rang-long<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.AutoPartitionByLong<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>mapFile<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>autopartition-long.txt<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>defaultNode<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>autopartition-long.txt 配置如下：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"># range start-end ,data node index 
+# K=1000,M=10000. 
+0-500M=0 
+500M-1000M=1 
+1000M-1500M=2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>含义为 ： </p>
+<ul>
+<li><p>0 - 500 万之间的值 ， 存储在0号数据节点 ； </p>
+</li>
+<li><p>500万 - 1000万之间的数据存储在1号数据节点 ；</p>
+</li>
+<li><p>1000万 - 1500 万的数据节点存储在2号节点 ；</p>
+</li>
+</ul>
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>mapFile</td>
+<td>对应的外部配置文件</td>
+</tr>
+<tr>
+<td>type</td>
+<td>默认值为0 ; 0 表示Integer , 1 表示String</td>
+</tr>
+<tr>
+<td>defaultNode</td>
+<td>默认节点 默认节点的所用:枚举分片时,如果碰到不识别的枚举值, 就让它路由到默认节点 ; 如果没有默认值,碰到不识别的则报错 。</td>
+</tr>
+</tbody></table>
+<h2 id="3、枚举分片"><a href="#3、枚举分片" class="headerlink" title="3、枚举分片"></a>3、枚举分片</h2><p>通过在配置文件中配置可能的枚举值, 指定数据分布到不同数据节点上, 本规则适用于按照<strong>省份或状态拆分数据</strong>等业务。</p>
+<p>配置如下:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-intfile<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>status<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>hash-int<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>hash-int<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionByFileMap<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>mapFile<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>partition-hash-int.txt<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>type<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>defaultNode<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>partition-hash-int.txt，内容如下 :</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">待处理=0 
+处理中=1 
+已完成=2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>含义为：</p>
+<ul>
+<li><p>status&#x3D;待处理的落在0号分片</p>
+</li>
+<li><p>status&#x3D;处理中的落在1号分片</p>
+</li>
+<li><p>status&#x3D;已完成的落在2号分片</p>
+</li>
+</ul>
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>mapFile</td>
+<td>对应的外部配置文件</td>
+</tr>
+<tr>
+<td>type</td>
+<td>默认值为0 ; 0 表示Integer , 1 表示String</td>
+</tr>
+<tr>
+<td>defaultNode</td>
+<td>默认节点 ; 小于0 标识不设置默认节点 , 大于等于0代表设置默认节点 ; 默认节点的所用:枚举分片时,如果碰到不识别的枚举值, 就让它路由到默认节点 ; 如果没有默认值,碰到不识别的则报错 。</td>
+</tr>
+</tbody></table>
+<h2 id="4、范围取模"><a href="#4、范围取模" class="headerlink" title="4、范围取模"></a>4、范围取模</h2><p>该算法为先进行范围分片, 计算出分片组 , 再进行组内求模。</p>
+<p>配置如下</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>auto-sharding-rang-mod<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>id<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>rang-mod<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>rang-mod<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionByRangeMod<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>mapFile<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>autopartition-range-mod.txt<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>defaultNode<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>autopartition-range-mod.txt配置格式</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">#range start-end , data node group size 
+0-500M=1 
+500M-2000M=2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>含义为：</p>
+<ul>
+<li><p>0 - 500 万之间的值 ， 存储在一个分片节点上；</p>
+</li>
+<li><p>500万到2000万之间的值，存储在两个分片节点上；</p>
+</li>
+<li><p>然后拿到分片节点数量之后，在对分片节点数量进行取模，得到具体的存储分片；</p>
+</li>
+</ul>
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段名</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>mapFile</td>
+<td>对应的外部配置文件</td>
+</tr>
+<tr>
+<td>defaultNode</td>
+<td>默认节点 ; 未包含以上规则的数据存储在defaultNode节点中, 节点从0开始</td>
+</tr>
+</tbody></table>
+<p><strong>优点</strong>： 综合了范围分片和求模分片的优点。 分片组内使用求模可以保证组内的数据分布比较均匀，分片组之间采用范围分片可以兼顾范围分片的特点。</p>
+<p><strong>缺点</strong>： 在数据范围时固定值（非递增值）时，存在不方便扩展的情况，例如将 dataNode Group size 从 2 扩展为 4 时，需要进行数据迁移才能完成 ；</p>
+<h2 id="5、固定分片hash"><a href="#5、固定分片hash" class="headerlink" title="5、固定分片hash"></a>5、固定分片hash</h2><p>该算法类似于十进制的求模运算，但是为二进制的操作，例如，取 id 的二进制低 10 位 与 1111111111 进行<strong>位 &amp; 运算</strong>。</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">最小值的情况：
+    0 0 0 0 0 0 0 0 0 0 
+&amp;   1 1 1 1 1 1 1 1 1 1 
+---------------------------------
+    0 0 0 0 0 0 0 0 0 0       =   0
+
+最大值的情况
+    1 1 1 1 1 1 1 1 1 1 
+&amp;   1 1 1 1 1 1 1 1 1 1 
+----------------------------------
+    1 1 1 1 1 1 1 1 1 1       =   2^10-1 = 1023<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>配置如下 ：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-long-hash<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>id<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>func1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>func1<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>org.opencloudb.route.function.PartitionByLong<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>partitionCount<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>2,1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>partitionLength<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>256,512<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>含义是：</p>
+<ul>
+<li><p>在示例中配置的分片策略，希望将数据水平分成3份，前两份各占 25%，第三份占 50%。</p>
+</li>
+<li><p>示例数据：</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>id开始</th>
+<th>id结束</th>
+<th>数据节点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>255</td>
+<td>dn1</td>
+</tr>
+<tr>
+<td>256</td>
+<td>511</td>
+<td>dn1</td>
+</tr>
+<tr>
+<td>512</td>
+<td>1023</td>
+<td>dn2</td>
+</tr>
+<tr>
+<td>1024</td>
+<td>1024+255</td>
+<td>dn1</td>
+</tr>
+<tr>
+<td>1024+256</td>
+<td>1024+511</td>
+<td>dn2</td>
+</tr>
+<tr>
+<td>1024+512</td>
+<td>1024+1023</td>
+<td>dn3</td>
+</tr>
+</tbody></table>
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段名</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>partitionCount</td>
+<td>分片个数列表，是一个数组</td>
+</tr>
+<tr>
+<td>partitionLength</td>
+<td>分片范围列表，是一个数组</td>
+</tr>
+</tbody></table>
+<p>约束 :</p>
+<ul>
+<li><p>分片长度 : 默认最大2^10 , 为 1024 ;</p>
+</li>
+<li><p>partitionCount, partitionLength的数组长度必须是一致的 ;</p>
+</li>
+<li><p>1024 &#x3D; sum((count[i]*length[i]))</p>
+</li>
+</ul>
+<p>优点： 这种策略比较灵活，可以均匀分配也可以非均匀分配，各节点的分配比例和容量大小由 partitionCount 和 partitionLength 两个参数决定</p>
+<p>缺点：和取模分片类似。</p>
+<p>看不懂，看这个：<a target="_blank" rel="noopener" href="https://blog.csdn.net/zhou920786312/article/details/122427650">https://blog.csdn.net/zhou920786312/article/details/122427650</a></p>
+<h2 id="6、取模范围"><a href="#6、取模范围" class="headerlink" title="6、取模范围"></a>6、取模范围</h2><p>该算法先进行取模，然后根据取模值所属范围进行分片。</p>
+<p><strong>注意 : 取模范围算法只能针对于数字类型进行取模运算 ; 如果是字符串则无法进行取模分片 ;</strong></p>
+<p>配置如下:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-pattern<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>id<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>sharding-by-pattern<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-pattern<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionByPattern<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>mapFile<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>partition-pattern.txt<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>defaultNode<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>patternValue<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>96<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>partition-pattern.txt配置如下:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">0-32=0 
+33-64=1 
+65-96=2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>含义是：</p>
+<ul>
+<li><p>在mapFile配置文件中</p>
+</li>
+<li><p><strong>1-32即代表id%96后的分布情况</strong>。</p>
+</li>
+<li><p>如果在1-32, 则在分片0上 ; </p>
+</li>
+<li><p>如果在33-64, 则在分片1上 ; </p>
+</li>
+<li><p>如果在65-96, 则在分片2上。</p>
+</li>
+</ul>
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>mapFile</td>
+<td>对应的外部配置文件</td>
+</tr>
+<tr>
+<td>defaultNode</td>
+<td>默认节点 ; 如果id不是数字, 无法求模, 将分配在defaultNode上</td>
+</tr>
+<tr>
+<td>patternValue</td>
+<td>求模基数</td>
+</tr>
+</tbody></table>
+<p><strong>优点</strong>：可以自主决定取模后数据的节点分布</p>
+<p><strong>缺点</strong>：dataNode 划分节点是事先建好的，需要扩展时比较麻烦。</p>
+<h2 id="7、字符串hash求模范围"><a href="#7、字符串hash求模范围" class="headerlink" title="7、字符串hash求模范围"></a>7、字符串hash求模范围</h2><p>与取模范围算法类似, 该算法支持<strong>数值</strong>、<strong>符号</strong>、<strong>字母取模</strong>，首先截取长度为 prefixLength 的子串，在对子串中每一个字符的 <strong>ASCII 码</strong>求和，然后对求和值进行<strong>取模运算</strong>（sum%patternValue），就可以计算出子串的分片数。</p>
+<p>配置如下：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-prefixpattern<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>id<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>sharding-by-prefixpattern<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-prefixpattern<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionByPrefixPattern<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>mapFile<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>partition-prefixpattern.txt<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>prefixLength<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>5<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>patternValue<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>96<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>partition-prefixpattern.txt配置如下:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"># range start-end ,data node index 
+# ASCII 
+# 48-57=0-9 
+# 64、65-90=@、A-Z 
+# 97-122=a-z 
+###### first host configuration 
+0-32=0 
+33-64=1 
+65-96=2<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>含义是：</p>
+<ul>
+<li><p>对id先截取prefixLength 长度的数据</p>
+</li>
+<li><p>然后对截取后的数据的 每一位 获取ASCII 码</p>
+</li>
+<li><p>然后把所有的ASCII码求和</p>
+</li>
+<li><p>求和之后对patternValue 取模</p>
+</li>
+<li><p>然后对取模的结果在 partition-prefixpattern.txt 中进行范围的匹配</p>
+</li>
+</ul>
+<p>比如：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">字符串 : 
+    gf89f9a 
+
+截取字符串的前5位进行ASCII的累加运算 : 
+    g - 103 
+    f - 102 
+    8 - 56 
+    9 - 57 
+    f - 102 
+    
+    sum求和 : 103 + 102 + + 56 + 57 + 102 = 420 
+    求模 : 420 % 96 = 36<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>mapFile</td>
+<td>对应的外部配置文件</td>
+</tr>
+<tr>
+<td>prefixLength</td>
+<td>截取的位数; 将该字段获取前prefixLength位所有ASCII码的和, 进行求模sum%patternValue ,获取的值，在通配范围内的即分片数 ;</td>
+</tr>
+<tr>
+<td>patternValue</td>
+<td>求模基数</td>
+</tr>
+</tbody></table>
+<p><strong>优点</strong>：可以自主决定取模后数据的节点分布</p>
+<p><strong>缺点</strong>：｀dataNode｀ 划分节点是事先建好的，需要扩展时比较麻烦。</p>
+<h2 id="8、应用代码指定"><a href="#8、应用代码指定" class="headerlink" title="8、应用代码指定"></a>8、应用代码指定</h2><p>由运行阶段由应用自主决定路由到那个分片 , 直接根据字符子串（必须是数字）计算分片号 , 配置如下 :</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-substring<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>id<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>sharding-by-substring<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-substring<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionDirectBySubString<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>startIndex<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> <span class="token comment">&lt;!-- zero-based --></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>size<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>partitionCount<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>3<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>defaultPartition<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>含义是：</p>
+<ul>
+<li><p>对id从startIndex 开始截取，截取 size 个长度，比如id&#x3D;756432，截取之后就是75,</p>
+</li>
+<li><p>然后75不在partitionCount 中，75 &gt;3了，所以放在默认分片 defaultPartition 0中</p>
+</li>
+</ul>
+<p>配置说明</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>startIndex</td>
+<td>字符子串起始索引</td>
+</tr>
+<tr>
+<td>size</td>
+<td>字符长度</td>
+</tr>
+<tr>
+<td>patternValue</td>
+<td>分区（分片）数量</td>
+</tr>
+<tr>
+<td>defaultPartition</td>
+<td>默认分片，当截取之后的获得分片号不在分片数量内时，使用默认分片</td>
+</tr>
+</tbody></table>
+<h2 id="9、字符串hash解析"><a href="#9、字符串hash解析" class="headerlink" title="??? 9、字符串hash解析"></a>??? 9、字符串hash解析</h2><p>取字符串中的指定位置的子字符串, 进行hash算法， 算出分片 ， </p>
+<p>配置如下</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-stringhash<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>user_id<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>sharding-by-stringhash<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-stringhash<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionByString<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>partitionLength<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>512<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> <span class="token comment">&lt;!-- zero-based --></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>partitionCount<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>hashSlice<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>0:2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>含义是：</p>
+<ul>
+<li>对一个字符串，截取（0,2）的长度</li>
+<li>对截取后的字符串，进行hash</li>
+<li>hash后的结果，按照partitionLength和partitionCount进行分片</li>
+</ul>
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>partitionLength</td>
+<td>hash取模基数； length * count &#x3D; 1024 （非出性能考虑）</td>
+</tr>
+<tr>
+<td>partitionCount</td>
+<td>分区数</td>
+</tr>
+<tr>
+<td>hashSlice</td>
+<td>hash运算符，根据字符串的hash运算；<br/> 0 代表str.length()<br/>-1 代表str.length() - 1<br/>大于0 代表数字自身<br/>可以理解为：substring(start,end)</td>
+</tr>
+</tbody></table>
+<h2 id="10、一致性hash"><a href="#10、一致性hash" class="headerlink" title="10、一致性hash"></a>10、一致性hash</h2><h2 id="11、日期分片"><a href="#11、日期分片" class="headerlink" title="11、日期分片"></a>11、日期分片</h2><p>按照日期来分片</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-date<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>create_time<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>sharding-by-date<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-date<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionByDate<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>dateFormat<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>yyyy-MM-dd<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sBeginDate<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>2020-01-01<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sEndDate<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>2020-12-31<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sPartionDay<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>10<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>dateFormat</td>
+<td>日期格式</td>
+</tr>
+<tr>
+<td>sBeginDate</td>
+<td>开始日期</td>
+</tr>
+<tr>
+<td>sEndDate</td>
+<td>结束日期，如果配置了结束日期，则表示数据到达了这个日期所在的分片之后，会重头开始再次插入</td>
+</tr>
+<tr>
+<td>sPartionDay</td>
+<td>分区天数，默认是10，表示10天的数据存在一个分区</td>
+</tr>
+</tbody></table>
+<p>注意：配置规则的表的dataNode的分片，必须和分片规则数量一致</p>
+<p>例如 2020-01-01 到 2020-12-31 ，每10天一个分片，一共需要37个分片。</p>
+<h2 id="12、单月小时"><a href="#12、单月小时" class="headerlink" title="12、单月小时"></a>12、单月小时</h2><p>单月内按照小时拆分, 最小粒度是小时 , 一天最多可以有24个分片, 最小1个分片, 下个月从头开始循环, 每个月末需要手动清理数据。</p>
+<p>配置如下 ：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-hour<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>create_time<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>sharding-by-hour<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-hour<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.LatestMonthPartion<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>splitOneDay<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>24<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>splitOneDay</td>
+<td>一天切分的分片数</td>
+</tr>
+</tbody></table>
+<h2 id="13、自然月分片"><a href="#13、自然月分片" class="headerlink" title="13、自然月分片"></a>13、自然月分片</h2><p>使用场景为按照月份列分区, 每个自然月为一个分片。</p>
+<p> 配置如下:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-month<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>create_time<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>sharding-by-month<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sharding-by-month<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionByMonth<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>dateFormat<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>yyyy-MM-dd<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sBeginDate<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>2020-01-01<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sEndDate<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>2020-12-31<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>dateFormat</td>
+<td>日期格式</td>
+</tr>
+<tr>
+<td>sBeginDate</td>
+<td>开始日期</td>
+</tr>
+<tr>
+<td>sEndDate</td>
+<td>结束日期，如果配置了结束日期，当到达这个月份之后，会重复从开始分片插入</td>
+</tr>
+</tbody></table>
+<h2 id="14、日期范围hash"><a href="#14、日期范围hash" class="headerlink" title="14、日期范围hash"></a>14、日期范围hash</h2><p>其思想和范围取模分片一样，先根据日期进行范围分片求出分片组，再根据时间hash使得短期内数据分布的更均匀 ;</p>
+<p>配置如下：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tableRule</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>range-date-hash<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>rule</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>columns</span><span class="token punctuation">></span></span>create_time<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>columns</span><span class="token punctuation">></span></span> 
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>algorithm</span><span class="token punctuation">></span></span>range-date-hash<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>algorithm</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>rule</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tableRule</span><span class="token punctuation">></span></span> 
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>function</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>range-date-hash<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>io.mycat.route.function.PartitionByRangeDateHash<span class="token punctuation">"</span></span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>dateFormat<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>yyyy-MM-dd HH:mm:ss<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sBeginDate<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>2020-01-01 00:00:00<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>groupPartionSize<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>6<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sPartionDay<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>10<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>property</span><span class="token punctuation">></span></span> 
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>function</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>配置说明:</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>columns</td>
+<td>标识将要分片的表字段</td>
+</tr>
+<tr>
+<td>algorithm</td>
+<td>指定分片函数与function的对应关系</td>
+</tr>
+<tr>
+<td>class</td>
+<td>指定该分片算法对应的类</td>
+</tr>
+<tr>
+<td>dateFormat</td>
+<td>日期格式，符合java标准</td>
+</tr>
+<tr>
+<td>sBeginDate</td>
+<td>开始日期，与 dateFormat 指定的格式一致</td>
+</tr>
+<tr>
+<td>groupPartionSize</td>
+<td>每组的分片数量</td>
+</tr>
+<tr>
+<td>sPartionDay</td>
+<td>代表多少天为一组</td>
+</tr>
+</tbody></table>
+<p>优点 : 可以避免扩容时的数据迁移，又可以一定程度上避免范围分片的热点问题</p>
+<p>注意 : 要求日期格式尽量精确些，不然达不到局部均匀的目的</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/mycat/">mycat</a><a class="post-meta__tags" href="/tags/%E5%88%86%E7%89%87/">分片</a></div><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">zs</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">37</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">53</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">21</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#mycat%E7%9A%8414%E4%B8%AD%E5%88%86%E7%89%87%E8%A7%84%E5%88%99"><span class="toc-number">1.</span> <span class="toc-text">mycat的14中分片规则</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="toc-number">2.</span> <span class="toc-text">参考文章</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="toc-number">3.</span> <span class="toc-text">环境准备</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E7%89%87%E8%A7%84%E5%88%99"><span class="toc-number">4.</span> <span class="toc-text">分片规则</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E5%8F%96%E6%A8%A1%E5%88%86%E7%89%87"><span class="toc-number">4.1.</span> <span class="toc-text">1、取模分片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E8%8C%83%E5%9B%B4%E5%88%86%E7%89%87"><span class="toc-number">4.2.</span> <span class="toc-text">2、范围分片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81%E6%9E%9A%E4%B8%BE%E5%88%86%E7%89%87"><span class="toc-number">4.3.</span> <span class="toc-text">3、枚举分片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%E3%80%81%E8%8C%83%E5%9B%B4%E5%8F%96%E6%A8%A1"><span class="toc-number">4.4.</span> <span class="toc-text">4、范围取模</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%E3%80%81%E5%9B%BA%E5%AE%9A%E5%88%86%E7%89%87hash"><span class="toc-number">4.5.</span> <span class="toc-text">5、固定分片hash</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6%E3%80%81%E5%8F%96%E6%A8%A1%E8%8C%83%E5%9B%B4"><span class="toc-number">4.6.</span> <span class="toc-text">6、取模范围</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7%E3%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2hash%E6%B1%82%E6%A8%A1%E8%8C%83%E5%9B%B4"><span class="toc-number">4.7.</span> <span class="toc-text">7、字符串hash求模范围</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8%E3%80%81%E5%BA%94%E7%94%A8%E4%BB%A3%E7%A0%81%E6%8C%87%E5%AE%9A"><span class="toc-number">4.8.</span> <span class="toc-text">8、应用代码指定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9%E3%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2hash%E8%A7%A3%E6%9E%90"><span class="toc-number">4.9.</span> <span class="toc-text">??? 9、字符串hash解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10%E3%80%81%E4%B8%80%E8%87%B4%E6%80%A7hash"><span class="toc-number">4.10.</span> <span class="toc-text">10、一致性hash</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11%E3%80%81%E6%97%A5%E6%9C%9F%E5%88%86%E7%89%87"><span class="toc-number">4.11.</span> <span class="toc-text">11、日期分片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12%E3%80%81%E5%8D%95%E6%9C%88%E5%B0%8F%E6%97%B6"><span class="toc-number">4.12.</span> <span class="toc-text">12、单月小时</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13%E3%80%81%E8%87%AA%E7%84%B6%E6%9C%88%E5%88%86%E7%89%87"><span class="toc-number">4.13.</span> <span class="toc-text">13、自然月分片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14%E3%80%81%E6%97%A5%E6%9C%9F%E8%8C%83%E5%9B%B4hash"><span class="toc-number">4.14.</span> <span class="toc-text">14、日期范围hash</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By zs</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/8.13.8/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
