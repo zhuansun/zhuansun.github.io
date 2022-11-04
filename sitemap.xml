@@ -732,6 +732,13 @@
   </url>
   
   <url>
+    <loc>https://zhuansunpengcheng.gitee.io/tags/%E4%B9%B1%E7%A0%81/</loc>
+    <lastmod>2022-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://zhuansunpengcheng.gitee.io/tags/kafka/</loc>
     <lastmod>2022-11-04</lastmod>
     <changefreq>weekly</changefreq>
@@ -761,13 +768,6 @@
   
   <url>
     <loc>https://zhuansunpengcheng.gitee.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/</loc>
-    <lastmod>2022-11-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://zhuansunpengcheng.gitee.io/tags/%E4%B9%B1%E7%A0%81/</loc>
     <lastmod>2022-11-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -853,7 +853,7 @@
   </url>
   
   <url>
-    <loc>https://zhuansunpengcheng.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/</loc>
+    <loc>https://zhuansunpengcheng.gitee.io/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/</loc>
     <lastmod>2022-11-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -861,13 +861,6 @@
   
   <url>
     <loc>https://zhuansunpengcheng.gitee.io/categories/TOOLS/idea/</loc>
-    <lastmod>2022-11-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://zhuansunpengcheng.gitee.io/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/</loc>
     <lastmod>2022-11-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -909,14 +902,21 @@
   </url>
   
   <url>
-    <loc>https://zhuansunpengcheng.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/KAFKA/</loc>
+    <loc>https://zhuansunpengcheng.gitee.io/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/DOCKER/</loc>
     <lastmod>2022-11-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://zhuansunpengcheng.gitee.io/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/DOCKER/</loc>
+    <loc>https://zhuansunpengcheng.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/</loc>
+    <lastmod>2022-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://zhuansunpengcheng.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/KAFKA/</loc>
     <lastmod>2022-11-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
