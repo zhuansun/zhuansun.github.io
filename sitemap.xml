@@ -191,7 +191,7 @@
   </url>
   
   <url>
-    <loc>https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E6%8E%92%E5%BA%8F%E5%AD%97%E6%AE%B5%E7%9B%B8%E5%90%8C%E5%AF%BC%E8%87%B4%E7%BB%93%E6%9E%9C%E4%B8%8D%E4%B8%80%E8%87%B4/</loc>
+    <loc>https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%AB%99/</loc>
     
     <lastmod>2022-10-31</lastmod>
     
@@ -200,7 +200,7 @@
   </url>
   
   <url>
-    <loc>https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%AB%99/</loc>
+    <loc>https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E6%8E%92%E5%BA%8F%E5%AD%97%E6%AE%B5%E7%9B%B8%E5%90%8C%E5%AF%BC%E8%87%B4%E7%BB%93%E6%9E%9C%E4%B8%8D%E4%B8%80%E8%87%B4/</loc>
     
     <lastmod>2022-10-31</lastmod>
     
@@ -741,6 +741,13 @@
   </url>
   
   <url>
+    <loc>https://zspcer.gitee.io/tags/%E4%B9%B1%E7%A0%81/</loc>
+    <lastmod>2022-11-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://zspcer.gitee.io/tags/kafka/</loc>
     <lastmod>2022-11-10</lastmod>
     <changefreq>weekly</changefreq>
@@ -770,13 +777,6 @@
   
   <url>
     <loc>https://zspcer.gitee.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/</loc>
-    <lastmod>2022-11-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://zspcer.gitee.io/tags/%E4%B9%B1%E7%A0%81/</loc>
     <lastmod>2022-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -904,13 +904,6 @@
   </url>
   
   <url>
-    <loc>https://zspcer.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/</loc>
-    <lastmod>2022-11-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://zspcer.gitee.io/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/</loc>
     <lastmod>2022-11-10</lastmod>
     <changefreq>weekly</changefreq>
@@ -918,7 +911,7 @@
   </url>
   
   <url>
-    <loc>https://zspcer.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/KAFKA/</loc>
+    <loc>https://zspcer.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/</loc>
     <lastmod>2022-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -926,6 +919,13 @@
   
   <url>
     <loc>https://zspcer.gitee.io/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/DOCKER/</loc>
+    <lastmod>2022-11-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://zspcer.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/KAFKA/</loc>
     <lastmod>2022-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

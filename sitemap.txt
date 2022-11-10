@@ -19,8 +19,8 @@ https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/ORACLE/oracle%E5%8
 https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%BB%99%E5%A4%A7%E8%A1%A8%E5%8A%A0%E7%B4%A2%E5%BC%95/
 https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/%E5%8D%95%E7%B2%BE%E5%BA%A6%E4%B8%8E%E5%8F%8C%E7%B2%BE%E5%BA%A6%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB/
 https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E6%95%B0%E6%8D%AE%E5%AE%BD%E5%BA%A6%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%95%BF%E5%BA%A6/
-https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E6%8E%92%E5%BA%8F%E5%AD%97%E6%AE%B5%E7%9B%B8%E5%90%8C%E5%AF%BC%E8%87%B4%E7%BB%93%E6%9E%9C%E4%B8%8D%E4%B8%80%E8%87%B4/
 https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%AB%99/
+https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E6%8E%92%E5%BA%8F%E5%AD%97%E6%AE%B5%E7%9B%B8%E5%90%8C%E5%AF%BC%E8%87%B4%E7%BB%93%E6%9E%9C%E4%B8%8D%E4%B8%80%E8%87%B4/
 https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E5%BB%BA%E8%A1%A8%E7%9A%84utf8%E5%92%8Cutf8mb4%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB/
 https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E4%B8%AD+%E5%8F%B7%E7%9A%84%E4%BD%9C%E7%94%A8/
 https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E4%B8%AD%E7%9A%84%E4%BA%A4%E9%9B%86%E5%B7%AE%E9%9B%86%E5%B9%B6%E9%9B%86/
@@ -91,12 +91,12 @@ https://zspcer.gitee.io/tags/redolog/
 https://zspcer.gitee.io/tags/%E7%B4%A2%E5%BC%95/
 https://zspcer.gitee.io/tags/oracle/
 https://zspcer.gitee.io/tags/%E8%A1%A8%E7%BB%93%E6%9E%84/
+https://zspcer.gitee.io/tags/%E4%B9%B1%E7%A0%81/
 https://zspcer.gitee.io/tags/kafka/
 https://zspcer.gitee.io/tags/%E7%94%9F%E4%BA%A7%E8%80%85/
 https://zspcer.gitee.io/tags/%E6%B6%88%E8%B4%B9%E8%80%85/
 https://zspcer.gitee.io/tags/%E6%B6%88%E6%81%AF/
 https://zspcer.gitee.io/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/
-https://zspcer.gitee.io/tags/%E4%B9%B1%E7%A0%81/
 https://zspcer.gitee.io/categories/NAS/
 https://zspcer.gitee.io/categories/PROJECT/
 https://zspcer.gitee.io/categories/WORKER/
@@ -114,7 +114,7 @@ https://zspcer.gitee.io/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MONGO/
 https://zspcer.gitee.io/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYCAT/
 https://zspcer.gitee.io/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/
 https://zspcer.gitee.io/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/ORACLE/
-https://zspcer.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/
 https://zspcer.gitee.io/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/
-https://zspcer.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/KAFKA/
+https://zspcer.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/
 https://zspcer.gitee.io/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/DOCKER/
+https://zspcer.gitee.io/categories/JAVA/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/KAFKA/
