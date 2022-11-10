@@ -1,19 +1,19 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>mysql的主备从入门到入土 | 张三的个人电脑</title><meta name="author" content="zs"><meta name="copyright" content="zs"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="mysql的主备从入门到入土 binlog 可以用来归档，也可以用来做主备同步，那么具体是怎么做主备同步的呢？为什么备库执行了 binlog 就可以跟主库保持一致了呢？ 什么是主备？传统的单机架构在目前的应用场景中不足以应对，后来才衍生出高可用，解决单点问题。mysql也不例外 主备一致（主备同步）的流程是什么样的flowchart LR 开始((开始))--&gt;undologmem[undolog">
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>mysql的主备从入门到入土 | 张三的个人电脑</title><meta name="author" content="zs"><meta name="copyright" content="zs"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="mysql的主备从入门到入土 binlog 可以用来归档，也可以用来做主备同步，那么具体是怎么做主备同步的呢？为什么备库执行了 binlog 就可以跟主库保持一致了呢？ 什么是主备？传统的单机架构在目前的应用场景中不足以应对，后来才衍生出高可用，解决单点问题。mysql也不例外 主备同步（主备一致）的流程flowchart LR 开始((开始))--&gt;undologmem[undologmem]">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql的主备从入门到入土">
-<meta property="og:url" content="https://zhuansunpengcheng.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%B8%BB%E5%A4%87%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/index.html">
+<meta property="og:url" content="https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%B8%BB%E5%A4%87%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/index.html">
 <meta property="og:site_name" content="张三的个人电脑">
-<meta property="og:description" content="mysql的主备从入门到入土 binlog 可以用来归档，也可以用来做主备同步，那么具体是怎么做主备同步的呢？为什么备库执行了 binlog 就可以跟主库保持一致了呢？ 什么是主备？传统的单机架构在目前的应用场景中不足以应对，后来才衍生出高可用，解决单点问题。mysql也不例外 主备一致（主备同步）的流程是什么样的flowchart LR 开始((开始))--&gt;undologmem[undolog">
+<meta property="og:description" content="mysql的主备从入门到入土 binlog 可以用来归档，也可以用来做主备同步，那么具体是怎么做主备同步的呢？为什么备库执行了 binlog 就可以跟主库保持一致了呢？ 什么是主备？传统的单机架构在目前的应用场景中不足以应对，后来才衍生出高可用，解决单点问题。mysql也不例外 主备同步（主备一致）的流程flowchart LR 开始((开始))--&gt;undologmem[undologmem]">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s2.loli.net/2022/10/31/o6sHQh8AU2cSCMV.jpg">
-<meta property="article:published_time" content="2022-11-07T14:38:43.180Z">
-<meta property="article:modified_time" content="2022-11-07T14:38:43.180Z">
+<meta property="og:image" content="https://s2.loli.net/2022/10/31/arBIhfY23pSjex7.jpg">
+<meta property="article:published_time" content="2022-11-10T12:15:37.597Z">
+<meta property="article:modified_time" content="2022-11-10T12:15:37.597Z">
 <meta property="article:author" content="zs">
 <meta property="article:tag" content="mysql">
 <meta property="article:tag" content="主备一致">
 <meta property="article:tag" content="高可用">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s2.loli.net/2022/10/31/o6sHQh8AU2cSCMV.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhuansunpengcheng.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%B8%BB%E5%A4%87%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+<meta name="twitter:image" content="https://s2.loli.net/2022/10/31/arBIhfY23pSjex7.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%B8%BB%E5%A4%87%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
   root: '/',
   algolia: undefined,
   localSearch: undefined,
@@ -55,7 +55,7 @@
   isHome: false,
   isHighlightShrink: false,
   isToc: true,
-  postUpdate: '2022-11-07 14:38:43'
+  postUpdate: '2022-11-10 12:15:37'
 }</script><noscript><style type="text/css">
   #nav {
     opacity: 1
@@ -145,10 +145,10 @@
     }
     detectApple()
     })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="张三的个人电脑" type="application/atom+xml">
-</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">38</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">55</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">21</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s2.loli.net/2022/10/31/o6sHQh8AU2cSCMV.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">张三的个人电脑</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">mysql的主备从入门到入土</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-11-07T14:38:43.180Z" title="发表于 2022-11-07 14:38:43">2022-11-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-11-07T14:38:43.180Z" title="更新于 2022-11-07 14:38:43">2022-11-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="mysql的主备从入门到入土"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="mysql的主备从入门到入土"><a href="#mysql的主备从入门到入土" class="headerlink" title="mysql的主备从入门到入土"></a>mysql的主备从入门到入土</h1><hr>
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">39</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">55</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">21</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s2.loli.net/2022/10/31/arBIhfY23pSjex7.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">张三的个人电脑</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">mysql的主备从入门到入土</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-11-10T12:15:37.597Z" title="发表于 2022-11-10 12:15:37">2022-11-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-11-10T12:15:37.597Z" title="更新于 2022-11-10 12:15:37">2022-11-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="mysql的主备从入门到入土"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="mysql的主备从入门到入土"><a href="#mysql的主备从入门到入土" class="headerlink" title="mysql的主备从入门到入土"></a>mysql的主备从入门到入土</h1><hr>
 <p>binlog 可以用来归档，也可以用来做主备同步，那么具体是怎么做主备同步的呢？为什么备库执行了 binlog 就可以跟主库保持一致了呢？</p>
 <h2 id="什么是主备？"><a href="#什么是主备？" class="headerlink" title="什么是主备？"></a>什么是主备？</h2><p>传统的单机架构在目前的应用场景中不足以应对，后来才衍生出高可用，解决单点问题。mysql也不例外</p>
-<h2 id="主备一致（主备同步）的流程是什么样的"><a href="#主备一致（主备同步）的流程是什么样的" class="headerlink" title="主备一致（主备同步）的流程是什么样的"></a>主备一致（主备同步）的流程是什么样的</h2><pre class="mermaid">flowchart LR
+<h2 id="主备同步（主备一致）的流程"><a href="#主备同步（主备一致）的流程" class="headerlink" title="主备同步（主备一致）的流程"></a>主备同步（主备一致）的流程</h2><pre class="mermaid">flowchart LR
 开始((开始))-->undologmem[undolog<br/>mem]
 subgraph masterA
 undologmem-->datamem[data<br/>mem]
@@ -178,24 +178,22 @@ end</pre>
 <li>masterB备库，接收到masterA主库传过来的binlog，先暂存到本地文件，称为中转日志 relaylog</li>
 <li>在备库B中有一个线程sql_thread，会负责解析中转日志relaylog，并执行</li>
 </ul>
-<h2 id="高可用（主备切换）"><a href="#高可用（主备切换）" class="headerlink" title="高可用（主备切换）"></a>高可用（主备切换）</h2><h3 id="M-S结构的主备切换流程"><a href="#M-S结构的主备切换流程" class="headerlink" title="M-S结构的主备切换流程"></a>M-S结构的主备切换流程</h3><pre class="mermaid">flowchart TD
-subgraph M-S结构
+<h3 id="M-S结构的主备同步流程"><a href="#M-S结构的主备同步流程" class="headerlink" title="M-S结构的主备同步流程"></a>M-S结构的主备同步流程</h3><pre class="mermaid">flowchart TD
 client-->mysqlA
-mysqlA-->mysqlB\nreadonly
-end</pre>
+mysqlA-->mysqlB\nreadonly</pre>
 
 <p>M-S结构如图所示，mysqlB是只读的，作为A的备库。</p>
 <p>在主备切换的时候，会把client的请求转发到B，同时将mysqlA设置为readonly，设置为mysqlB的备库</p>
 <p>当然在主备切换的时候，会有问题，比如把client的请求转发到B，但是此时B是readonly的，写不进去数据怎么办？</p>
 <ul>
 <li>其实这是主备切换必须要面对的问题，后面会介绍到：可用性优先切换，和可靠性优先切换 两个方案。</li>
+<li>点此查看：<a href="#%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BC%98%E5%85%88%E7%AD%96%E7%95%A5">可靠性优先切换策略</a></li>
+<li>点此查看：<a href="#%E5%8F%AF%E7%94%A8%E6%80%A7%E4%BC%98%E5%85%88%E7%AD%96%E7%95%A5">可用性优先切换策略</a></li>
 </ul>
-<h3 id="双M结构的主备切换流程"><a href="#双M结构的主备切换流程" class="headerlink" title="双M结构的主备切换流程"></a>双M结构的主备切换流程</h3><pre class="mermaid">flowchart TD
-subgraph 双M
+<h3 id="双M结构的主备同步流程"><a href="#双M结构的主备同步流程" class="headerlink" title="双M结构的主备同步流程"></a>双M结构的主备同步流程</h3><pre class="mermaid">flowchart TD
 client-->mysqlA
 mysqlA-->mysqlB\nreadonly
-mysqlB\nreadonly-->mysqlA
-end</pre>
+mysqlB\nreadonly-->mysqlA</pre>
 
 
 
@@ -218,7 +216,7 @@ end</pre>
 <li>对于方案三，mysql采用的这个方式，mysql具体是怎么实现的呢？</li>
 </ul>
 <p>方案三的实现：</p>
-<p>在mysql的binlog中，我们知道有三种格式，但是一般我们都是ROW，在ROW格式下的binlog中，记录了一个叫做server id 的东西，如下（截取了部分binlog）：</p>
+<p>在mysql的binlog中，记录了一个叫做server id 的东西，如下（截取了部分binlog）：</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">C:<span class="token punctuation">\</span>Program Files<span class="token punctuation">\</span>MySQL<span class="token punctuation">\</span>MySQL Server <span class="token number">8.0</span><span class="token punctuation">\</span>bin<span class="token operator">></span>mysqlbinlog.exe  <span class="token parameter variable">-vv</span> <span class="token string">"C:\ProgramData\MySQL\MySQL Server 8.0\Data\SF0001408876LA-bin.000002"</span> --start-position<span class="token operator">=</span><span class="token number">5043</span> --stop-position<span class="token operator">=</span><span class="token number">5300</span>
 <span class="token comment"># at 5043</span>
 <span class="token comment">#221101 15:21:11 server id 1  end_log_pos 5122 CRC32 0x72f668e7         Anonymous_GTID  last_committed=17       sequence_number=18      rbr_only=yes    original_committed_timestamp=1667287271257812   immediate_commit_timestamp=1667287271257812  transaction_length=287</span>
@@ -226,13 +224,324 @@ SET @@<span class="token environment constant">SESSION</span>.GTID_NEXT<span cla
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>可以看到，是有 <code>server id 1 </code>这个内容的，就表示当前这个binlog是在server&#x3D;1这个库上产生的。</p>
+<p>ROW格式的是有serverid的，那么statement格式的有吗？当然也有。也得用mysqlbinlog工具查看才行，都可以看到<code>server id</code>这个字段</p>
+<pre class="line-numbers language-mysql" data-language="mysql"><code class="language-mysql">mysqlbinlog.exe  -vv &quot;C:\ProgramData\MySQL\MySQL Server 8.0\Data\SF0001408876LA-bin.000002&quot; --start-position&#x3D;7829 --stop-position&#x3D;8126<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>具体的binlog的格式可以参考：<code>mysql的日志从入门到入库-&gt;重要的日志模块(redolog和binlog)-&gt;binlog的结构</code> 这一篇文章</p>
 <ul>
 <li>规定两个库的 server id 必须不同，如果相同，则它们之间不能设定为主备关系；</li>
 <li>一个备库接到 binlog 并在重放的过程中，生成与原 binlog 的 server id 相同的新的 binlog；</li>
 <li>每个库在收到从自己的主库发过来的日志后，先判断 server id，如果跟自己的相同，表示这个日志是自己生成的，就直接丢弃这个日志。</li>
 </ul>
-</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/mysql/">mysql</a><a class="post-meta__tags" href="/tags/%E4%B8%BB%E5%A4%87%E4%B8%80%E8%87%B4/">主备一致</a><a class="post-meta__tags" href="/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/">高可用</a></div><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#mysql%E7%9A%84%E4%B8%BB%E5%A4%87%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F"><span class="toc-number">1.</span> <span class="toc-text">mysql的主备从入门到入土</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%BB%E5%A4%87%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是主备？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E5%A4%87%E4%B8%80%E8%87%B4%EF%BC%88%E4%B8%BB%E5%A4%87%E5%90%8C%E6%AD%A5%EF%BC%89%E7%9A%84%E6%B5%81%E7%A8%8B%E6%98%AF%E4%BB%80%E4%B9%88%E6%A0%B7%E7%9A%84"><span class="toc-number">1.2.</span> <span class="toc-text">主备一致（主备同步）的流程是什么样的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AB%98%E5%8F%AF%E7%94%A8%EF%BC%88%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">高可用（主备切换）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#M-S%E7%BB%93%E6%9E%84%E7%9A%84%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2%E6%B5%81%E7%A8%8B"><span class="toc-number">1.3.1.</span> <span class="toc-text">M-S结构的主备切换流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8CM%E7%BB%93%E6%9E%84%E7%9A%84%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2%E6%B5%81%E7%A8%8B"><span class="toc-number">1.3.2.</span> <span class="toc-text">双M结构的主备切换流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BE%AA%E7%8E%AF%E5%A4%8D%E5%88%B6%E9%97%AE%E9%A2%98"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">循环复制问题</span></a></li></ol></li></ol></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By zs</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/8.13.8/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+<h3 id="公司生产使用的是M-S结构"><a href="#公司生产使用的是M-S结构" class="headerlink" title="公司生产使用的是M-S结构"></a>公司生产使用的是M-S结构</h3><img src="mysql的主备从入门到入土.assets/image-20221108181935875.png" alt="image-20221108181935875" style="zoom:80%;" />
+
+
+
+<p>上面两个是生产环境（prod）的主节点和从节点；下面两个是容灾环境（dr）的主节点和从节点。</p>
+<h2 id="主备延迟和产生和避免"><a href="#主备延迟和产生和避免" class="headerlink" title="主备延迟和产生和避免"></a>主备延迟和产生和避免</h2><p>从主备同步可以看出来，备库从主库同步binlog，会有网络的问题，主库和备库机器性能问题等，都会导致备库执行binlog的速度比主库生成的速度慢，这就会导致主备延迟。</p>
+<p>但是呢，只要主库生成的binlog都被备库正常接收了，并且正确执行了，那么主库和备库之间，数据就会保持：最终一致性。</p>
+<p>但是仅仅有最终一致性，是不满足高可用的，因为还有之前说的主备延迟的问题。考虑这么一个场景：主库突然出问题了，要进行主备切换，然后现在备库还没有执行完主库的binlog，强行切换到备库，就会导致数据不一致的问题。</p>
+<h3 id="什么是主备延迟"><a href="#什么是主备延迟" class="headerlink" title="什么是主备延迟"></a>什么是主备延迟</h3><p>备库从主库同步binlog，会有网络的问题，主库和备库机器性能问题等，都会导致备库执行binlog的速度比主库生成的速度慢，这就会导致主备延迟。</p>
+<pre class="mermaid">flowchart LR
+主库A的binlog生成完成-->备库B接收到binlog-->备库B执行完成binlog</pre>
+
+<p>上面三个时间点，分别记为：T1，T2，T3，那么T3-T1就是主备延迟的时间。</p>
+<p>在mysql中，可以通过在备库上执行<code>show slave status</code>命令，在执行结果中有一个<code>seconds_behind_master</code>字段，表示备库落后于主库多少秒。</p>
+<h3 id="为什么会产生主备延迟"><a href="#为什么会产生主备延迟" class="headerlink" title="为什么会产生主备延迟"></a>为什么会产生主备延迟</h3><ul>
+<li><p>备库的机器性能比主库差</p>
+</li>
+<li><p>备库压力大</p>
+<ul>
+<li>我们一般把备库设置为readonly，并提供一些只读的查询，这些只读的查询，一般会比较复杂，会对数据库造成压力</li>
+<li>解决：可以采用一主多从的架构，分担读压力；还可以将数据分散到外部系统，比如大数据。</li>
+</ul>
+</li>
+<li><p>大事务</p>
+<ul>
+<li>因为主库上必须等事务执行完成才会写入 binlog，再传给备库。所以，如果一个主库上的语句执行 10 分钟，那这个事务很可能就会导致从库延迟 10 分钟。</li>
+<li>常见的大事务有哪些？<ul>
+<li>一次性地用 delete 语句删除太多数据。解决办法就是，少量多次删除。</li>
+<li>大表DDL：使用gh-ost方案。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>备库的并行复制能力</p>
+</li>
+</ul>
+<h3 id="备库的并行复制能力"><a href="#备库的并行复制能力" class="headerlink" title="备库的并行复制能力"></a>备库的并行复制能力</h3><p>通过以上产生主备延迟的原因，基本都有对应的解决办法，都是mysql也为了减少主备延迟的时间，做了很多努力。</p>
+<p>为什么要有多线程复制呢？这是因为单线程复制的能力全面低于多线程复制，对于更新压力较大的主库，备库是可能一直追不上主库的。从现象上看就是，备库上 seconds_behind_master 的值越来越大。</p>
+<p>都做了什么努力呢？我们再来回顾主备同步的步骤。</p>
+<pre class="mermaid">flowchart LR
+开始((开始))-->undologmem[undolog<br/>mem]
+subgraph masterA
+undologmem-->datamem[data<br/>mem]
+datamem-->redologprepare[redolog<br/>prepare]
+redologprepare-->binlog[binlog]
+binlog-->redologcommit[redolog<br/>commit]
+binlog-->dump_thread[dump_thread]
+bg_thread[bg_thread]-->undologdisk[undolog<br/>disk]
+undologdisk-->datadisk[data<br/>disk]
+end
+redologcommit-->ack((ack))
+subgraph masterB
+dump_thread-->io_thread[io_thread]
+io_thread-->relaylog[relaylog]
+relaylog-->sql_thread[sql_thread]
+sql_thread==>data[data]
+end</pre>
+
+<p>这个图，可文章开始的图有一点点细微的差别，这个细微的差别，在于最后一步：sql_thread-&gt;data 这一步的线，比之前的图，粗了一点点。为什么呢？</p>
+<p>因为mysql对这一步骤做了优化，在通过sql_thread执行relaylog的时候，是通过多线程执行的。</p>
+<p>使用了多线程，就可以提高备库的能力。减少主备延迟的时间。</p>
+<h4 id="并行复制的基本原理"><a href="#并行复制的基本原理" class="headerlink" title="并行复制的基本原理"></a>并行复制的基本原理</h4><p>从单线程复制到最新版本的多线程复制，中间的演化经历了好几个版本。接下来，我就跟你说说 MySQL 多线程复制的演进过程。</p>
+<p>其实说到底，所有的多线程复制机制，都是要把上图中只有一个线程的 sql_thread，拆成多个线程：</p>
+<pre class="mermaid">flowchart LR
+relaylog-->coordinator
+subgraph sql_thread
+coordinator-->worker-1
+coordinator-->worker-2
+coordinator-->worker-3
+coordinator-->点点点[..........]
+coordinator-->worker-n
+end
+worker-1-->data
+worker-2-->data
+worker-3-->data
+点点点-->data
+worker-n-->data</pre>
+
+<p>其中的<code>coordinator</code>和<code>worker</code>就是原来的<code>sql_thread</code>;</p>
+<ul>
+<li><code>coordinator</code>复制读取和分发<code>relaylog</code></li>
+<li><code>worker</code>线程是真正来执行<code>relaylog</code>的</li>
+</ul>
+<p>worker线程有多少个？</p>
+<ul>
+<li>是通过<code>slave_parallel_workers</code>参数控制的，一般32C的机器，建议设置为8-16之间，要留一些用于读查询</li>
+<li>对于单机的mysql，默认是0</li>
+<li>公司的生产环境配置的是 16</li>
+</ul>
+<h4 id="并行复制面临的问题"><a href="#并行复制面临的问题" class="headerlink" title="并行复制面临的问题"></a>并行复制面临的问题</h4><p>了解了并行复制的基本原理，接下来思考几个问题？</p>
+<p><strong><code>coordinator</code>是怎么分发<code>relaylog</code>给worker线程的？能不能按照轮训的方式，也就是事务1的日志分为worker1，事务2的日志分给worker2？</strong></p>
+<ul>
+<li>不能</li>
+<li>因为不同的事务可能会操作同一行，由于CPU的调度问题，很有可能导致事务2的日志先执行，事务1的日志后执行，导致数据不一致的问题。</li>
+</ul>
+<p><strong><code>coordinator</code>能不能把一个事务的不同的更新语句的binlog分给多个worker执行？</strong></p>
+<ul>
+<li>不能</li>
+<li>一个事务的binlog是完整的，分开执行，很有可能也会出现数据不一致的情况。</li>
+</ul>
+<p>所以，对<code>coordinator</code>的分发，就提出了两个最基本的要求</p>
+<ul>
+<li>要求更新同一行的不同事务，必须被分发到同一个 worker 中。</li>
+<li>要求同一个事务不能被分开，必须被分发到同一个 worker 中。</li>
+</ul>
+<h4 id="MySQL-5-5-版本的并行复制策略（不支持）"><a href="#MySQL-5-5-版本的并行复制策略（不支持）" class="headerlink" title="MySQL 5.5 版本的并行复制策略（不支持）"></a>MySQL 5.5 版本的并行复制策略（不支持）</h4><p>官方 MySQL 5.5 版本是不支持并行复制的。</p>
+<p>但是，在 2012 年的时候，我自己服务的业务出现了严重的主备延迟，原因就是备库只有单线程复制。</p>
+<p>然后，我就先后写了两个版本的并行策略。即按表分发策略和按行分发策略，以帮助你理解 MySQL 官方版本并行复制策略的迭代。</p>
+<h5 id="按表分发策略"><a href="#按表分发策略" class="headerlink" title="按表分发策略"></a>按表分发策略</h5><p><strong>基本原理</strong>：如果两个事务操作的是不同的表，那么这两个事务就可以并行处理；如果一个事务中操作了多张表，那么把这些表当做一张表。</p>
+<p><strong>实现细节</strong>：</p>
+<ul>
+<li>每一个worker线程，维护一个hashmap，key是【库名+表名】，value是待执行的事务日志的个数<ul>
+<li>当<code>coordinator</code>把一个事务分给worker执行的时候，value+1</li>
+<li>当worker把某一个事务执行完成的时候，value-1</li>
+</ul>
+</li>
+<li>当coordinator读取下一个事务的日志之后，先获取到这个事务所操作的【库名+表名】（可能是一张表，也可能是多张表）</li>
+<li>如果是一张表<ul>
+<li>遍历所有的worker</li>
+<li>判断当前worker中的hashmap的key，是不是包含这张表</li>
+<li>如果包含：则把这个事务，交给这个worker执行</li>
+<li>如果不包含，继续遍历下一个worker</li>
+<li>如果所有的worker都不包含，则把这个事务交给负载最低的worker执行，并将当前的【库名+表名】添加到这个worker的hashmap中</li>
+</ul>
+</li>
+<li>如果是多张表<ul>
+<li>遍历所有的worker</li>
+<li>如果这多张表，是由一个worker执行的，则把这个事务，交给这个worker执行</li>
+<li>如果这多张表，目前没有worker执行，则把这个事务，交给负载最低的worker执行</li>
+<li>如果这多张表，是由多个woker执行的，则<code>coordinator</code>进入等待，并且不停的进行遍历worker进行判断</li>
+</ul>
+</li>
+</ul>
+<p><strong>缺点</strong>：这个按表分发的方案，在多个表负载均匀的场景里应用效果很好。但是，如果碰到热点表，比如所有的更新事务都会涉及到某一个表的时候，所有事务都会被分配到同一个 worker 中，就变成单线程复制了。</p>
+<h5 id="按行分发策略"><a href="#按行分发策略" class="headerlink" title="按行分发策略"></a>按行分发策略</h5><p>要解决热点表的并行复制问题，就需要一个按行并行复制的方案。</p>
+<p><strong>基本原理</strong>：如果两个事务没有更新相同的行，它们在备库上可以并行执行。显然，这个模式要求 binlog 格式必须是 row。因为statement记录的是sql语句，无法判断更新了哪一行？</p>
+<p>实现细节：</p>
+<ul>
+<li>每一个worker线程，维护一个hashmap，key是【库名+表名+主键值+唯一索引的值】，value是待执行的事务日志的个数</li>
+<li>剩下的步骤，同<strong>按表分发策略</strong></li>
+</ul>
+<p><strong>缺点</strong>：对比按表分发和按行分发这两个方案的话，按行分发策略的并行度更高。不过，如果是要操作很多行的大事务的话，按行分发的策略有两个问题：</p>
+<ul>
+<li>耗费内存。比如一个语句要删除 100 万行数据，这时候 hash 表就要记录 100 万个项。</li>
+<li>耗费 CPU。解析 binlog，然后计算 hash 值，对于大事务，这个成本还是很高的。</li>
+</ul>
+<p><strong>退化</strong>：因为缺点的存在，所以在实现这个策略的时候会设置一个阈值，单个事务如果超过设置的行数阈值（比如，如果单个事务更新的行数超过 10 万行），就暂时退化为单线程模式，退化过程的逻辑大概是这样的：</p>
+<ul>
+<li>coordinator 暂时先 hold 住这个事务；</li>
+<li>等待所有 worker 都执行完成，变成空队列；</li>
+<li>coordinator 直接执行这个事务；</li>
+<li>恢复并行模式。</li>
+</ul>
+<h4 id="MySQL-5-6-版本的并行复制策略"><a href="#MySQL-5-6-版本的并行复制策略" class="headerlink" title="MySQL 5.6 版本的并行复制策略"></a>MySQL 5.6 版本的并行复制策略</h4><p>官方 MySQL5.6 版本，支持了并行复制，只是支持的粒度是<strong>按库并行</strong>。</p>
+<p>具体的实现方案和按表分发以及按行分拨的是一样的，只不过hashmap中的key是库名了。</p>
+<h4 id="MariaDB-的并行复制策略"><a href="#MariaDB-的并行复制策略" class="headerlink" title="MariaDB 的并行复制策略"></a>MariaDB 的并行复制策略</h4><p><strong>基本原理</strong>：利用了组提交的特性</p>
+<ul>
+<li>能在同一个组中提交的事务，一定不会更新同一行（因为innodb在更新某一行的时候，会先获取行锁，上一个事务还没有commit的时候，行锁是不会释放的）</li>
+<li>主库能并行执行的，备库一定也可以并行执行。</li>
+</ul>
+<p><strong>实现细节</strong>：</p>
+<ul>
+<li>在一组里面提交的事务，有一个共同的commit_id</li>
+<li>coordinator每次从relaylog中获取一批事务（具有相同的commit_id）</li>
+<li>然后把这一批直接分给worker并发执行</li>
+<li>等待worker执行完之后，coordinator在获取下一批事务</li>
+</ul>
+<p><strong>缺点</strong>：虽然是并发了，但是并发度不够，不够在哪里呢？思考一下，在主库上，一组事务的binlog在commit的时候，下一组binlog可能已经开始write了，主库的效率是很高的。而在备库上，coordinator获取一批事务，必须等待这一批执行完，才能执行下一批。效率相比较于主库，就比较慢了。</p>
+<h4 id="MySQL-5-7-的并行复制策略"><a href="#MySQL-5-7-的并行复制策略" class="headerlink" title="MySQL 5.7 的并行复制策略"></a>MySQL 5.7 的并行复制策略</h4><p>在MariaDB 的并行复制策略出现之后，mysql5.7也出了一个类似的，但是呢，也并没有舍弃mysql5.6中的按库分发策略。mysql5.7提供了一个参数</p>
+<ul>
+<li>slave-parallel-type</li>
+<li>配置为 DATABASE，表示使用 MySQL 5.6 版本的按库并行策略；</li>
+<li>配置为 LOGICAL_CLOCK，表示的就是类似 MariaDB 的策略（不过是mysql优化后的）。</li>
+</ul>
+<p><strong>mysql对 MariaDB 的策略进行了优化，优化了什么呢？</strong></p>
+<p>在回顾一下MariaDB的并行复制策略的核心是：所有commit的事务，可以并行执行。因为commit的事务一定是不会有锁冲突的。</p>
+<p>那么在思考一下mysql的更新流程：</p>
+<pre class="mermaid">flowchart LR
+开始((开始))-->undologmem[undolog<br/>mem]
+undologmem-->datamem[data<br/>mem]
+datamem-->redologprepare[redolog<br/>prepare]
+redologprepare-->binlog[binlog]
+binlog-->redologcommit[redolog<br/>commit]</pre>
+
+<p>可以发现，其实在记录redolog（prepare）的时候，就已经通过了锁校验。具体的关于锁，可以看：mysql的锁从入门到入土</p>
+<p>优化点：只要是通过了redolog（prepare）阶段后的一组事务的binlog（组提交），传到备库的时候，这组事务都是可以并行执行的</p>
+<h4 id="MySQL-5-7-22-的并行复制策略"><a href="#MySQL-5-7-22-的并行复制策略" class="headerlink" title="MySQL 5.7.22 的并行复制策略"></a>MySQL 5.7.22 的并行复制策略</h4><p>公司生产用的是mysql版本是5.7.19</p>
+<p>在 2018 年 4 月份发布的 MySQL 5.7.22 版本里，MySQL 增加了一个新的并行复制策略，基于 WRITESET 的并行复制。</p>
+<p>相应地，新增了一个参数 <code>binlog-transaction-dependency-tracking</code>，用来控制是否启用这个新策略。这个参数的可选值有以下三种。</p>
+<ul>
+<li><code>COMMIT_ORDER</code>表示的就是前面介绍的，根据同时进入 prepare 和 commit 来判断是否可以并行的策略。</li>
+<li><code>WRITESET</code>表示的是对于事务涉及更新的每一行，计算出这一行的 hash 值，组成集合 writeset。如果两个事务没有操作相同的行，也就是说它们的 writeset 没有交集，就可以并行。</li>
+<li><code>WRITESET_SESSION</code>是在 WRITESET 的基础上多了一个约束，即在主库上同一个线程先后执行的两个事务，在备库执行的时候，要保证相同的先后顺序。</li>
+</ul>
+<p><strong>实现细节</strong>：</p>
+<ul>
+<li>msyql对于事务涉及更新的每一行，计算出这一行的 hash 值（是通过“库名 + 表名 + 索引名 + 值”计算出来的），组成集合 writeset。</li>
+<li>把这个writeset集合写到binlog中（写在binlog哪里的，不知道，怎么从binlog中获取的，也不知道，这里没扣细节）</li>
+<li>备库执行的时候，直接获取一批事务，获取这一批事务的writeset，和当前正在执行的事务的writeset，判断是否有交集。</li>
+<li>没有交集，就可以并行。</li>
+</ul>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>获取writeset的时候，不需要计算，也不需要解析binlog，就可以直接拿到，省CPU</li>
+<li>不需要把整个事务的 binlog 都扫一遍才能决定分发到哪个 worker，更省内存；</li>
+<li>由于备库的分发策略不依赖于 binlog 内容，所以 binlog 是 statement 格式也是可以的。</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>对于“表上没主键”和“外键约束”的场景，WRITESET 策略也是没法并行的，也会暂时退化为单线程模型。</li>
+</ul>
+<h3 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h3><p>如果主库都是单线程压力模式，在从库追主库的过程中，binlog-transaction-dependency-tracking 应该选用什么参数？</p>
+<ul>
+<li><p>首先binlog-transaction-dependency-tracking能选哪些参数？</p>
+<ul>
+<li>ORDER_COMMIT</li>
+<li>WRITE_SET</li>
+<li>WRITE_SET_SESSION</li>
+</ul>
+</li>
+<li><p>其次看这三个参数分别对应了什么？</p>
+<ul>
+<li>ORDER_COMMIT：主要是处于redolog（prepare）状态之后的，组提交的事务，可以并行复制；</li>
+<li>WRITE_SET_SESSION：同一个会话中的事务的writeset，即使没有交集，也要顺序执行</li>
+<li>WRITE_SET：同一个会话中的事务的writeset，只要没有交集，就可以并行</li>
+</ul>
+</li>
+<li><p>在分析题目</p>
+<ul>
+<li>单线程：所以就没有组提交了，因为都是一个一个提交的。</li>
+<li>单线程：所以是一个会话</li>
+</ul>
+</li>
+<li><p>结合来看：</p>
+<ul>
+<li>没有组提交，就不能用ORDER_COMMIT，备库会单线程复制。</li>
+<li>是一个会话，所以就不能用WRITE_SET_SESSION，因为也会顺序执行，顺序执行，就成了单线程复制。</li>
+</ul>
+</li>
+</ul>
+<h2 id="主备切换（高可用）"><a href="#主备切换（高可用）" class="headerlink" title="主备切换（高可用）"></a>主备切换（高可用）</h2><h3 id="为什么要进行主备切换"><a href="#为什么要进行主备切换" class="headerlink" title="为什么要进行主备切换"></a>为什么要进行主备切换</h3><p>主备切换有两种场景，一种是主动切换，一种是被动切换。</p>
+<ul>
+<li>主动切换：人为的发起</li>
+<li>被动切换：一般是因为主库出问题了，由 HA 系统发起的。</li>
+</ul>
+<p>这也就引出了我们今天要讨论的问题：怎么判断一个主库出问题了？</p>
+<h3 id="怎么判断库有问题"><a href="#怎么判断库有问题" class="headerlink" title="怎么判断库有问题"></a>怎么判断库有问题</h3><h3 id="两种主备架构"><a href="#两种主备架构" class="headerlink" title="两种主备架构"></a>两种主备架构</h3><pre class="mermaid">flowchart TD
+subgraph M-S结构
+clientms[client]-->mysqlAms[mysqlA]
+mysqlAms-->mysqlBms[mysqlB<br/>readonly]
+end
+subgraph 双M结构
+clientmm[client]-->mysqlAmm[mysqlA]
+mysqlAmm-->mysqlBmm[mysqlB<br/>readonly]
+mysqlBmm-->mysqlAmm
+end</pre>
+
+
+
+<p>由于主备延迟的存在，所以在主备切换的时候，就相应的有不同的策略。</p>
+<h3 id="可靠性优先切换策略"><a href="#可靠性优先切换策略" class="headerlink" title="可靠性优先切换策略"></a>可靠性优先切换策略</h3><p>下面的切换流程，是在<code>双M结构</code>的流程下进行的操作，和<code>M-S结构</code>的区别在于：不用修改主备关系了。</p>
+<ul>
+<li>1、判断备库B上的seconds_behind_master，如果小于某个值（比如5秒），继续下一步，否则继续当前步骤</li>
+<li>2、将主库A设置为readonly</li>
+<li>3、判断备库B上的seconds_behind_master，直到它变为0为止</li>
+<li>4、将备库B设置为可读写</li>
+<li>5、将业务请求转发到备库B</li>
+</ul>
+<p>在上面的步骤中，我们看到，系统是有不可用时间的。此时主库A和备库B都处于只读状态。</p>
+<h3 id="可用性优先切换策略"><a href="#可用性优先切换策略" class="headerlink" title="可用性优先切换策略"></a>可用性优先切换策略</h3><p>下面的切换流程，是在<code>双M结构</code>的流程下进行的操作，和<code>M-S结构</code>的区别在于：不用修改主备关系了。</p>
+<ul>
+<li>1、将备库B设置为可读写</li>
+<li>2、将业务请求转发到备库B，此时原来的主库A就不会有业务请求了</li>
+<li>3、判断备库B上的seconds_behind_master，直到它变为0为止</li>
+<li>4、将主库A设置为readonly</li>
+</ul>
+<p>在上面的步骤中，系统可能会出现数据不一致的情况的，就是A产生的binlog，B还没有执行的时候，就接收到了新的请求，然后主库A的binlog此时传到了备库B上，B在执行binlog，就会导致数据不一致的场景。</p>
+<h3 id="公司生产使用的是可靠性优先策略"><a href="#公司生产使用的是可靠性优先策略" class="headerlink" title="公司生产使用的是可靠性优先策略"></a>公司生产使用的是可靠性优先策略</h3><p>公司使用的是M-S结构，并且使用的是可靠性优先切换策略。</p>
+<p>之前进行过主备切换，DBA通知需要停应用才行的。</p>
+<img src="mysql的主备从入门到入土.assets/image-20221110201120695.png" alt="image-20221110201120695" style="zoom:67%;" />
+
+<p>而且主备切换，一般是由专门的HA系统操作的，不用人为的介入，以下的公司的ha系统</p>
+<img src="mysql的主备从入门到入土.assets/image-20221110195355203.png" alt="image-20221110195355203" style="zoom: 80%;" />
+
+
+
+
+
+
+
+<h2 id="主从切换"><a href="#主从切换" class="headerlink" title="主从切换"></a>主从切换</h2><h3 id="什么是一主多从"><a href="#什么是一主多从" class="headerlink" title="什么是一主多从"></a>什么是一主多从</h3><pre class="mermaid">flowchart TD
+client-->|write|mysqlA
+mysqlA-.->mysqlA1
+mysqlA1-.->mysqlA
+client-->|read|mysqlB
+client-->|read|mysqlC
+client-->|read|mysqlD
+mysqlA-.->mysqlB
+mysqlA-.->mysqlC
+mysqlA-.->mysqlD</pre>
+
+<p>mysqlA是主库</p>
+<p>mysqlA1是备库（双M结构）</p>
+<p>mysqlB，C，D是从库，从主库mysqlA进行同步</p>
+<p>以上的架构就是一主多从架构。</p>
+<h3 id="一主多从有什么问题"><a href="#一主多从有什么问题" class="headerlink" title="一主多从有什么问题"></a>一主多从有什么问题</h3><h3 id="一主多从的切换策略"><a href="#一主多从的切换策略" class="headerlink" title="一主多从的切换策略"></a>一主多从的切换策略</h3><h4 id="基于位点的主备切换"><a href="#基于位点的主备切换" class="headerlink" title="基于位点的主备切换"></a>基于位点的主备切换</h4><h4 id="基于-GTID-的主备切换"><a href="#基于-GTID-的主备切换" class="headerlink" title="基于 GTID 的主备切换"></a>基于 GTID 的主备切换</h4><h2 id="读写分离（一主多从的应用场景）"><a href="#读写分离（一主多从的应用场景）" class="headerlink" title="读写分离（一主多从的应用场景）"></a>读写分离（一主多从的应用场景）</h2><p>读写分离的两种架构</p>
+<p>直连架构</p>
+<p>proxy架构</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/mysql/">mysql</a><a class="post-meta__tags" href="/tags/%E4%B8%BB%E5%A4%87%E4%B8%80%E8%87%B4/">主备一致</a><a class="post-meta__tags" href="/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/">高可用</a></div><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#mysql%E7%9A%84%E4%B8%BB%E5%A4%87%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F"><span class="toc-number">1.</span> <span class="toc-text">mysql的主备从入门到入土</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%BB%E5%A4%87%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是主备？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E5%A4%87%E5%90%8C%E6%AD%A5%EF%BC%88%E4%B8%BB%E5%A4%87%E4%B8%80%E8%87%B4%EF%BC%89%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-number">1.2.</span> <span class="toc-text">主备同步（主备一致）的流程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#M-S%E7%BB%93%E6%9E%84%E7%9A%84%E4%B8%BB%E5%A4%87%E5%90%8C%E6%AD%A5%E6%B5%81%E7%A8%8B"><span class="toc-number">1.2.1.</span> <span class="toc-text">M-S结构的主备同步流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8CM%E7%BB%93%E6%9E%84%E7%9A%84%E4%B8%BB%E5%A4%87%E5%90%8C%E6%AD%A5%E6%B5%81%E7%A8%8B"><span class="toc-number">1.2.2.</span> <span class="toc-text">双M结构的主备同步流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BE%AA%E7%8E%AF%E5%A4%8D%E5%88%B6%E9%97%AE%E9%A2%98"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">循环复制问题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AC%E5%8F%B8%E7%94%9F%E4%BA%A7%E4%BD%BF%E7%94%A8%E7%9A%84%E6%98%AFM-S%E7%BB%93%E6%9E%84"><span class="toc-number">1.2.3.</span> <span class="toc-text">公司生产使用的是M-S结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E5%A4%87%E5%BB%B6%E8%BF%9F%E5%92%8C%E4%BA%A7%E7%94%9F%E5%92%8C%E9%81%BF%E5%85%8D"><span class="toc-number">1.3.</span> <span class="toc-text">主备延迟和产生和避免</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%BB%E5%A4%87%E5%BB%B6%E8%BF%9F"><span class="toc-number">1.3.1.</span> <span class="toc-text">什么是主备延迟</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E4%BA%A7%E7%94%9F%E4%B8%BB%E5%A4%87%E5%BB%B6%E8%BF%9F"><span class="toc-number">1.3.2.</span> <span class="toc-text">为什么会产生主备延迟</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%87%E5%BA%93%E7%9A%84%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E8%83%BD%E5%8A%9B"><span class="toc-number">1.3.3.</span> <span class="toc-text">备库的并行复制能力</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.3.1.</span> <span class="toc-text">并行复制的基本原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E9%9D%A2%E4%B8%B4%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.3.3.2.</span> <span class="toc-text">并行复制面临的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MySQL-5-5-%E7%89%88%E6%9C%AC%E7%9A%84%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E7%AD%96%E7%95%A5%EF%BC%88%E4%B8%8D%E6%94%AF%E6%8C%81%EF%BC%89"><span class="toc-number">1.3.3.3.</span> <span class="toc-text">MySQL 5.5 版本的并行复制策略（不支持）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8C%89%E8%A1%A8%E5%88%86%E5%8F%91%E7%AD%96%E7%95%A5"><span class="toc-number">1.3.3.3.1.</span> <span class="toc-text">按表分发策略</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8C%89%E8%A1%8C%E5%88%86%E5%8F%91%E7%AD%96%E7%95%A5"><span class="toc-number">1.3.3.3.2.</span> <span class="toc-text">按行分发策略</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MySQL-5-6-%E7%89%88%E6%9C%AC%E7%9A%84%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E7%AD%96%E7%95%A5"><span class="toc-number">1.3.3.4.</span> <span class="toc-text">MySQL 5.6 版本的并行复制策略</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MariaDB-%E7%9A%84%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E7%AD%96%E7%95%A5"><span class="toc-number">1.3.3.5.</span> <span class="toc-text">MariaDB 的并行复制策略</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MySQL-5-7-%E7%9A%84%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E7%AD%96%E7%95%A5"><span class="toc-number">1.3.3.6.</span> <span class="toc-text">MySQL 5.7 的并行复制策略</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MySQL-5-7-22-%E7%9A%84%E5%B9%B6%E8%A1%8C%E5%A4%8D%E5%88%B6%E7%AD%96%E7%95%A5"><span class="toc-number">1.3.3.7.</span> <span class="toc-text">MySQL 5.7.22 的并行复制策略</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%80%83%E9%A2%98"><span class="toc-number">1.3.4.</span> <span class="toc-text">思考题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2%EF%BC%88%E9%AB%98%E5%8F%AF%E7%94%A8%EF%BC%89"><span class="toc-number">1.4.</span> <span class="toc-text">主备切换（高可用）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E8%BF%9B%E8%A1%8C%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2"><span class="toc-number">1.4.1.</span> <span class="toc-text">为什么要进行主备切换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%8E%E4%B9%88%E5%88%A4%E6%96%AD%E5%BA%93%E6%9C%89%E9%97%AE%E9%A2%98"><span class="toc-number">1.4.2.</span> <span class="toc-text">怎么判断库有问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E4%B8%BB%E5%A4%87%E6%9E%B6%E6%9E%84"><span class="toc-number">1.4.3.</span> <span class="toc-text">两种主备架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BC%98%E5%85%88%E5%88%87%E6%8D%A2%E7%AD%96%E7%95%A5"><span class="toc-number">1.4.4.</span> <span class="toc-text">可靠性优先切换策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E7%94%A8%E6%80%A7%E4%BC%98%E5%85%88%E5%88%87%E6%8D%A2%E7%AD%96%E7%95%A5"><span class="toc-number">1.4.5.</span> <span class="toc-text">可用性优先切换策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AC%E5%8F%B8%E7%94%9F%E4%BA%A7%E4%BD%BF%E7%94%A8%E7%9A%84%E6%98%AF%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BC%98%E5%85%88%E7%AD%96%E7%95%A5"><span class="toc-number">1.4.6.</span> <span class="toc-text">公司生产使用的是可靠性优先策略</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E4%BB%8E%E5%88%87%E6%8D%A2"><span class="toc-number">1.5.</span> <span class="toc-text">主从切换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%80%E4%B8%BB%E5%A4%9A%E4%BB%8E"><span class="toc-number">1.5.1.</span> <span class="toc-text">什么是一主多从</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%BB%E5%A4%9A%E4%BB%8E%E6%9C%89%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="toc-number">1.5.2.</span> <span class="toc-text">一主多从有什么问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%BB%E5%A4%9A%E4%BB%8E%E7%9A%84%E5%88%87%E6%8D%A2%E7%AD%96%E7%95%A5"><span class="toc-number">1.5.3.</span> <span class="toc-text">一主多从的切换策略</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E4%BD%8D%E7%82%B9%E7%9A%84%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2"><span class="toc-number">1.5.3.1.</span> <span class="toc-text">基于位点的主备切换</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E-GTID-%E7%9A%84%E4%B8%BB%E5%A4%87%E5%88%87%E6%8D%A2"><span class="toc-number">1.5.3.2.</span> <span class="toc-text">基于 GTID 的主备切换</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%EF%BC%88%E4%B8%80%E4%B8%BB%E5%A4%9A%E4%BB%8E%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%EF%BC%89"><span class="toc-number">1.6.</span> <span class="toc-text">读写分离（一主多从的应用场景）</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By zs</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/8.13.8/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
   const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
   if ($mermaidWrap.length) {
     window.runMermaid = () => {
