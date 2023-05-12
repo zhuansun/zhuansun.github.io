@@ -1,0 +1,366 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Redis诞生背景原理介绍 | ZSPCR</title><meta name="author"><meta name="copyright"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="redis的诞生背景在计算中，数据是存在磁盘中；而从磁盘中读取数据，一般有两个重要的指标  寻址：毫秒级别的；  带宽：单位时间可以传输多少数据，一般是数百MB或者数GB每秒  而如果数据在内存中：  寻址：纳秒级别的 带宽：GB起步，肯定比磁盘快的多  总结  磁盘比内存慢了十万倍（只是寻址上慢）  redis是kv结构，为啥还要给v定义五种基本类型大数据概念：计算向数据移动。 不给 v 定义类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis诞生背景原理介绍">
+<meta property="og:url" content="https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/REDIS/Redis%E8%AF%9E%E7%94%9F%E8%83%8C%E6%99%AF%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="ZSPCR">
+<meta property="og:description" content="redis的诞生背景在计算中，数据是存在磁盘中；而从磁盘中读取数据，一般有两个重要的指标  寻址：毫秒级别的；  带宽：单位时间可以传输多少数据，一般是数百MB或者数GB每秒  而如果数据在内存中：  寻址：纳秒级别的 带宽：GB起步，肯定比磁盘快的多  总结  磁盘比内存慢了十万倍（只是寻址上慢）  redis是kv结构，为啥还要给v定义五种基本类型大数据概念：计算向数据移动。 不给 v 定义类">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/10/31/hQzO1YEjg4V5DCp.jpg">
+<meta property="article:published_time" content="2022-11-14T17:17:31.000Z">
+<meta property="article:modified_time" content="2023-05-11T15:42:17.061Z">
+<meta property="article:tag" content="redis">
+<meta property="article:tag" content="原理">
+<meta property="article:tag" content="IO模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/10/31/hQzO1YEjg4V5DCp.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zspcer.gitee.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/REDIS/Redis%E8%AF%9E%E7%94%9F%E8%83%8C%E6%99%AF%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Redis诞生背景原理介绍',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-05-11 15:42:17'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="ZSPCR" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">82</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">123</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">30</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s2.loli.net/2022/10/31/hQzO1YEjg4V5DCp.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">ZSPCR</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Redis诞生背景原理介绍</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-11-14T17:17:31.000Z" title="发表于 2022-11-14 17:17:31">2022-11-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-05-11T15:42:17.061Z" title="更新于 2023-05-11 15:42:17">2023-05-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/REDIS/">REDIS</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Redis诞生背景原理介绍"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="redis的诞生背景"><a href="#redis的诞生背景" class="headerlink" title="redis的诞生背景"></a>redis的诞生背景</h2><p>在计算中，数据是存在磁盘中；而从磁盘中读取数据，一般有两个重要的指标</p>
+<ul>
+<li>寻址：毫秒级别的； </li>
+<li>带宽：单位时间可以传输多少数据，一般是数百MB或者数GB每秒</li>
+</ul>
+<p>而如果数据在内存中：</p>
+<ul>
+<li>寻址：纳秒级别的</li>
+<li>带宽：GB起步，肯定比磁盘快的多</li>
+</ul>
+<p>总结</p>
+<ul>
+<li>磁盘比内存慢了十万倍（只是寻址上慢）</li>
+</ul>
+<h2 id="redis是kv结构，为啥还要给v定义五种基本类型"><a href="#redis是kv结构，为啥还要给v定义五种基本类型" class="headerlink" title="redis是kv结构，为啥还要给v定义五种基本类型"></a>redis是kv结构，为啥还要给v定义五种基本类型</h2><p>大数据概念：<strong>计算向数据移动</strong>。</p>
+<p>不给 v 定义类型，是完全可以的。比如 memcache 就是没有类型的，它的 value 是二进制的数据，可以存任何类型的数据。</p>
+<p>那么给 v 定义类型有什么好处呢？</p>
+<p>举一个例子就明白了。</p>
+<p>同样的我们存一个复杂结构数据，比如超长的数组，分别存到 memcache 中和 redis 中，当我们想取出这个 value 中的某一个数据的时候：</p>
+<p>memcache的操作方法是：将 value ，也就是这个超长的数据，全部返回给客户端，由客户端在进行处理。</p>
+<p>而redis的操作方法是：将 value 在服务端就可以进行过滤，只给 客户端 返回 客户端 想要的数据。</p>
+<p>这就是：计算向数据移动。 </p>
+<h2 id="redis是怎么处理大量的并发请求的"><a href="#redis是怎么处理大量的并发请求的" class="headerlink" title="redis是怎么处理大量的并发请求的"></a>redis是怎么处理大量的并发请求的</h2><p>一个系统可以部署多个redis进程，但是一个redis实例是<strong>单进程单线程</strong>单实例的，那么redis是怎么处理大量的并发请求的呢？</p>
+<img src="Redis诞生背景原理介绍.assets/image-20230509215237383.png" alt="image-20230509215237383" style="zoom: 50%;" />
+
+<ul>
+<li><p>如上图，我们的【redis:6379】是部署在【linux】服务器上的，linux有内核；</p>
+</li>
+<li><p>那么redis的处理流程就是：</p>
+</li>
+<li><p>多个client可能发起很多的请求来到linux服务器上，这些请求会交给linux操作系统处理；</p>
+</li>
+<li><p>然后系统会把请求交给redis的进程来处理；</p>
+</li>
+<li><p>这部分工作都是kernel来进行调度的</p>
+</li>
+<li><p>然后redis是通过调用kernel的系统调用（mmap的共享空间+epoll）来实现的，通过这种方式 <strong>多路复用+共享空间(避免拷贝)</strong> 就是redis处理快的原因。</p>
+</li>
+<li><p>具体什么是mmap和epoll可以看下面的解释</p>
+</li>
+</ul>
+<h2 id="redis为啥要设计成单进程单线程的"><a href="#redis为啥要设计成单进程单线程的" class="headerlink" title="redis为啥要设计成单进程单线程的"></a>redis为啥要设计成单进程单线程的</h2><p>为了避免并发问题。</p>
+<p>比如不同的client在同一时刻对 同一个key 进行操作； 一个修改key，一个删除key。</p>
+<p>必然会导致并发问题。</p>
+<p>而redis为了处理速度，就不能引入过多的逻辑，解决并发问题的常见方式就是锁，如果引入了锁，必然会影响性能。</p>
+<p>所以直接使用单进程，单线程的方式，就可以完美解决并发问题。</p>
+<p>不管你是多少个线程，反正到了 redis 服务端，都是一个线程。</p>
+<h2 id="内核程序调用的发展历程"><a href="#内核程序调用的发展历程" class="headerlink" title="内核程序调用的发展历程"></a>内核程序调用的发展历程</h2><h3 id="阻塞时期（BIO）"><a href="#阻塞时期（BIO）" class="headerlink" title="阻塞时期（BIO）"></a>阻塞时期（BIO）</h3><p><img src="/Redis%E8%AF%9E%E7%94%9F%E8%83%8C%E6%99%AF%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D.assets/image-20230511144324177.png" alt="image-20230511144324177"></p>
+<p>在Linux早期，client读取一个文件的流程是</p>
+<ul>
+<li>client 告诉 Kernel 我要读取哪一个文件；在Linux中一切皆文件，所以 client  会给 kernel 一个 <code>fd（文件描述符）</code></li>
+<li>kernel 拿到这个 <code>fd（文件描述符）</code>开启一个线程，通过 read（系统调用）读取指定的 <code>fd（文件描述符）</code></li>
+<li>如果此时<code>fd（文件描述符）</code>并没有准备好，那么read（系统调用）所在的这个线程就会一直阻塞；</li>
+<li>那么此时别的线程需要读取的<code>fd（文件描述符）</code>即使已经准备好了，由于有别的线程在阻塞，所以这个线程也要等着。</li>
+</ul>
+<p>read（系统调用）为什么是阻塞的</p>
+<ul>
+<li>read（系统调用）底层是通过 socket 和 kernel 通信的</li>
+<li>socket也是一个系统调用，只不过在Linux早期阶段，socket是阻塞的。（PS：后面随着Linux的发展，socket可以被设置为：非阻塞）</li>
+</ul>
+<p>在这个阶段产生的问题就是：<strong>并发很低</strong></p>
+<h3 id="同步非阻塞（NIO）"><a href="#同步非阻塞（NIO）" class="headerlink" title="同步非阻塞（NIO）"></a>同步非阻塞（NIO）</h3><p><img src="/Redis%E8%AF%9E%E7%94%9F%E8%83%8C%E6%99%AF%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D.assets/image-20230509215259250.png" alt="image-20230509215259250"></p>
+<p>在这个阶段，随着Linux的发展， socket这个系统调用，可以通过参数指定，将socket设置为：非阻塞socket；</p>
+<p>相对于上一个 阻塞时期（BIO），同步非阻塞的时期的处理逻辑是：</p>
+<ul>
+<li>client 告诉 Kernel 我要读取哪一个文件；在Linux中一切皆文件，所以 client  会给 kernel 一个 <code>fd（文件描述符）</code></li>
+<li>kernel 拿到这个<code>fd（文件描述符）</code>开启一个线程，通过 read（系统调用）读取指定的<code>fd（文件描述符）</code><ul>
+<li>由于这个时期，read（系统调用）所依赖的 socket 已经可以被设置为：非阻塞</li>
+<li>所以，就不会像 BIO 阶段一样，开启多个线程了，此时只需要一个线程就可以处理，因为read（系统调用）此时已经是：非阻塞了。</li>
+</ul>
+</li>
+<li>这个线程，在 kernel 中，会一直轮训，判断 client 所需要的<code>fd（文件描述符）</code>是否准备好<ul>
+<li>如果 read 的这个<code>fd（文件描述符）</code>还没有准备好，此时会直接返回false，表示还没有准备好。如果<code>fd（文件描述符）</code>准备好了，会直接返回<code>fd（文件描述符）</code>；</li>
+<li>轮训发生在用户空间。</li>
+</ul>
+</li>
+<li>这样的话，用户空间在轮训的时候，就可以通过返回值来判断。这样就不会阻塞了</li>
+<li>此时轮训的线程，还是同步线程，并不是异步。</li>
+</ul>
+<p>问题：如果此时有1000个或者更多的线程read，那么在用户控件轮训1000次或者更多次，就会有很大的调用成本。那么怎么解决呢？</p>
+<h3 id="多路复用（NIO）"><a href="#多路复用（NIO）" class="headerlink" title="多路复用（NIO）"></a>多路复用（NIO）</h3><p><img src="/Redis%E8%AF%9E%E7%94%9F%E8%83%8C%E6%99%AF%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D.assets/image-20230509215310178.png" alt="image-20230509215310178"></p>
+<p>从同步非阻塞（NIO）过来之后，linux系统继续发展，要怎么解决因为轮训次数多导致的系统消耗呢？</p>
+<p>于是kernal新增了一个系统调用，这个系统调用叫做 select，它的作用就是对一批fd（文件描述符）查询这些 fds 是否已经准备好，比如说select(1000fds),其中有800个已经准备好，那么select就会返回这800个fd</p>
+<p>然后交给用户线程，由用户线程调用这800个fds，那么就能保证每次调用的fd都是已经准备好的了。</p>
+<p>那么这样就没有问题了嘛？当然不是，注意这其中的调用关系</p>
+<p><img src="/Redis%E8%AF%9E%E7%94%9F%E8%83%8C%E6%99%AF%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D.assets/image-20230509215335798.png" alt="image-20230509215335798"></p>
+<p>在用户空间和系统空间中；会通过select和read来回调用，注意其中的参数是fds，那么我们知道fd是在系统空间中的，用户空间想要读取和处理一个fd，就需要去系统空间中拿，拿到之后，返回到用户空间，这个过程是将系统空间中的fd复制一份到用户空间中的。那么当fd很多的时候，复制也会增加系统消耗，浪费存储空间。</p>
+<h3 id="多路复用共享空间（mmap）"><a href="#多路复用共享空间（mmap）" class="headerlink" title="多路复用共享空间（mmap）"></a>多路复用共享空间（mmap）</h3><p><img src="/Redis%E8%AF%9E%E7%94%9F%E8%83%8C%E6%99%AF%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D.assets/image-20230509215344040.png" alt="image-20230509215344040"></p>
+<p>上面说到了多路复用的场景，会出现系统空间和用户空间fd数据拷贝的问题，那么解决的办法就是：在用户空间和系统空间中间增加一个共享空间。这个共享空间通过红黑树和链表存储fd；</p>
+<p>共享空间是通过什么系统调用来实现的？是通过mmap这个系统调用；共享空间里放了一些数据结构：红黑树，链表</p>
+<p>一个新加入的等待查询的fd是放在红黑树中的，查询出来的fd是放在链表中的，供用户使用。</p>
+<p>epoll是一系列系统调用的统称，包括：epoll_create;epoll_ctl;epoll_wait</p>
+<p>整体流程就是：</p>
+<ul>
+<li><p>用户线程&#x2F;进程会调用epoll_create创建一个epoll的fd</p>
+</li>
+<li><p>然后当来一个查询的时候，会交给epoll的fd，然后epoll会有一个共享空间（这个共享空间就是通过mmap实现的）</p>
+</li>
+<li><p>比如我们要查询1000个fd，这1000个fd会通过epoll的fd写入到共享空间的红黑树中；</p>
+</li>
+<li><p>那么epoll的fd是怎么写入到共享空间的呢？是通过epoll中另一个系统调用：epoll_ctl</p>
+<ul>
+<li><p>etl add：向共享空间加一个fd</p>
+</li>
+<li><p>etl del：从共享空间中删除一个fd</p>
+</li>
+</ul>
+</li>
+<li><p>那么epoll还有一个系统调用，epoll_wait是干嘛的呢？ 它的作用是当我们要查询1000个fd的时候，这些fd通过ctl写入到共享空间中的红黑树之后，每写入一个fd，就会调用wait，然后当前fd就会阻塞等待kernal处理，kernal处理完一个，就返回一个，处理完一个，返回一个。（wait就类似于回调）</p>
+</li>
+<li><p>然后epoll返回fd之后，用户线程会再次调用read从共享空间中获取fd</p>
+</li>
+</ul>
+<h3 id="补充：到底什么是多路复用"><a href="#补充：到底什么是多路复用" class="headerlink" title="补充：到底什么是多路复用"></a>补充：到底什么是多路复用</h3><p>多路复用是指同时监控多个 IO 事件的技术，能够让单个线程或进程同时处理多个连接。</p>
+<p>常见的多路复用技术包括 select、poll 和 epoll 等</p>
+<p>这些技术底层实现原理不尽相同，但都能够在单个进程或线程内同时监视多个 IO 事件，以提高系统的吞吐量和响应速度。</p>
+<h3 id="补充：关于共享空间"><a href="#补充：关于共享空间" class="headerlink" title="补充：关于共享空间"></a>补充：关于共享空间</h3><ul>
+<li>共享空间是“共享的”</li>
+<li>什么意思呢？<ul>
+<li>就是说用户空间可以直接看到并操作共享空间中的数据，而系统空间也可以直接看到并操作共享空间中的数据</li>
+</ul>
+</li>
+<li>这样的好处是什么呢？<ul>
+<li>避免了fd（文件描述符）在用户空间和系统空间中的来回复制，减少性能开销</li>
+</ul>
+</li>
+<li>注意<ul>
+<li>这里不是0拷贝，0拷贝的系统调用是：sendfile； 而共享空间的系统调用是：mmap</li>
+<li>但是mmap和sendfile的核心思想都差不多，都是为了减少fd（文件描述符）的拷贝，提升性能</li>
+</ul>
+</li>
+</ul>
+<h3 id="补充：0拷贝"><a href="#补充：0拷贝" class="headerlink" title="补充：0拷贝"></a>补充：0拷贝</h3><p>假设这么一个场景：一个程序进程需要读取系统中的一个文件，然后通过网卡发出去</p>
+<p>在没有0拷贝之前：1、内核读取文件，写入fd3；2、用户程序进程读取fd3；3：用户程序将读取到的内容写入fd4；4、网卡将fd4发送出去。</p>
+<img src="Redis诞生背景原理介绍.assets/image-20230509215353219.png" alt="image-20230509215353219" style="zoom:50%;" />
+
+<p>在没有0拷贝之前，整个过程读来写去的，很浪费性能。那么0拷贝怎么做的呢？</p>
+<img src="Redis诞生背景原理介绍.assets/image-20230509215400076.png" alt="image-20230509215400076" style="zoom:50%;" />
+
+<p>0拷贝就很简单了，首先说一下0拷贝的系统调用</p>
+<p>sendfile(out,in) 表示将in写入out，因为是直接内核处理，所以不用和用户空间互相拷贝了。</p>
+<p>整个流程就是，内核读取文件；然后用户线程通过sendfile0拷贝直接写入到fd4；网卡将fd4发出去</p>
+<h3 id="补充：kafka的简单实现原理"><a href="#补充：kafka的简单实现原理" class="headerlink" title="补充：kafka的简单实现原理"></a>补充：kafka的简单实现原理</h3><img src="Redis诞生背景原理介绍.assets/image-20230509215408746.png" alt="image-20230509215408746" style="zoom:50%;" />
+
+<p>kafka的简单实现原理是分两步</p>
+<p>生产者生产消息</p>
+<ul>
+<li><p>kafka是接收网卡传过来的数据之后</p>
+</li>
+<li><p>用户进程通过mmap写入到共享空间</p>
+</li>
+<li><p>由于写到了共享空间，kernal就可以直接用了，kernal就可以将这些数据直接写入磁盘文件</p>
+</li>
+<li><p>中间因为使用了mmap系统调用，减少了数据的拷贝；</p>
+</li>
+</ul>
+<p>消费者消费消息</p>
+<ul>
+<li><p>kafka的消费者是通过sendfile的0拷贝来进行消费的；</p>
+</li>
+<li><p>sendfile的两个参数，一个输入，一个输出；输入就是上一步写入的file，输出就是消费者消费的内容；</p>
+</li>
+<li><p>这样消费者使用 sendfile 也避免了数据的拷贝，提升了性能。</p>
+</li>
+</ul>
+<p>sendfile是一个系统调用，在没有sendfile的时候，用户进程获取一个文件是通过kernel读取文件，然后写入到用户空间，用户空间在把这个文件传给具体的程序处理；有了sendfile这个系统调用之后，可以直接讲文件传给具体的程序处理，避免了中间的拷贝；</p>
+<h2 id="redis的运行原理"><a href="#redis的运行原理" class="headerlink" title="redis的运行原理"></a>redis的运行原理</h2><p>这部分和 《redis是单进程单线程单实例的，那么redis是怎么处理大量的并发请求的呢？》有点重复了。内容都是一致的。</p>
+<p>redis里面只有一个线程一个进程吗？ 并不是，要注意这个概念，在redis中处理用户命令的线程只有一个，但是redis本身并不是只有一个线程一个进程。</p>
+<p><img src="/Redis%E8%AF%9E%E7%94%9F%E8%83%8C%E6%99%AF%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D.assets/image-20230509215419415.png" alt="image-20230509215419415"></p>
+<p>假设目前有三个client连接了redis，redis是运行在linux上的；</p>
+<ul>
+<li>client发送了redis命令进行查询或者设值，对linux来说，就是很多的socket打在了内核上</li>
+<li>然后通过epoll（create,ctl,wait）和共享空间（mmap）等待（wait）redis进程(6379和6380)准备数据，这个数据对linux来说就是fd；</li>
+<li>等redis准备好了，会将这些数据(或者说是fd)通知到内核（因为此时内核还在wait，等待回调呢），</li>
+<li>然后内核调用read获取内容，在发送给client；</li>
+</ul>
+<p>这就是整个redis的处理过程。那么redis为什么快？主要就是因为：使用了多路复用（提高性能）+共享空间（避免拷贝）保证了redis的快速处理。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/redis/">redis</a><a class="post-meta__tags" href="/tags/%E5%8E%9F%E7%90%86/">原理</a><a class="post-meta__tags" href="/tags/IO%E6%A8%A1%E5%9E%8B/">IO模型</a></div><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E7%9A%84%E8%AF%9E%E7%94%9F%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">redis的诞生背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E6%98%AFkv%E7%BB%93%E6%9E%84%EF%BC%8C%E4%B8%BA%E5%95%A5%E8%BF%98%E8%A6%81%E7%BB%99v%E5%AE%9A%E4%B9%89%E4%BA%94%E7%A7%8D%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="toc-number">2.</span> <span class="toc-text">redis是kv结构，为啥还要给v定义五种基本类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E6%98%AF%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%E5%A4%A7%E9%87%8F%E7%9A%84%E5%B9%B6%E5%8F%91%E8%AF%B7%E6%B1%82%E7%9A%84"><span class="toc-number">3.</span> <span class="toc-text">redis是怎么处理大量的并发请求的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E4%B8%BA%E5%95%A5%E8%A6%81%E8%AE%BE%E8%AE%A1%E6%88%90%E5%8D%95%E8%BF%9B%E7%A8%8B%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%9A%84"><span class="toc-number">4.</span> <span class="toc-text">redis为啥要设计成单进程单线程的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E7%A8%8B%E5%BA%8F%E8%B0%83%E7%94%A8%E7%9A%84%E5%8F%91%E5%B1%95%E5%8E%86%E7%A8%8B"><span class="toc-number">5.</span> <span class="toc-text">内核程序调用的发展历程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%BB%E5%A1%9E%E6%97%B6%E6%9C%9F%EF%BC%88BIO%EF%BC%89"><span class="toc-number">5.1.</span> <span class="toc-text">阻塞时期（BIO）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E9%9D%9E%E9%98%BB%E5%A1%9E%EF%BC%88NIO%EF%BC%89"><span class="toc-number">5.2.</span> <span class="toc-text">同步非阻塞（NIO）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%EF%BC%88NIO%EF%BC%89"><span class="toc-number">5.3.</span> <span class="toc-text">多路复用（NIO）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%E5%85%B1%E4%BA%AB%E7%A9%BA%E9%97%B4%EF%BC%88mmap%EF%BC%89"><span class="toc-number">5.4.</span> <span class="toc-text">多路复用共享空间（mmap）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9A%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%98%AF%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8"><span class="toc-number">5.5.</span> <span class="toc-text">补充：到底什么是多路复用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9A%E5%85%B3%E4%BA%8E%E5%85%B1%E4%BA%AB%E7%A9%BA%E9%97%B4"><span class="toc-number">5.6.</span> <span class="toc-text">补充：关于共享空间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9A0%E6%8B%B7%E8%B4%9D"><span class="toc-number">5.7.</span> <span class="toc-text">补充：0拷贝</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9Akafka%E7%9A%84%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-number">5.8.</span> <span class="toc-text">补充：kafka的简单实现原理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E7%9A%84%E8%BF%90%E8%A1%8C%E5%8E%9F%E7%90%86"><span class="toc-number">6.</span> <span class="toc-text">redis的运行原理</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By null</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/9.4.0/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
