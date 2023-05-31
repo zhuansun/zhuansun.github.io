@@ -1,0 +1,442 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Redis的持久化RDB和AOF | CCWorld</title><meta name="author" content="张三"><meta name="copyright" content="张三"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="为什么要有持久化？ 因为redis不仅可以用来做缓存，还可以用来做数据库。 而作为数据库的时候，就要求数据不能丢失。 数据不能丢失，就要有持久化。 还有一个别的原因，就是redis的主从复制也需要。 持久化的技术方案  快照 日志  快照具有时点性，但是存储的是全量数据；日志具有实时性，但是存储的数据有限。 对于Mysql来说，binlog就是快照，redolog就是日志； 对于Redis来说，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis的持久化RDB和AOF">
+<meta property="og:url" content="https://zhuansun.github.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/REDIS/Redis%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96RDB%E5%92%8CAOF/index.html">
+<meta property="og:site_name" content="CCWorld">
+<meta property="og:description" content="为什么要有持久化？ 因为redis不仅可以用来做缓存，还可以用来做数据库。 而作为数据库的时候，就要求数据不能丢失。 数据不能丢失，就要有持久化。 还有一个别的原因，就是redis的主从复制也需要。 持久化的技术方案  快照 日志  快照具有时点性，但是存储的是全量数据；日志具有实时性，但是存储的数据有限。 对于Mysql来说，binlog就是快照，redolog就是日志； 对于Redis来说，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhuansun.github.io/Redis%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96RDB%E5%92%8CAOF.assets/image-20230526174932259.png">
+<meta property="article:published_time" content="2023-05-23T10:26:42.000Z">
+<meta property="article:modified_time" content="2023-05-29T14:32:37.289Z">
+<meta property="article:author" content="张三">
+<meta property="article:tag" content="redis">
+<meta property="article:tag" content="RDB">
+<meta property="article:tag" content="AOF">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhuansun.github.io/Redis%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96RDB%E5%92%8CAOF.assets/image-20230526174932259.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhuansun.github.io/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/REDIS/Redis%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96RDB%E5%92%8CAOF/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Redis的持久化RDB和AOF',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-05-29 14:32:37'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="CCWorld" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">108</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">146</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">39</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/./Redis%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96RDB%E5%92%8CAOF.assets/image-20230526174932259.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">CCWorld</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Redis的持久化RDB和AOF</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2023-05-23T10:26:42.000Z" title="发表于 2023-05-23 10:26:42">2023-05-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/REDIS/">REDIS</a></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p><img src="/Redis%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96RDB%E5%92%8CAOF.assets/image-20230526174932259.png" alt="image-20230526174932259"></p>
+<p>为什么要有持久化？</p>
+<p>因为redis不仅可以用来做缓存，还可以用来做数据库。</p>
+<p>而作为数据库的时候，就要求数据不能丢失。</p>
+<p>数据不能丢失，就要有持久化。</p>
+<p>还有一个别的原因，就是redis的主从复制也需要。</p>
+<p>持久化的技术方案</p>
+<ul>
+<li>快照</li>
+<li>日志</li>
+</ul>
+<p>快照具有时点性，但是存储的是全量数据；日志具有实时性，但是存储的数据有限。</p>
+<p>对于Mysql来说，binlog就是快照，redolog就是日志；</p>
+<p>对于Redis来说，RDB就是快照，AOF就是日志；</p>
+<p>我们现在知道RDB是快照日志，现在有个问题：假设我的Redis中有10G的数据，在8点整的时候，生成RDB文件，生成文件的时候肯定不可能一下就生成RDB文件，假设这个过程持续10分钟，那么在这10分钟内Redis也会产生数据。那么问题来了：RDB文件中存储的是8点的数据，还是8:10的数据？</p>
+<p>这个问题就是：时点混乱的问题。</p>
+<p>怎么解决呢？</p>
+<ul>
+<li>在生成RDB的时候，阻塞式的生成，数据肯定是时点性的，但是此时Redis服务就不可用了。</li>
+<li>在生成RDB的时候，不阻塞，Redis服务继续提供服务，但是此时时点性怎么保证呢？</li>
+</ul>
+<p>有没有一种技术：既可以满足时点性， 又可以非阻塞？</p>
+<p>Linux中管道和进程的概念</p>
+<p>管道的特性是：将一个命令的输出作为另一个命令的输入。</p>
+<p>管道的实现原理是：开启新的进程，通过进程间通信实现。</p>
+<p>进程的概念：</p>
+<p>进程间的数据隔离：进程间的数据隔离是默认的，默认就是隔离的。</p>
+<p>进程间的数据通信：如果需要通信，需要特殊手段，比如 export 命令，类似于我们配置Java的环境变量</p>
+<p>进程间的数据变更：在进程间对同一个变量进行变更，数据不互通</p>
+<p>虚拟地址</p>
+<p>虚拟地址是操作系统为每个进程单独分配的地址空间。</p>
+<p>第一点，它让每个进程认为自己独占整个系统内存空间，有助于简化程序设计和管理，并提高了内存利用率。</p>
+<p>第二点，虚拟地址可以支持多任务处理和资源共享，不同的进程可以同时运行在同一个系统上，并且它们往往需要访问大量的数据和共享资源。通过将虚拟地址映射到各种实际的物理地址，所有进程都可以访问相同的物理内存位置，而又不会相互干扰，从而加强了系统的可靠性和稳定性。</p>
+<p>第三点，虚拟地址还有助于保护系统和进程的安全性，由于虚拟地址并不是真实地址，所以可以防止恶意程序破坏操作系统。</p>
+<p>写时复制copy-on-write（COW）</p>
+<p>写时复制是一种内存机制，由于优化重复的数据复制和修改操作。简单的说：当使用COW机制的时候，多个进程可以共享同一个内存区域，当其中某一个进程需要对共享内存区域进行修改的时候，会使用COW机制，将需要修改的这一部分内存区域进行复制，然后对复制后的内存区域进行修改，并修改当前进程的指针指向这块新复制的内存。从而不影响另一个进程的数据。</p>
+<p>当使用写时复制技术时，多个进程可以共享同一个资源，只有在其中一个进程真正需要进行写操作时，才会对该资源进行复制并修改。具体来说，当进程尝试写入共享内存时，操作系统会将该内存页复制一份并分配新的物理地址，这样每个进程都可以拥有自己的内存副本，从而避免了多个进程同时进行写操作造成的冲突。</p>
+<p>写时复制技术可以带来许多好处。首先，它可以减少内存开销，因为多个进程可以共享大部分内存空间，只有部分发生变化的内存才需要进行复制和修改。其次，它可以提高程序性能，因为不需要频繁地进行锁定和解锁等同步操作，从而避免了进程之间的竞争和调度延迟。此外，写时复制还有助于增强系统可靠性和安全性，因为每个进程都可以访问自己的内存副本，避免了错误和恶意代码对其他进程的影响。</p>
+<p>fork系统调用实现：既可以满足时点性， 又可以非阻塞！</p>
+<p>fork是一个系统调用，用于创建一个新的进程。当一个进程调用 fork 系统调用时，操作系统会复制一份当前进程的内存空间到一个新的进程中，新的进程是一个完全独立的进程，拥有新的PID，同时用于和主进程相同的内存区域。</p>
+<p>由于COW机制的存在，使用系统调用，既可以满足时点性，又可以满足非阻塞。</p>
+<p>Redis怎么触发fork系统调用：save和bgsave</p>
+<p>save：是阻塞式的生成RDB文件</p>
+<p>bgsave：就是使用fork的方式，非阻塞的生成RDB文件</p>
+<p>注意：bgsave可以由用户手动执行。也可以通过配置文件配置让Redis自动执行，但是在配置文件中不叫bgsave，而是叫save；（Redis在这部分处理的不好，容易产生歧义）</p>
+<p>RDB快照文件</p>
+<p>格式：</p>
+<p>弊端：具有时点性，也就是说并不是实时数据。</p>
+<p>好处：二进制存储的，恢复特别快。</p>
+<p>怎么解决RDB快照的弊端的？也就是怎么让日志文件具有时点性。</p>
+<p>就是：AOF</p>
+<p>AOF：Append Only File</p>
+<p>通过名字就可以看出来，Append Only File，只会向文件中写，写的是什么呢？就是实时发生的各种写操作。</p>
+<p>通过AOF就可以实时的持久化Redis的实时数据。</p>
+<p>弊端：AOF中记录的是命令的原文，恢复起来很慢</p>
+<p>优点：可以记录实时数据</p>
+<p>AOF的重写</p>
+<ul>
+<li>是为了减少AOF的文件大小</li>
+</ul>
+<p>AOF和RDB中会存储相同的数据吗？</p>
+<p>AOF中存储的是全量数据吗？</p>
+<p>Redis服务重启后，AOF中的数据是全量的？ 追加写到之前的文件的。</p>
+<p>AOF中包含RDB的头文件是什么意思？aof-use-rdb-preamble</p>
+<p>AOF日志</p>
+<p>日志格式：</p>
+<p>什么时候存：</p>
+<p>AOF的刷新模式：no，always，everysec</p>
+<p>AOF的老模式和新模式：其实就是是否开启了aof-use-rdb-preamble，没开就是老模式，开了就是新模式</p>
+<p>AOF的重写：</p>
+<p>AOF的文件会无限扩大吗？还是达到一定量就拆分？</p>
+<p>在RDB和AOF同时开启的情况下，RDB已经存了时点备份，AOF中也会记录全量数据吗？</p>
+<p>在实际的生产环境中，RDB和AOF是怎么配置的呢？</p>
+<p>RDB的源码分析</p>
+<ul>
+<li>生成的源码分析</li>
+<li>载入的源码分析</li>
+<li>定时生成RDB的源码分析</li>
+</ul>
+<p>AOF的源码分析</p>
+<p>RDB生成的命令伪代码</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// SAVE的伪代码</span>
+def <span class="token function">SAVE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span>
+    # 创建RDB文件
+    <span class="token function">rdbSave</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        
+        
+<span class="token comment">// BGSAVE的伪代码        </span>
+def <span class="token function">BGSAVE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span>
+    # 创建子进程
+    pid <span class="token operator">=</span> <span class="token function">fork</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> pid <span class="token operator">==</span> <span class="token number">0</span><span class="token operator">:</span>
+        # 子进程负责创建RDB文件
+        <span class="token function">rdbSave</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        # 完成之后向父进程发送信号
+        <span class="token function">signal_parent</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    elif pid <span class="token operator">></span> <span class="token number">0</span><span class="token operator">:</span>
+        # 父进程继续处理命令请求，并通过轮询等待子进程的信号
+        <span class="token function">handle_request_and_wait_signal</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">else</span><span class="token operator">:</span>
+        # 处理出错情况
+        <span class="token function">handle_fork_error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>AOF生成的命令伪代码</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">def <span class="token function">eventLoop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span>
+    <span class="token keyword">while</span> True<span class="token operator">:</span>
+        # 处理文件事件，接收命令请求以及发送命令回复
+        # 处理命令请求时可能会有新内容被追加到 aof_buf 缓冲区中
+        <span class="token function">processFileEvents</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        # 处理时间事件
+        <span class="token function">processTimeEvents</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        # 考虑是否要将 aof_buf 中的内容写入和保存到 AOF 文件里面
+        <span class="token function">flushAppendOnlyFile</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>AOF的重写伪代码</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">def <span class="token function">aof_rewrite</span><span class="token punctuation">(</span>new_aof_file_name<span class="token punctuation">)</span><span class="token operator">:</span>
+    # 创建新 AOF 文件
+    f <span class="token operator">=</span> <span class="token function">create_file</span><span class="token punctuation">(</span>new_aof_file_name<span class="token punctuation">)</span>
+    # 遍历数据库
+    <span class="token keyword">for</span> db in redisServer<span class="token punctuation">.</span>db<span class="token operator">:</span>
+        # 忽略空数据库
+        <span class="token keyword">if</span> db<span class="token punctuation">.</span><span class="token function">is_empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">continue</span>
+        # 写入SELECT命令，指定数据库号码
+        f<span class="token punctuation">.</span><span class="token function">write_command</span><span class="token punctuation">(</span><span class="token string">"SELECT"</span> <span class="token operator">+</span> db<span class="token punctuation">.</span>id<span class="token punctuation">)</span>
+        # 遍历数据库中的所有键
+        <span class="token keyword">for</span> key in db<span class="token operator">:</span>
+            # 忽略已过期的键
+            <span class="token keyword">if</span> key<span class="token punctuation">.</span><span class="token function">is_expired</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">continue</span>
+            # 根据键的类型对键进行重写
+            <span class="token keyword">if</span> key<span class="token punctuation">.</span>type <span class="token operator">==</span> String<span class="token operator">:</span>
+                <span class="token function">rewrite_string</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+            elif key<span class="token punctuation">.</span>type <span class="token operator">==</span> List<span class="token operator">:</span>
+                <span class="token function">rewrite_list</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+            elif key<span class="token punctuation">.</span>type <span class="token operator">==</span> Hash<span class="token operator">:</span>
+                <span class="token function">rewrite_hash</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+            elif key<span class="token punctuation">.</span>type <span class="token operator">==</span> Set<span class="token operator">:</span>
+                <span class="token function">rewrite_set</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+            elif key<span class="token punctuation">.</span>type <span class="token operator">==</span> SortedSet<span class="token operator">:</span>
+                <span class="token function">rewrite_sorted_set</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+            # 如果键带有过期时间，那么过期时间也要被重写
+            <span class="token keyword">if</span> key<span class="token punctuation">.</span><span class="token function">have_expire_time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span>
+                <span class="token function">rewrite_expire_time</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+    # 写入完毕，关闭文件
+    f<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+def <span class="token function">rewrite_string</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token operator">:</span>
+    # 使用GET命令获取字符串键的值
+    value <span class="token operator">=</span> <span class="token function">GET</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+    # 使用SET命令重写字符串键
+    f<span class="token punctuation">.</span><span class="token function">write_command</span><span class="token punctuation">(</span>SET<span class="token punctuation">,</span> key<span class="token punctuation">,</span> value<span class="token punctuation">)</span>
+def <span class="token function">rewrite_list</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token operator">:</span>
+    # 使用LRANGE命令获取列表键包含的所有元素
+    item1<span class="token punctuation">,</span> item2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> itemN <span class="token operator">=</span> <span class="token function">LRANGE</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+    # 使用RPUSH命令重写列表键
+    f<span class="token punctuation">.</span><span class="token function">write_command</span><span class="token punctuation">(</span>RPUSH<span class="token punctuation">,</span> key<span class="token punctuation">,</span> item1<span class="token punctuation">,</span> item2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> itemN<span class="token punctuation">)</span>
+def <span class="token function">rewrite_hash</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token operator">:</span>
+    # 使用HGETALL命令获取哈希键包含的所有键值对
+    field1<span class="token punctuation">,</span> value1<span class="token punctuation">,</span> field2<span class="token punctuation">,</span> value2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> fieldN<span class="token punctuation">,</span> valueN <span class="token operator">=</span> <span class="token function">HGETALL</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+    # 使用HMSET命令重写哈希键
+    f<span class="token punctuation">.</span><span class="token function">write_command</span><span class="token punctuation">(</span>HMSET<span class="token punctuation">,</span> key<span class="token punctuation">,</span> field1<span class="token punctuation">,</span> value1<span class="token punctuation">,</span> field2<span class="token punctuation">,</span> value2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> fieldN<span class="token punctuation">,</span> valueN<span class="token punctuation">)</span>
+def <span class="token function">rewrite_set</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    # 使用SMEMBERS命令获取集合键包含的所有元素
+    elem1<span class="token punctuation">,</span> elem2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> elemN <span class="token operator">=</span> <span class="token function">SMEMBERS</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+    # 使用SADD命令重写集合键
+    f<span class="token punctuation">.</span><span class="token function">write_command</span><span class="token punctuation">(</span>SADD<span class="token punctuation">,</span> key<span class="token punctuation">,</span> elem1<span class="token punctuation">,</span> elem2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> elemN<span class="token punctuation">)</span>
+def <span class="token function">rewrite_sorted_set</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token operator">:</span>
+    # 使用ZRANGE命令获取有序集合键包含的所有元素
+    member1<span class="token punctuation">,</span> score1<span class="token punctuation">,</span> member2<span class="token punctuation">,</span> score2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> memberN<span class="token punctuation">,</span> scoreN <span class="token operator">=</span> <span class="token function">ZRANGE</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">"WITHSCORES"</span><span class="token punctuation">)</span>
+    # 使用ZADD命令重写有序集合键
+    f<span class="token punctuation">.</span><span class="token function">write_command</span><span class="token punctuation">(</span>ZADD<span class="token punctuation">,</span> key<span class="token punctuation">,</span> score1<span class="token punctuation">,</span> member1<span class="token punctuation">,</span> score2<span class="token punctuation">,</span> member2<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> scoreN<span class="token punctuation">,</span> memberN<span class="token punctuation">)</span>
+def <span class="token function">rewrite_expire_time</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token operator">:</span>
+    # 获取毫秒精度的键过期时间戳
+    timestamp <span class="token operator">=</span> <span class="token function">get_expire_time_in_unixstamp</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+    # 使用PEXPIREAT命令重写键的过期时间
+    f<span class="token punctuation">.</span><span class="token function">write_command</span><span class="token punctuation">(</span>PEXPIREAT<span class="token punctuation">,</span> key<span class="token punctuation">,</span> timestamp<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+
+
+<p>对于Redis的日志，如果只是作为缓存，rdb就够了。如果是把Redis当做数据库来用的话，由于要保证数据不丢失，就需要配置AOF</p>
+<p>call 命令开始</p>
+<p>proc开始处理..</p>
+<p>propagate() 方法： 命令执行完之后，执行这个方法</p>
+<ul>
+<li>这个方法回写AOP（AppendOnlyFile）</li>
+<li>还有可能会replication</li>
+</ul>
+<p>feedAppendOnlyFile</p>
+<p>会将命令协议化之后，积攒到 server.aof_buf</p>
+<p>如果当前有子进程在重写，会将server.aof_buf传给子进程</p>
+<p>循环处理事件</p>
+<p>其中有一个定时任务，这个任务做了什么？</p>
+<p>1、客户端的处理</p>
+<p>2、db的过期key的处理</p>
+<p>3、rehash的处理</p>
+<p>4、bgrdb</p>
+<p>5、bgrewriteaof</p>
+<p>6、前台刷写aof</p>
+<p>7、集群的相关处理</p>
+<p>numevents &#x3D; aeapiloop…..</p>
+<p>后台的 bgsave 和 bgrewriteaofCommand</p>
+<ul>
+<li>子进程怎么从主进程中获取增量的cmd</li>
+</ul>
+<p>rewriteAppendOnlyFileBackGround</p>
+<ul>
+<li><p>aofCreatePipes</p>
+<ul>
+<li>pipe是什么？ 底层是FIFO，由操作系统完成提供</li>
+<li>有什么用呢？使用pipe用于父子进程间的通信</li>
+</ul>
+</li>
+<li><p>redisFork</p>
+<ul>
+<li>fork出一个子进程</li>
+<li>对于fork出的子进程来说，childpid&#x3D;&#x3D;0</li>
+<li>对于父进程来说，chilep&#x3D;&#x3D;具体的值</li>
+<li>由于copy-on-write的存在，fork出的子进程可以拿到fork这一时刻主进程之前的所有数据</li>
+<li>但是fork之后的子进程，是无法拿到主进程之后的变动数据的？那么怎么拿呢？<ul>
+<li>就是上面说的 pipe 管道，通过pipe就可以实时的拿到主进程的实时变动数据。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>setcpuaffinity：设置子进程的亲密度</p>
+<ul>
+<li>避免子进程执行的时候，不停地cpu之间来回切换，性能消耗。</li>
+</ul>
+</li>
+<li><p>rewriteAppendOnlyFile(tempFIle)</p>
+<ul>
+<li>aewait() + aofReadDifferentFromparent() ：子进程从主进程中获取差异</li>
+<li>子进程给主进程发一个：！，然后等待主进程给自己发一个：！<ul>
+<li>目的是因为：子进程说，别给我发了，我得先处理一下了。 主进程说：好的，不给你发了。</li>
+</ul>
+</li>
+<li>子进程：rename &amp;&amp; exit</li>
+<li>父进程收到子进程exit的信号之后，开始处理自己手头上剩余的工作</li>
+</ul>
+</li>
+<li><p>sendChildCowInfo：子进程开启进程间的通信，通过pipe</p>
+</li>
+<li><p>子程序退出之后，主进程：checkChildernDone</p>
+<ul>
+<li>backGroundRewriteDonehandler：这里面主要是主线程把手里的工作都处理掉。然后rename(tmpfile, server.aof_filename)</li>
+</ul>
+</li>
+</ul>
+<p>补充：copy-on-write</p>
+<ul>
+<li>在linux中，fork实现了 copy-on-write 机制。</li>
+</ul>
+</article><div class="tag_share"><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">张三</div><div class="author-info__description">happy everyday</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">108</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">146</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">39</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhuansun"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"></div></div></main><footer id="footer" style="background-image: url('/./Redis%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96RDB%E5%92%8CAOF.assets/image-20230526174932259.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By 张三</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/9.4.0/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"></div><div id="rightside-config-show"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>

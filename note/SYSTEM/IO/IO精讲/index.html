@@ -1,0 +1,263 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>CCWorld | CCWorld</title><meta name="author" content="张三"><meta name="copyright" content="张三"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一切且文件 虚拟文件系统 任何文件都有 0 1 2 三个文件描述符：标准输入，标准输出，错误输出 文件描述符  cd &#x2F;proc&#x2F;$$&#x2F;fd  两个程序可以打开同一个文件，但是对于两个程序来说，分别是不同的fd，也就是不同的指针 &#x2F;proc 关机之后看硬盘，里面是啥都没有的。只有在系统运行的时候，一些进程会被映射成文件，放在这里。 $$ 是一个特殊的环境">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CCWorld">
+<meta property="og:url" content="https://zhuansun.github.io/note/SYSTEM/IO/IO%E7%B2%BE%E8%AE%B2/index.html">
+<meta property="og:site_name" content="CCWorld">
+<meta property="og:description" content="一切且文件 虚拟文件系统 任何文件都有 0 1 2 三个文件描述符：标准输入，标准输出，错误输出 文件描述符  cd &#x2F;proc&#x2F;$$&#x2F;fd  两个程序可以打开同一个文件，但是对于两个程序来说，分别是不同的fd，也就是不同的指针 &#x2F;proc 关机之后看硬盘，里面是啥都没有的。只有在系统运行的时候，一些进程会被映射成文件，放在这里。 $$ 是一个特殊的环境">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/10/31/C8gKdeILb2EhnT1.jpg">
+<meta property="article:published_time" content="2023-05-30T19:00:02.009Z">
+<meta property="article:modified_time" content="2023-05-30T19:00:02.009Z">
+<meta property="article:author" content="张三">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/10/31/C8gKdeILb2EhnT1.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhuansun.github.io/note/SYSTEM/IO/IO%E7%B2%BE%E8%AE%B2/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'CCWorld',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-05-30 19:00:02'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="CCWorld" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">108</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">146</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">39</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s2.loli.net/2022/10/31/C8gKdeILb2EhnT1.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">CCWorld</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">无题</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2023-05-30T19:00:02.009Z" title="发表于 2023-05-30 19:00:02">2023-05-30</time></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><hr>
+<hr>
+<p>一切且文件</p>
+<p>虚拟文件系统</p>
+<p>任何文件都有 0 1 2 三个文件描述符：标准输入，标准输出，错误输出</p>
+<p>文件描述符</p>
+<blockquote>
+<p>cd &#x2F;proc&#x2F;$$&#x2F;fd</p>
+</blockquote>
+<p>两个程序可以打开同一个文件，但是对于两个程序来说，分别是不同的fd，也就是不同的指针</p>
+<p>&#x2F;proc</p>
+<p>关机之后看硬盘，里面是啥都没有的。只有在系统运行的时候，一些进程会被映射成文件，放在这里。</p>
+<p>$$</p>
+<p>是一个特殊的环境变量，表示当前bash的pid</p>
+<p>lsof -op $$</p>
+<p>当前bash的pid的一些详细数据</p>
+<p>重定向：不是命令，而是一种机制</p>
+<p>pstree：查看的进程的父子关系</p>
+<p>socket</p>
+<p>pipline：管道两边分别是两个子进程，一个子进程在写，一个子进程再读，进程与进程之间是隔离的，通过管道可以实现进程间的通信</p>
+<p>int 0x80 </p>
+<ul>
+<li>int：是cpu的一个指令</li>
+<li>0x80：对应二进制 1000 0000 ；是对应 中断描述符表 中的128这个位置的callback方法。</li>
+</ul>
+<p>在程序和物理内存之间，会有一个虚拟地址的概念，程序以为我是独占所有内存的。</p>
+<p>汇通一个MMU单元进行管理，会将程序的虚拟地址映射到物理内存的地址上。</p>
+<p>在虚拟地址上，程序认为申请的内存都是连续的。但是在物理内存上，可能是不连续的。</p>
+<p>应用程序在运行的时候，所需要的内存并不是一次性全部分配的，是在运行过程中，需要多少，就申请多少</p>
+<p>每次申请至少是4k，因为分配的最小粒度是PageCache，一个PageCache的大小是4k；</p>
+<blockquote>
+<p>pcstat  &#x2F;bin&#x2F;bash</p>
+<p>pcstat 文件</p>
+</blockquote>
+<p>pcstat 就是查看pageCache的状态</p>
+<p><img src="/IO%E7%B2%BE%E8%AE%B2.assets/image-20230530145156763.png" alt="image-20230530145156763"></p>
+<p>这个图的意思就是说：bin&#x2F;bash 这个程序（它是一个程序哦），在操作系统中它的大小是：903336字节，换算一下就是882.16KB；我们知道一个PageCache是4K，所以它占用的pages就是221个，但是目前加载的PageCache只有194个，并不是所有的都加载进来了。</p>
+<p>我们要学习的IO知识，是依赖与PageCache的</p>
+<blockquote>
+<p>sysctl -a</p>
+</blockquote>
+<p>查看当前系统中的所有配置项</p>
+<p>其中有一个脏页的概念</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token punctuation">[</span>appdeploy@pangu-site-dev1-7ddf994d6f-zxjxc deploy<span class="token punctuation">]</span><span class="token variable">$sysctl</span> <span class="token parameter variable">-a</span> <span class="token operator">|</span> <span class="token function">grep</span> dirty
+vm.dirty_background_bytes <span class="token operator">=</span> <span class="token number">0</span>
+vm.dirty_background_ratio <span class="token operator">=</span> <span class="token number">3</span>  <span class="token comment"># 表示当后台进程在运行时可以存在多少个脏页（这些脏页占用的内存占总内存的百分比）而不需要回写到磁盘上</span>
+vm.dirty_bytes <span class="token operator">=</span> <span class="token number">0</span>
+vm.dirty_expire_centisecs <span class="token operator">=</span> <span class="token number">3000</span>
+vm.dirty_ratio <span class="token operator">=</span> <span class="token number">10</span>  <span class="token comment"># 用户的进程不停的申请内存申请内存，当系统内存使用量达到总内存的多少百分比时开始回写脏页到硬盘上</span>
+vm.dirty_writeback_centisecs <span class="token operator">=</span> <span class="token number">500</span>
+vm.dirtytime_expire_seconds <span class="token operator">=</span> <span class="token number">43200</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>怎么修改</p>
+<blockquote>
+<p>vi &#x2F;etc&#x2F;sysctl.conf</p>
+</blockquote>
+<p>这两个参数具体的实践</p>
+<ul>
+<li>在Redis刷RDB和AOF（RDB是手动或者定时触发bgsave生成的），而AOF是有一个配置的：no，always，everysec</li>
+<li>在Mysql中redolog和binlong的刷盘也是有配置的。</li>
+<li>它们之所以提供配置，就是因为内核并不是保证实时刷盘的。</li>
+</ul>
+<p>想写的时候，compact一下</p>
+<p>想读的时候，flip一下</p>
+<p>数据库会用DirectIO</p>
+<p><img src="/IO%E7%B2%BE%E8%AE%B2.assets/image-20230530190036881.png" alt="image-20230530190036881"></p>
+<p>IO的种类有很多种</p>
+<ul>
+<li>磁盘IO</li>
+<li>socket IO</li>
+<li>网络IO</li>
+</ul>
+<p>都是IO</p>
+</article><div class="tag_share"><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">张三</div><div class="author-info__description">happy everyday</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">108</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">146</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">39</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhuansun"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"></div></div></main><footer id="footer" style="background-image: url('https://s2.loli.net/2022/10/31/C8gKdeILb2EhnT1.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By 张三</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/9.4.0/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"></div><div id="rightside-config-show"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>

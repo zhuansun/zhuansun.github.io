@@ -1,0 +1,2368 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>CCWorld | CCWorld</title><meta name="author" content="张三"><meta name="copyright" content="张三"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="面经汇总&#x2F;儒猿面经广告鸡汤&#x2F;广深中小厂面经验    顺丰-1面：     1	项目中有什么难点？    2	Redis用来做了些什么？    3	Redis的做布隆过滤器是怎么玩的？    4	使用Redis时，怎么考虑用哪种类型？    5	Redis为什么快？    6	Redis内部实现的大致原理是什么？    7	Redis的高可用怎么保证？    8	怎么保证MQ消费">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CCWorld">
+<meta property="og:url" content="https://zhuansun.github.io/note/JAVA/%E9%9D%A2%E8%AF%95/%E5%84%92%E7%8C%BF%E9%9D%A2%E7%BB%8F/%E5%84%92%E7%8C%BF%E9%9D%A2%E7%BB%8F%E6%B1%87%E6%80%BB/index.html">
+<meta property="og:site_name" content="CCWorld">
+<meta property="og:description" content="面经汇总&#x2F;儒猿面经广告鸡汤&#x2F;广深中小厂面经验    顺丰-1面：     1	项目中有什么难点？    2	Redis用来做了些什么？    3	Redis的做布隆过滤器是怎么玩的？    4	使用Redis时，怎么考虑用哪种类型？    5	Redis为什么快？    6	Redis内部实现的大致原理是什么？    7	Redis的高可用怎么保证？    8	怎么保证MQ消费">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/10/31/U5JGEBcWmqsn1LV.jpg">
+<meta property="article:published_time" content="2023-05-29T14:32:37.354Z">
+<meta property="article:modified_time" content="2023-05-29T14:32:37.354Z">
+<meta property="article:author" content="张三">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/10/31/U5JGEBcWmqsn1LV.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhuansun.github.io/note/JAVA/%E9%9D%A2%E8%AF%95/%E5%84%92%E7%8C%BF%E9%9D%A2%E7%BB%8F/%E5%84%92%E7%8C%BF%E9%9D%A2%E7%BB%8F%E6%B1%87%E6%80%BB/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'CCWorld',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-05-29 14:32:37'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="CCWorld" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">108</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">146</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">39</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s2.loli.net/2022/10/31/U5JGEBcWmqsn1LV.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">CCWorld</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">无题</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2023-05-29T14:32:37.354Z" title="发表于 2023-05-29 14:32:37">2023-05-29</time></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="面经汇总-x2F-儒猿面经广告鸡汤-x2F-广深中小厂面经验"><a href="#面经汇总-x2F-儒猿面经广告鸡汤-x2F-广深中小厂面经验" class="headerlink" title="面经汇总&#x2F;儒猿面经广告鸡汤&#x2F;广深中小厂面经验"></a><a target="_blank" rel="noopener" href="https://github.com/huangfeiyuCoder/JavaMianShi/tree/main/%E9%9D%A2%E7%BB%8F%E6%B1%87%E6%80%BB">面经汇总</a>&#x2F;<a target="_blank" rel="noopener" href="https://github.com/huangfeiyuCoder/JavaMianShi/tree/main/%E9%9D%A2%E7%BB%8F%E6%B1%87%E6%80%BB/%E5%84%92%E7%8C%BF%E9%9D%A2%E7%BB%8F%E5%B9%BF%E5%91%8A%E9%B8%A1%E6%B1%A4">儒猿面经广告鸡汤</a>&#x2F;<strong>广深中小厂面经验</strong></h2><table>
+<thead>
+<tr>
+<th></th>
+<th>顺丰-1面：</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td>1	项目中有什么难点？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	Redis用来做了些什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	Redis的做布隆过滤器是怎么玩的？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	使用Redis时，怎么考虑用哪种类型？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	Redis为什么快？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	Redis内部实现的大致原理是什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	Redis的高可用怎么保证？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	怎么保证MQ消费幂等性？</td>
+</tr>
+<tr>
+<td></td>
+<td>9	怎么实现消息的有序性？</td>
+</tr>
+<tr>
+<td></td>
+<td>10	怎么保证MQ的可靠性投递？</td>
+</tr>
+<tr>
+<td></td>
+<td>11	怎么解决MQ的积压问题？ （在消费者不扩容的前提下怎么解决？）</td>
+</tr>
+<tr>
+<td></td>
+<td>12	A系统同时给B系统分别发送2个请求（先insert请求后update请求），B有部署两个节点，你怎么保证在B系统的两个节点上执行是有序的？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	讲讲Java中的集合，并发，Queue队列相关的东西。</td>
+</tr>
+<tr>
+<td></td>
+<td>14	Spring中的生命周期？</td>
+</tr>
+<tr>
+<td></td>
+<td>15	SPring中是怎么实现事务的？</td>
+</tr>
+<tr>
+<td></td>
+<td>16	如果要对线上某个表的一个字段长度扩容，你会考虑什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>17	QPS1万+的查询接口你怎么设计？</td>
+</tr>
+<tr>
+<td></td>
+<td>18	QPS1万+的有状态接口你怎么设计？</td>
+</tr>
+<tr>
+<td></td>
+<td>。。。其他的忘了，反正都是一些常见的问题</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>顺丰-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	介绍项目业务？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	怎么保证上下游系统间数据的一致性?</td>
+</tr>
+<tr>
+<td></td>
+<td>3	怎么保证数据的幂等性？ 如何利用tokenID来实现幂等？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	你们用Redis干些什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	如果Redis挂了，怎么办？（从降级，限流，快速恢复角度去答）</td>
+</tr>
+<tr>
+<td></td>
+<td>6	Redis脑裂咋办？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	如果Redis集群中一个节点挂了，怎么保证高可用？ （问题有点模糊）</td>
+</tr>
+<tr>
+<td></td>
+<td>8	Redis的分配一致性哈希算法？怎么解决的数据倾斜问题？</td>
+</tr>
+<tr>
+<td></td>
+<td>9	JDK里面有哪些引用关系？（强，软，弱引用，以及使用场景上回答）</td>
+</tr>
+<tr>
+<td></td>
+<td>10	FullGC和OOM溢出有啥关系？</td>
+</tr>
+<tr>
+<td></td>
+<td>11	有遇到过OOM嘛？怎么解决的？</td>
+</tr>
+<tr>
+<td></td>
+<td>12	讲讲JVM哪些区域里会发生OOM，在代码中应该如何避免？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	高并发下对MySQL的表结构设计，好操作时，要注意些什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>14	（我主要是从事务粒度，锁粒度，扫描行数，是否走索引来回答）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>顺丰HR-3面：</td>
+</tr>
+<tr>
+<td></td>
+<td>反正就是一些常见没有意义的题</td>
+</tr>
+<tr>
+<td></td>
+<td>问期望工资</td>
+</tr>
+<tr>
+<td></td>
+<td>优缺点</td>
+</tr>
+<tr>
+<td></td>
+<td>沟通情况等等</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>YY直播-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	Netty 的粘包拆包方法有哪些？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	Kafak的 broker是什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	Redis分布式锁，怎么实现可重入锁？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	Redis，Hash，List，Set分别对应的底层数据结构？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	了解意向锁嘛？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	什么是覆盖索引，什么是索引下推？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	什么是redoLog日志？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	说说RedoLog日志和Binlog日志的怎么使用?</td>
+</tr>
+<tr>
+<td></td>
+<td>9	什么是MVCC机制？</td>
+</tr>
+<tr>
+<td></td>
+<td>10	讲讲红黑二叉树？</td>
+</tr>
+<tr>
+<td></td>
+<td>11	怎么排查线上实例CPU飙高的问题？</td>
+</tr>
+<tr>
+<td></td>
+<td>12	JVM参数配置需要注意一些什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	为什么堆大堆小内存要设置一样？</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>YY直播-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1.你们布隆过滤器怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>2.怎么在BitMap上解决哈希冲突问题的？</td>
+</tr>
+<tr>
+<td></td>
+<td>3.为什么不直接用Order作为Key，直接以KV形式存储在Redis里面？（占内存）</td>
+</tr>
+<tr>
+<td></td>
+<td>4.Redis用的什么集群？Redis有做读写分离吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>5.怎么利用Redis做的MQ幂等性？</td>
+</tr>
+<tr>
+<td></td>
+<td>6.怎么利用Redis来设计每日热搜排行榜？</td>
+</tr>
+<tr>
+<td></td>
+<td>7.Redis分布式锁有几种实现方式？</td>
+</tr>
+<tr>
+<td></td>
+<td>8.Redission底层是怎么实现分布式锁的？</td>
+</tr>
+<tr>
+<td></td>
+<td>9.Java中Syncroinze锁和ReenTrantLock有什么区别，底层怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>10.问几个Linux命令：（都没答上来）</td>
+</tr>
+<tr>
+<td></td>
+<td>怎么查询IO磁盘占用了多少？</td>
+</tr>
+<tr>
+<td></td>
+<td>怎么查询内存占用多少？</td>
+</tr>
+<tr>
+<td></td>
+<td>怎么查询CPU占用？</td>
+</tr>
+<tr>
+<td></td>
+<td>怎么查询网络连接占用多少？</td>
+</tr>
+<tr>
+<td></td>
+<td>11.怎么利用MySQL实现分布式锁？</td>
+</tr>
+<tr>
+<td></td>
+<td>12.MySQL建表的时候，你要考虑一些什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>（字段类型，长度，索引设计，null值，编码等去聊）</td>
+</tr>
+<tr>
+<td></td>
+<td>13.设计题：有20个群，大概每个群1万人，需要在15-16点的时候，会在群里的右下角展示一个图片，图片中🈶投票按钮，和显示 “已投人数”，投完票后显示本群已投票的人名榜，按住投票先后排序。 这个你怎么设计？</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>。。。。二面后挂了：面试评价：Java基础较好，但是Linux知识比较差，因此知识面不广。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>富途-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	浏览器发起请求后经历了哪些过程？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	HTTP由哪些部分组成？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	三次握手四次挥手分别传递了什么信息？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	HTTPS协议的区别？ 对称加密先做了非对称加密？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	一个SQL查询题？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	一个SQL表设计题？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	一个场景提？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	一个字符串解析题，需要用到递归去实现。</td>
+</tr>
+<tr>
+<td></td>
+<td>9	一个级联关系的JSON，怎么解析，据说在什么加密算法里有使用到？</td>
+</tr>
+<tr>
+<td></td>
+<td>。。。其他的忘了，反正前前后后面了一个小时</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>富途-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1.有AB两个数组，判断B是否为A的子集。（编码题）</td>
+</tr>
+<tr>
+<td></td>
+<td>2.一副扑克牌，没有大小王一共52张，从里面随机抽2张，问抽到颜色相等的概率是多少。（算术，思维题）</td>
+</tr>
+<tr>
+<td></td>
+<td>3.一堆桃子分给一群猴子，如果每个猴子分3个，还剩59个；如果每个猴子分5个，那么最后一个猴子分得的桃子不够3个，你能求出有几只猴子，几个桃子吗？（思维题）</td>
+</tr>
+<tr>
+<td></td>
+<td>4.事务的四个特性？分别解释一下四个特性</td>
+</tr>
+<tr>
+<td></td>
+<td>5.事务怎么实现的？Spring里面又是怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>6.TCP协议的三次握手</td>
+</tr>
+<tr>
+<td></td>
+<td>7.TCP以及握手中发送了什么信息</td>
+</tr>
+<tr>
+<td></td>
+<td>8.如果利用第三次握手后如果没有返回服务端，会发生什么？</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>。。。面完后挂了：算法写出来了，数学题没做出来。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>朴朴买菜-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	熟悉线程、线程池的参数使用以及原生线程池的一些问题</td>
+</tr>
+<tr>
+<td></td>
+<td>2	了解synchronized，了解锁优化，了解voliate，lock的底层原理</td>
+</tr>
+<tr>
+<td></td>
+<td>3	了解jvm的原理，对jvm做的调优，比如导致数据场景，调大新生代，避免对象今早进入老年代</td>
+</tr>
+<tr>
+<td></td>
+<td>4	使用过工具分析过dump文件</td>
+</tr>
+<tr>
+<td></td>
+<td>5	了解数据库索引结构、知道聚集索引，非聚集索引，了解索引下推，b+树结构等</td>
+</tr>
+<tr>
+<td></td>
+<td>6	会使用explain分析慢sql，遇到过隐式转换导致索引失效</td>
+</tr>
+<tr>
+<td></td>
+<td>7	redis这块用过分布式锁，用过sortedset（主要拿来排序，场景是延时队列，不是常见的redis延时队列方案），使用过bitmap，配合lua脚本实现限流</td>
+</tr>
+<tr>
+<td></td>
+<td>8	mq使用简单了解，知道消费不丢，了解顺序消费，了解幂等消费方案。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>朴朴买菜-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	如何解决系统调用时数据的一致性问题。</td>
+</tr>
+<tr>
+<td></td>
+<td>2	刷数据问题：要求使用time_update更新，避免漏数据。刚好在分页节点，多条记录time_update 一样的时候，使用id排序做游标, 包括深分页的优化。</td>
+</tr>
+<tr>
+<td></td>
+<td>3	上述业务有无其他方案，能想到消息的方式，但是觉得过度设计，宁愿这种耦合。</td>
+</tr>
+<tr>
+<td></td>
+<td>4	对DDD、领域事件有基本了解</td>
+</tr>
+<tr>
+<td></td>
+<td>5	接口优化，线程池、事物粒度等角度讲。</td>
+</tr>
+<tr>
+<td></td>
+<td>6	有个特别的设计：开票二维码的code，有自定义的规则判断是否有效，避免无效请求。</td>
+</tr>
+<tr>
+<td></td>
+<td>7	按照场景提前加载缓存。穿透问题有考虑，方案只是使用了单机线程池，流控方面比较缺少</td>
+</tr>
+<tr>
+<td></td>
+<td>8	固定窗口、滑动窗口等方案了解，面试过程能细的讲滑动窗口的自定义实现（数据结构不优）</td>
+</tr>
+<tr>
+<td></td>
+<td>9	压测方案怎么指定？解读和场景方面缺少。</td>
+</tr>
+<tr>
+<td></td>
+<td>。。。其他的忘了，反正前前后后面了一个小时</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>朴朴买菜-HR面：</td>
+</tr>
+<tr>
+<td></td>
+<td>问为啥离职，介绍深圳计算团队，是做供应链的，人数就几十个人，然后直接</td>
+</tr>
+<tr>
+<td></td>
+<td>谈工资，谈期权。（社保低，公积金高）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>玄武科技-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	聊聊JVM虚拟机</td>
+</tr>
+<tr>
+<td></td>
+<td>2	聊聊JVM内存模型，GC，对象回收算法。</td>
+</tr>
+<tr>
+<td></td>
+<td>3	聊聊Java中的多线程要考虑的问题？（原子性，隔离性，有序性，从这三方面去切入）</td>
+</tr>
+<tr>
+<td></td>
+<td>4	聊聊java中为了解决线程安全的东西，锁，队列，volatile，安全容器，原子变量等等。</td>
+</tr>
+<tr>
+<td></td>
+<td>5	聊聊Jvm的类加载，对象创建，Javac,类加载器，双亲委派，JavaAgent动态代理，cglib动态代理从这些去聊）</td>
+</tr>
+<tr>
+<td></td>
+<td>6	聊聊Java中的IO模型，AIO，BIO，NIO。这些。</td>
+</tr>
+<tr>
+<td></td>
+<td>7	了解Netty底层的实现吗?聊聊多路复用，React模型，select，poll,epoll模型。</td>
+</tr>
+<tr>
+<td></td>
+<td>8	聊聊Spring中的东西，IOC,DI,AOP这些。</td>
+</tr>
+<tr>
+<td></td>
+<td>9	聊聊SpringBoot里面是怎么设计的，SPI机制，start怎么实现的，那一堆吧。</td>
+</tr>
+<tr>
+<td></td>
+<td>10	聊聊SpringBoot中内嵌的Tomcat，和Jetty有什么区别？</td>
+</tr>
+<tr>
+<td></td>
+<td>11	聊聊Innodb中的索引结构。</td>
+</tr>
+<tr>
+<td></td>
+<td>12	聊聊SQL优化时，和建表时需要注意哪些。（建表时，select查询时，修改插入时， 从这几方面切入）</td>
+</tr>
+<tr>
+<td></td>
+<td>13	CodeReview时，你会注意哪些方面？（可读性，拓展性，性能 从这三面去总结）</td>
+</tr>
+<tr>
+<td></td>
+<td>14	聊聊你知道哪些设计原则，开发时是怎么体现的？：（单一，开闭，里氏替换原则）</td>
+</tr>
+<tr>
+<td></td>
+<td>15	聊聊TCP为啥时可靠性传输？</td>
+</tr>
+<tr>
+<td></td>
+<td>16	为啥TCP连接时要三次握手，断开时需要四次握手?</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>玄武科技-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	问了一下项目业务？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	有哪些难点？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	介绍一下分库分表过程是怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	讲讲你做了哪些技术方案？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	讲讲GetWay的原理？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	如何设计一个高并发的系统？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	RocketMQ的底层实现？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	。。。反正正常是面过了，但是面试官的结论，基础好，深度意识可以，就是缺少高并发的场景。</td>
+</tr>
+<tr>
+<td></td>
+<td>玄武科技HR-3面</td>
+</tr>
+<tr>
+<td></td>
+<td>期望薪资？</td>
+</tr>
+<tr>
+<td></td>
+<td>为什么想来广州？</td>
+</tr>
+<tr>
+<td></td>
+<td>自己擅长什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>基本上就是闲聊？</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>奇虎360-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	synchronized的底层原理</td>
+</tr>
+<tr>
+<td></td>
+<td>2	什么是内存逃逸分析？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	volatile的底层原理</td>
+</tr>
+<tr>
+<td></td>
+<td>4	AQS底层原理</td>
+</tr>
+<tr>
+<td></td>
+<td>5	用了哪些NoSQL数据库，为啥要用Mongodb不用MySQL。</td>
+</tr>
+<tr>
+<td></td>
+<td>6	你们CodeReview会注意哪些？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	你们采用敏捷开发模式，是怎么去推动？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	有没有遇到过那种迭代穿插进行的时候？</td>
+</tr>
+<tr>
+<td></td>
+<td>9	你们Excel导入是怎么优化的？</td>
+</tr>
+<tr>
+<td></td>
+<td>10	Redis怎么实现的项目重启保证幂等性问题？</td>
+</tr>
+<tr>
+<td></td>
+<td>11	有哪些JVM调优的经历？</td>
+</tr>
+<tr>
+<td></td>
+<td>12	JVM调优有哪些参考指标？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	G1和CMS回收器有什么不同？</td>
+</tr>
+<tr>
+<td></td>
+<td>14	你们那边网络安全是怎么保证的？</td>
+</tr>
+<tr>
+<td></td>
+<td>15	你知道哪些网络安全漏洞？</td>
+</tr>
+<tr>
+<td></td>
+<td>16	对下一个公司有什么期盼？</td>
+</tr>
+<tr>
+<td></td>
+<td>17	有干了哪些开源的事情？</td>
+</tr>
+<tr>
+<td></td>
+<td>。。。面过了，后面问我现在的工资和期盼，我拒绝，没告诉他，感觉他不是leader，只是处于好奇问的。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>奇虎360-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>上次Log4J的安全问题有了解吗？是怎么实现的线程不安全？</td>
+</tr>
+<tr>
+<td></td>
+<td>还有个什么场景题？我给忘了？</td>
+</tr>
+<tr>
+<td></td>
+<td>介绍了一下项目</td>
+</tr>
+<tr>
+<td></td>
+<td>怎么保证请求的有序性？</td>
+</tr>
+<tr>
+<td></td>
+<td>其他：</td>
+</tr>
+<tr>
+<td></td>
+<td>据说第一面评价说技术OK，所以就没多问技术方面的问题了，介绍了他们公司的情况。</td>
+</tr>
+<tr>
+<td></td>
+<td>据说这个他们项目组是去年被360收购的公司，组织架构现在是360集团，行政福利都一样，只是现在还没搬到广州总部一起办公，属于游离状态。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>奇虎360-3面：</td>
+</tr>
+<tr>
+<td></td>
+<td>目前还没约面，Boss特意给我打了个电话，因为Boss在深圳被隔离起来，无法现场面对面交流。</td>
+</tr>
+<tr>
+<td></td>
+<td>Boss说后面有时间再约我，感觉他们也不着急的样子。而且他们技术团队只有二十多人，是去年新收购的，目前还没有和360总部的在一起办公，目前是属于自己管自己，但是组织架构和福利待遇和360总部保持一致。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>致景科技-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	SQL调优有哪些？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	讲讲并发线程安全？（多节点线程安全&amp;单系统中的线程安全）</td>
+</tr>
+<tr>
+<td></td>
+<td>3	讲讲负责的系统业务？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	讲讲分布式锁的实现？如果获取锁失败怎么办？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	讲讲Redis限流怎么实现的？（固定窗口+弊端）</td>
+</tr>
+<tr>
+<td></td>
+<td>6	分库分表你们是怎么做的？（调研+方案+上线+数据迁移+测试）</td>
+</tr>
+<tr>
+<td></td>
+<td>7	对未来的规划？</td>
+</tr>
+<tr>
+<td></td>
+<td>致景科技-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>要我去线下面试，放他鸽子了。。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>三七互娱-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>问了一下大数据相关的东西，什么数据建模之类的，基本上都是经验输出，没有问太多八股文</td>
+</tr>
+<tr>
+<td></td>
+<td>基本上是问的一些开发思想，规约，建设，感觉面试官不是做Java开发的</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>三七互娱-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	你们的迭代是怎么跑的？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	怎么JVM调优？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	OOM问题，你们是怎么解决的，有考虑过这个NIO框架里为啥会OOM嘛？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	File文件压缩工具怎么做优化？用到了NIO中的哪个特性？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	什么是零拷贝？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	你们为什么要重构？怎么做重构的？怎么保证重构后的新老服务无缝对接？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	针对一些C端APP，不改变接口的情况下，如何切换新老服务？（反向代理，网关，IP切换等）</td>
+</tr>
+<tr>
+<td></td>
+<td>8	如何实现重构后的AB（灰度发布）发布？</td>
+</tr>
+<tr>
+<td></td>
+<td>9	你们是如何管理开发，测试，线上不同环境的？</td>
+</tr>
+<tr>
+<td></td>
+<td>10	如何管理代码分分支的？（Gitflow？）</td>
+</tr>
+<tr>
+<td></td>
+<td>11	系统部署环境是你们整的嘛？ （用的Jenkins,脚本是运维写的）</td>
+</tr>
+<tr>
+<td></td>
+<td>12	为何要自己搭一套FastDFS？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	讲讲线上SQL事故，为啥要弄Soar工具，有啥好处，比Expain分析工具好在哪里?</td>
+</tr>
+<tr>
+<td></td>
+<td>14	最近做的一次技术分享是什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>15	为啥要用ES替代ADS？ （成本，场景）</td>
+</tr>
+<tr>
+<td></td>
+<td>16	有做过大数据或者用户画像方面的系统吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>17	你们一般有哪些技术OKR？</td>
+</tr>
+<tr>
+<td></td>
+<td>18	对加班有什么看法？</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>广州三七互娱HR-3面：</td>
+</tr>
+<tr>
+<td></td>
+<td>给了定级P5，年包34万左右，HR说1，2，4加班到九点</td>
+</tr>
+<tr>
+<td></td>
+<td>做的是斗罗大陆，等游戏后台的营销，支付，等一个游戏平台部门，</td>
+</tr>
+<tr>
+<td></td>
+<td>工作内容：对接和开发占比 3：7， 平时可能回写写SDK之类的</td>
+</tr>
+<tr>
+<td></td>
+<td>听做游戏开发的朋友说，三七互娱很卷，劝退。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>格力电器-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	说说HashMap的底层数据结构？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	HashMap的扩容实现？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	HashMap出现线程不安全的原因？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	讲讲 并发包里熟悉哪些类？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	知道ReentrantLock底层是怎么实现的嘛？介绍一下里面的CHL队列？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	讲讲NIO，BIO，AIO的区别？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	讲讲BIO是在哪个阶段发生了阻塞？ 用户空间-内核空间的哪个阶段阻塞？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	讲讲NIO的多路复用模型？</td>
+</tr>
+<tr>
+<td></td>
+<td>9	Poll，epoll的区别？ （轮询，通知，水平触发，边缘触发）</td>
+</tr>
+<tr>
+<td></td>
+<td>10	讲讲Redis和Nginx中的NIO实现嘛？（equeue,Event事件驱动等，多路复用模型等）</td>
+</tr>
+<tr>
+<td></td>
+<td>11	你们Redis用的是什么集群？</td>
+</tr>
+<tr>
+<td></td>
+<td>12	Redis Cluster集群部署时，Redis多主节点，是把Key落到Hash槽位中前，这个Hash值是在客户端算出来的还是在服务端算出来的？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	Redis多节点要扩容时，是怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>14	讲讲Hash一致性算法？</td>
+</tr>
+<tr>
+<td></td>
+<td>15	一个API接口出现卡顿，你如何排查问题？ （监控判断瓶颈位置，如网关，第三方接口调用，慢SQL，锁超时等。JVM进程层面：判断是否发生了FullGC，是否有线程池配置不够等。Linux层面查看CPU占用，内存占用，网络阻塞情况等。）</td>
+</tr>
+<tr>
+<td></td>
+<td>16	讲讲为啥用来Nginx还要用Getway网关，有啥区别？</td>
+</tr>
+<tr>
+<td></td>
+<td>17	GetWay出现了断言清空问题？你怎么排查？ （GetWay的自身Bug，他们遇到过）</td>
+</tr>
+<tr>
+<td></td>
+<td>18	Nginx怎么实现高可用？ （LVS前置负载均衡，SLB ，Nginx层层代理，但是有20%的性能损耗等）</td>
+</tr>
+<tr>
+<td></td>
+<td>19	为啥要使用Nginx，为啥不直接挂Tomcat，这样就课没损耗了？</td>
+</tr>
+<tr>
+<td></td>
+<td>20	讲讲设计一个API接口，要注意哪些问题？</td>
+</tr>
+<tr>
+<td></td>
+<td>21	怎么保证前端表单不会出现重复提交？ （表单不会被抓包抓到重复发送数据请求过去？）</td>
+</tr>
+<tr>
+<td></td>
+<td>22	你们有哪些场景案例提升了接口的QPS？</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>格力电器-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	讲讲JVM？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	你们JVM参数有哪些？为啥要这么设置？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	讲讲有哪些GC回收器？分别怎么用的？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	有哪些垃圾回收算法？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	JVM参数模板上可以指定用哪种算法吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	做过哪些JVM调优？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	用过哪些OOM排查工具，怎么排查的？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	用的阿里那套微服务框架嘛？ 对那个东西熟？</td>
+</tr>
+<tr>
+<td></td>
+<td>9	了解GetWay网关吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>10	做过哪些QPS提升的东西？</td>
+</tr>
+<tr>
+<td></td>
+<td>11	做过压力测试吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>12	了解多少Redis？用的什么集群？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	知道Proxy集群模式吗？实现Redis代理的？</td>
+</tr>
+<tr>
+<td></td>
+<td>14	MySQL的行级锁是怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>15	MySQL的事务是怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>16	BinLog日志有哪几种模式？statement模式，rows, statement+row结合</td>
+</tr>
+<tr>
+<td></td>
+<td>17	Cancel有了解吗？ 他是用的哪种模式做的数据采集？</td>
+</tr>
+<tr>
+<td></td>
+<td>。。。挂了，面试官是公司同事的朋友，不配来应聘他们的高级，他们要的能解决问题的能力，线上排查问题的能力，而不是单纯写业务，背八股文的。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>格力电器-HR面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	为什么离职？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	对下个公司有什么期盼？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	你在当前公司的职责是什么？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	你的身高体重，是否结婚？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	期望薪资</td>
+</tr>
+<tr>
+<td></td>
+<td>6	格力 电子商务公司 数字化互联网 转型，</td>
+</tr>
+<tr>
+<td></td>
+<td>7	深圳：150人左右，开发事，电商，物流，仓储。</td>
+</tr>
+<tr>
+<td></td>
+<td>8	非深户 2档 ， 1万技术的10%公积金，合同主题 深圳艾维普公司，9-6点下半年</td>
+</tr>
+<tr>
+<td></td>
+<td>后面有了想去的offer，就没面了。。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>小鹏汽车-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	没问啥技术、都是问思想，开发意识等等</td>
+</tr>
+<tr>
+<td></td>
+<td>2	基本上问你对项目的了解？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	部门的一些职责，规约，比较一些技术难点，和技术方案。</td>
+</tr>
+<tr>
+<td></td>
+<td>小鹏汽车-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	和一面问的差不多，简单问了几个技术点，和算法设计</td>
+</tr>
+<tr>
+<td></td>
+<td>2	什么是BitMap的假阳性？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	通用的导入导出方案是怎么玩的？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	有哪些不错的方案设计？对产品的熟悉度？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	怎么划分迭代的？未来的规划？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	平时怎么学习？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	在技术方面有什么优势？</td>
+</tr>
+<tr>
+<td></td>
+<td>小鹏汽车HR-3面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	为啥离职？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	上一家公司为啥要回深圳？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	个人兴趣爱好等？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	个人学习情况等？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	讲解公司的待遇情况：</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>欢聚集团-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	Java基础？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	Lua脚本使用固定窗口限流的算法？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	令牌桶算法，漏桶算法，滑动窗口算法？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	@Transiational事务注解的实现？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	JVM垃圾回收机制，线上排查经验？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	系统复杂度情况，有无异常应对场景？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	分布式ID生成方案，但对雪花算法的时间回拨问题没有解决方案</td>
+</tr>
+<tr>
+<td></td>
+<td>。。。缺少电商，物流，等复杂系统的开发经验。面试的供应链部门</td>
+</tr>
+<tr>
+<td></td>
+<td>欢聚ShopLine-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	没有自我介绍，直接先介绍项目？（感觉面试官一天面了很多人，部门专场面试）</td>
+</tr>
+<tr>
+<td></td>
+<td>2	项目里面怎么保证数据的一致性？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	怎么保证订单消费的幂等性？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	Redis里用BitMap做订单存储，可以修改吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	怎么保证Redis里面的数据和MySQL里面的一致性？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	利用每晚定时任务去维护BitMap里Order信息的完整性，如果在维护之前就有操作怎么办？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	如果Redis挂了，还会不会去重新维护一个BitMap结构？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	Redis+Lua脚本限流是怎么实现的？为啥要用这个实现？ （固定窗口算法）</td>
+</tr>
+<tr>
+<td></td>
+<td>9	Excel数据导入导出工具优化怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>10	兑换码是怎么生成的？ （海明码，增加逻辑校验，减少无效请求）</td>
+</tr>
+<tr>
+<td></td>
+<td>11	项目里面还有用到什么技术难点？</td>
+</tr>
+<tr>
+<td></td>
+<td>12	为什么采用双写的数据迁移？不用Canal去监控BinLog日志去迁移？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	如果双写时，遇到有老数据的修改你们是怎么解决的？</td>
+</tr>
+<tr>
+<td></td>
+<td>14	新老库双写时，有没有遇到事务问题？</td>
+</tr>
+<tr>
+<td></td>
+<td>15	会记录错误日志，存储在哪里？</td>
+</tr>
+<tr>
+<td></td>
+<td>16	还有什么想问的吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>。。。。基本上抓着项目上，和简历上的东西问，所以对简历上写的东西一定要准备好。</td>
+</tr>
+<tr>
+<td></td>
+<td>部门专场招聘，感觉面试官一天面了不少人，自我介绍，客套话都省略了。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>欢聚ShopeLine-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1.自我介绍</td>
+</tr>
+<tr>
+<td></td>
+<td>2.介绍项目，</td>
+</tr>
+<tr>
+<td></td>
+<td>3.分析系统的分层，架构、</td>
+</tr>
+<tr>
+<td></td>
+<td>4.系统之间是怎么调用的？</td>
+</tr>
+<tr>
+<td></td>
+<td>5.你们系统之间的边界</td>
+</tr>
+<tr>
+<td></td>
+<td>6.为啥要把B端C端的流量放一个系统上？有什么好办法把它区分开？</td>
+</tr>
+<tr>
+<td></td>
+<td>7.如果分开部署，那怎么保证系统的公共业务是通用的呢？</td>
+</tr>
+<tr>
+<td></td>
+<td>8.为啥不建议一个应用挂两个数据源？</td>
+</tr>
+<tr>
+<td></td>
+<td>10.什么是中台？什么是平台？</td>
+</tr>
+<tr>
+<td></td>
+<td>基本没问技术八卦文，就是讨论系统设计的知识，相互讨论，相互互怼，有时候我反问他，问他们是怎么做的，他说他们也不是这样干的，只是为了讨论而已。。。。MMP。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>网易OA-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	线程池配置的参数？（CPU密集，IO密集，不同配置）</td>
+</tr>
+<tr>
+<td></td>
+<td>2	线程池内部创建线程的原理，以及引发OOM问题？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	G1的垃圾回收的特征？ 用的什么回收算法？ （复制，说成了标记整理，答错了）</td>
+</tr>
+<tr>
+<td></td>
+<td>4	Map为啥要用红黑二叉树的特征？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	Spring框架中有用了哪些设计模式？用在哪个地方？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	怎么解决Bean的循环依赖问题的？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	AOP切面的底层实现原理？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	在一个Bean内调用添加事务的方法，事务是否会生效？</td>
+</tr>
+<tr>
+<td></td>
+<td>9	Redis有哪些数据类型？</td>
+</tr>
+<tr>
+<td></td>
+<td>10	Redis有哪几种日志持久化方式？</td>
+</tr>
+<tr>
+<td></td>
+<td>11	Redis底层有哪些数据结构？</td>
+</tr>
+<tr>
+<td></td>
+<td>12	SortSet底层什么时候是压缩列表，什么时候用跳表？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	什么是跳表？数据结构是怎么样的？</td>
+</tr>
+<tr>
+<td></td>
+<td>14	Redis有哪些集群模式？</td>
+</tr>
+<tr>
+<td></td>
+<td>15	Redis的分布式锁是怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>16	还有哪些分布式锁实现的方式？</td>
+</tr>
+<tr>
+<td></td>
+<td>17	ZK的高可用机制是怎么保证的？ （paxos算法？不知道）</td>
+</tr>
+<tr>
+<td></td>
+<td>18	ZK实现分布式锁是怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>19	SpringCloud中的Eureka是多点集群的吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>20	内部高可用的机制是怎么实现的？ （不知道）</td>
+</tr>
+<tr>
+<td></td>
+<td>21	如果Eureka挂了，客户端之间还能调用吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>22	Nginx有哪些负载均衡算法？ （随机，轮询，Hash,权重）</td>
+</tr>
+<tr>
+<td></td>
+<td>23	如果请求采用Hash算法？但是后面新添加了节点，怎么解决扩容问题？ （转移到 一致性Hash算法上？）</td>
+</tr>
+<tr>
+<td></td>
+<td>24	一致性Hash算法是怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>25	你用项目里面用了哪些设计模式？怎么用的？</td>
+</tr>
+<tr>
+<td></td>
+<td>26	单例模式有哪几种？</td>
+</tr>
+<tr>
+<td></td>
+<td>27	怎么解决并发时的单例情况？（双重锁？序列化反序列对象创建bean）</td>
+</tr>
+<tr>
+<td></td>
+<td>28	项目中是怎么用工厂模式去做对三方请求的？ （我描述的可能不太清楚）</td>
+</tr>
+<tr>
+<td></td>
+<td>29	Kafka了解吗？ （不太了解）</td>
+</tr>
+<tr>
+<td></td>
+<td>30	和传统MQ的区别？</td>
+</tr>
+<tr>
+<td></td>
+<td>31	Borken,Topic,Patiion..(分区) 之间的关系？</td>
+</tr>
+<tr>
+<td></td>
+<td>32	一个Topic是单节点还是多节点的？ 忘了，不了解 。。</td>
+</tr>
+<tr>
+<td></td>
+<td>33	慢SQL怎么排查？ （Explian）</td>
+</tr>
+<tr>
+<td></td>
+<td>34	Like 会使用索引吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>35	等于号两边使用函数，会用索引吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>。。。。挂了。。。</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>唯品会-1面：</td>
+</tr>
+<tr>
+<td></td>
+<td>1	自我介绍，讲讲项目？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	Redis存一些什么?</td>
+</tr>
+<tr>
+<td></td>
+<td>3	Redis做分布式锁遇到过哪些坑？ （死锁，锁占用？）</td>
+</tr>
+<tr>
+<td></td>
+<td>4	Redis缓存失效，有大量请求怼在MySQL上有什么问题？ （其实就是缓存雪崩的场景）</td>
+</tr>
+<tr>
+<td></td>
+<td>5	Redis的RDB文件过大，怎么解决？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	Redis分布式集群最大支持多少实例？</td>
+</tr>
+<tr>
+<td></td>
+<td>7	Redis主节点挂了，如何快速恢复？</td>
+</tr>
+<tr>
+<td></td>
+<td>8	影响Redis恢复速度的情况可能有哪些？</td>
+</tr>
+<tr>
+<td></td>
+<td>9	MySQL什么时候会使用间隙锁？</td>
+</tr>
+<tr>
+<td></td>
+<td>10	你们的表最大数据量有多少？ （4000W+）</td>
+</tr>
+<tr>
+<td></td>
+<td>11	你们大表做了哪些优化？ （索引，业务上表分层，ShardJdbc分库分表）</td>
+</tr>
+<tr>
+<td></td>
+<td>12	分库分表情况下有哪些汇总计算的方式？（异步汇总缓存，查询内存汇总，Hive和MapReduce）</td>
+</tr>
+<tr>
+<td></td>
+<td>13	新应用上线，JVM参数模板怎么配置？（默认模板，压测，GC日志，堆占用，调节）</td>
+</tr>
+<tr>
+<td></td>
+<td>14	JVM频繁发生YGC和FullGC，你怎么去定位问题和解决？ （GC日志，动态规划，担保机制）</td>
+</tr>
+<tr>
+<td></td>
+<td>15	你们用了有大数据的Hadoop，Hive这些东西吗？ （说没有用到，但自己学过，就没下文了）</td>
+</tr>
+<tr>
+<td></td>
+<td>16	问到这里没了，有什么想问的嘛？</td>
+</tr>
+<tr>
+<td></td>
+<td>反问面试官：</td>
+</tr>
+<tr>
+<td></td>
+<td>Redis你们遇到过节点挂了的情况吗？ 你们怎么快速恢复的？ （结果就TM的主从切换，他们数据迁移的时候有考虑过）</td>
+</tr>
+<tr>
+<td></td>
+<td>前端后端大数据都要会点？（且大量操作Redis）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>唯品会-2面：</td>
+</tr>
+<tr>
+<td></td>
+<td>(面试时录音了，所以把每一个问题都记录了下来。面了50分钟左右)</td>
+</tr>
+<tr>
+<td></td>
+<td>1	介绍一下自己项目？（数据走向分析）你们的系统分层？为什么要这么分层？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	你了解什么是DDD驱动领域模型吗？ 了解DDD有哪几种模型？（充血，贫血）</td>
+</tr>
+<tr>
+<td></td>
+<td>3	为什么要在系统中用MQ？ （解耦，异步，削峰）讲讲MQ中的解耦，和异步有什么区别？</td>
+</tr>
+<tr>
+<td></td>
+<td>4	下单的时候扣库存有什么问题？ 下完单后扣减库存又有什么问题？</td>
+</tr>
+<tr>
+<td></td>
+<td>5	下单同步扣减库存和下单异步扣减库存有什么区别？会出现什么问题？</td>
+</tr>
+<tr>
+<td></td>
+<td>6	怎么解决库存多卖问题吗？ （分布式锁，Redis原子Incr命令）</td>
+</tr>
+<tr>
+<td></td>
+<td>7	分布式锁保证扣库存，会存在什么问题？ （串行，效率低）</td>
+</tr>
+<tr>
+<td></td>
+<td>8	Redis扣减库存后怎么最终会持久化到MySQL中？ （相等与缓存一致性的解决方案）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>9	RocketMQ的技术架构你了解过吗？ （下面几个直接说不了解）</td>
+</tr>
+<tr>
+<td></td>
+<td>10	RocketMQ的Topic是怎么管理的？</td>
+</tr>
+<tr>
+<td></td>
+<td>11	RocketMQ的服务器（节点）是怎么管理的？）</td>
+</tr>
+<tr>
+<td></td>
+<td>12	RocketMQ的日志文件是怎么管理的？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	RocketMQ的推拉模式是怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>14	RocketMQ支持什么样的事务？</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>15	RocketMQ发消息存在哪些不可靠的点？</td>
+</tr>
+<tr>
+<td></td>
+<td>16	MQ发送失败怎么 办？</td>
+</tr>
+<tr>
+<td></td>
+<td>17	本地消息表记录发送状态，那么如果这个状态如果没有修改成功，那么判断是否发送成功的点哪？他有没有发送成功的可能性？</td>
+</tr>
+<tr>
+<td></td>
+<td>18	发送的消息有个唯一标识，唯一标识是选择自己生成的还是用MQ系统的生成的？</td>
+</tr>
+<tr>
+<td></td>
+<td>19	如果第一次发送成功了，第二次又发了，在MQ服务端收到两条相同消息，MQ会怎么处理？</td>
+</tr>
+<tr>
+<td></td>
+<td>20	RocketMQ是从哪些方面解决性能问题的？</td>
+</tr>
+<tr>
+<td></td>
+<td>21	RocketMQ是在哪一块用的零拷贝？</td>
+</tr>
+<tr>
+<td></td>
+<td>22	MQ客户端什么情况下需要做幂等？</td>
+</tr>
+<tr>
+<td></td>
+<td>23	消费者端做幂等的话，需不需要做Try&#x2F;Catch ？</td>
+</tr>
+<tr>
+<td></td>
+<td>24	你们会用MQ的重试功能嘛？</td>
+</tr>
+<tr>
+<td></td>
+<td>25	MQ如果没有消费成功会重复消费吗？</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>26	Redis底层有哪几种数据结构？（跳表，压缩列表，SDS，数组）</td>
+</tr>
+<tr>
+<td></td>
+<td>27	Redis除了上面这些还有什么数据结构吗？ （BitMap? RedisObject可自定义类型？）</td>
+</tr>
+<tr>
+<td></td>
+<td>28	SDS为什么交动态字符串？ 那SDS会动态换吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>29	Hash和List底层数据结构是哪几种？ 怎么选择的？</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>30	Redis集群之间的通信协议原理你知道吗？ （二进制Gossip）</td>
+</tr>
+<tr>
+<td></td>
+<td>31	为什么Redis官方说建议最多1000台部署？</td>
+</tr>
+<tr>
+<td></td>
+<td>32	Redis的热Key怎么解决？</td>
+</tr>
+<tr>
+<td></td>
+<td>（我说没理解啥是热Key，他问的意思是高频使用的Key，有可能在集群中有部分节点出现了CPU飙高的问题，你怎么去解决怎么去查？ 我从 数据倾斜，BigKey两方面去定位分析 ）</td>
+</tr>
+<tr>
+<td></td>
+<td>33	为啥大Key会打满CPU？ （fork持久化线程时，和遍历时间复杂度 去分析的）</td>
+</tr>
+<tr>
+<td></td>
+<td>34	Redis的布隆过滤器去重的范围是多大？ （没有固定，需要根据BitMap长度和hash函数个数去分析）</td>
+</tr>
+<tr>
+<td></td>
+<td>35	HIVE本身的原理是什么？他是怎么工作的？ （HDFS，MySQL存元数据，底层MapReduce）</td>
+</tr>
+<tr>
+<td></td>
+<td>36	Hive和MapReduce有什么关系？ （底层计算是用的MR）</td>
+</tr>
+<tr>
+<td></td>
+<td>37	什么是Map什么是Reduce？</td>
+</tr>
+<tr>
+<td></td>
+<td>38	MapReduce会存在数据亲些的问题吗？ 怎么解决？ （不知道）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>39	CopyOnWriteArrayList 什么情况下使用它会合适？</td>
+</tr>
+<tr>
+<td></td>
+<td>40	Synchronized 和 volatile 有什么区别？ 也可以讲讲底层实现怎么实现的？</td>
+</tr>
+<tr>
+<td></td>
+<td>41	单处理器（单核）存在并发问题吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>反问面试官：</td>
+</tr>
+<tr>
+<td></td>
+<td>你们做什么业务的？运营中台，MPD，活动提报系统 图文系统，用户画像系统，超微系统？ 反正他们组是和用户相关的，面试官是做超微系统的，进去之后也不一定是做超微系统。</td>
+</tr>
+<tr>
+<td></td>
+<td>你们Redis有多少实例？ （300台，大促下会有600台 ）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>唯品会-3面：</td>
+</tr>
+<tr>
+<td></td>
+<td>（录音了，所以问题记录的比较多，面了1个小时多点。）</td>
+</tr>
+<tr>
+<td></td>
+<td>1	为什么想离职？</td>
+</tr>
+<tr>
+<td></td>
+<td>2	你在项目组里面是什么角色？</td>
+</tr>
+<tr>
+<td></td>
+<td>3	重点讲一下系统中遇到了些什么问题？有什么难点？用了什么方案去解决的？ （BitMap去重，海明码）</td>
+</tr>
+<tr>
+<td></td>
+<td>4	你的项目质量是怎么保证的？ （我从三个维度分析：代码质量，系统稳定质量，数据准确性质量）</td>
+</tr>
+<tr>
+<td></td>
+<td>5	讲一下你们怎么做CodeReview的？</td>
+</tr>
+<tr>
+<td></td>
+<td>（从两个维度去分析：</td>
+</tr>
+<tr>
+<td></td>
+<td>方案设计维度上： 体现API接口，和表设计和字段选型；</td>
+</tr>
+<tr>
+<td></td>
+<td>代码维度上：需要从时间，空间复杂度，池化配置，SQL效率，工具选型，代码可读性上去Review）</td>
+</tr>
+<tr>
+<td></td>
+<td>6	开发完后你们的单元测试怎么做的？ （没做，不了解）</td>
+</tr>
+<tr>
+<td></td>
+<td>7	项目开发完后发版，你们怎么保证系统的稳定？ （灰度，回滚机制，DDL语句）</td>
+</tr>
+<tr>
+<td></td>
+<td>8	你们用Redis除了做布隆过滤器还做了啥？ （延时队列，固定窗口限流，缓存）</td>
+</tr>
+<tr>
+<td></td>
+<td>9	讲一下Redis的Hash底层实现是怎么样的？</td>
+</tr>
+<tr>
+<td></td>
+<td>（我讲了 压缩列表，跳表 的特征，以及内部怎么抉择的使用哪种数据结构的）</td>
+</tr>
+<tr>
+<td></td>
+<td>10	Redis或DB的连接池怎么选择去配置的？ （我从两方面：Java客户端业务场景，DB服务端的瓶颈）</td>
+</tr>
+<tr>
+<td></td>
+<td>11	本地缓存有用吗？ （反问是不是说的是Ecache那种缓存？）</td>
+</tr>
+<tr>
+<td></td>
+<td>12	堆内和堆外的缓存有什么不一样？</td>
+</tr>
+<tr>
+<td></td>
+<td>13	堆外和堆内内存是否对GC有影响？</td>
+</tr>
+<tr>
+<td></td>
+<td>14	Linux的内核有没有研究过？ 有没有做Linux内核方面的调优？ （没有）</td>
+</tr>
+<tr>
+<td></td>
+<td>15	你一般怎么去分析GC日志的？ （jstact -gc 1000 1000 ）</td>
+</tr>
+<tr>
+<td></td>
+<td>16	JVM参数中的GC参数你怎么配的？有什么依据？ （从GC间隔时间，存活率，GC时长去分析）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>17	你怎么设计一个秒杀系统？ （从 持久层，交互，系统稳定性三方面去考虑）</td>
+</tr>
+<tr>
+<td></td>
+<td>18	在秒杀系统中 你用Redis是做持久层还是缓存？</td>
+</tr>
+<tr>
+<td></td>
+<td>19	怎么把Redis上的库存信息同步到MySQL？</td>
+</tr>
+<tr>
+<td></td>
+<td>20	如果你服务发版，把过期时间为15天的缓存给删了，你怎么把缓存恢复到Redis？（有点像预热的场景）</td>
+</tr>
+<tr>
+<td></td>
+<td>21	Redis节点挂了怎么恢复？</td>
+</tr>
+<tr>
+<td></td>
+<td>22	Redis主节点为什么不能开启持久化方式？</td>
+</tr>
+<tr>
+<td></td>
+<td>（主从快速恢复，fork拷贝内存耗时，利用丛丛去级联同步日志）</td>
+</tr>
+<tr>
+<td></td>
+<td>23	Redis主不开启持久化，从开启持久化机制，如果主节点挂了从当选为新的主节点来使用,此时从是配置了持久化的，那岂不是性能有影响？ （没办法，异常情况只能快速恢复）</td>
+</tr>
+<tr>
+<td></td>
+<td>24	怎么监控系统？ （我从三方面回答，系统日志层面，服务器实例监控，分布式链路监控）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>25	问我对新公司的期盼？ （对技术有追求，有学习成长）</td>
+</tr>
+<tr>
+<td></td>
+<td>26	问我们现在公司上班的情况，加不加班（我说七八点下班，2周一个迭代的那种）</td>
+</tr>
+<tr>
+<td></td>
+<td>27	你了解那些互联网电商公司的加班情况吗？</td>
+</tr>
+<tr>
+<td></td>
+<td>介绍他们组，做的是VIP用户下的交易系统，QPS上万，几十万的那种，要实时响应变化，经常需要发版。</td>
+</tr>
+<tr>
+<td></td>
+<td>所以需求多，加班多，一般是晚上10点左右才能下班，项目比较具有挑战性。</td>
+</tr>
+<tr>
+<td></td>
+<td>项目紧偶尔也会周六加班，面试官意思是如果能力好做的快，9点干完了，为了考虑整体团队情况也得10点下班的那种。比我现在的工作强度大很多，但是互联网电商项目比较具有挑战性，适合我们这种小年轻。</td>
+</tr>
+<tr>
+<td></td>
+<td>反问面试官：</td>
+</tr>
+<tr>
+<td></td>
+<td>你们Redis的主节点开启了了持久化机制吗？（不开启）</td>
+</tr>
+<tr>
+<td></td>
+<td>你们Redis的节点能到多少QPS？</td>
+</tr>
+<tr>
+<td></td>
+<td>（比我说的理论值10万QPS远远要小，只有6万左右的，让我感兴趣自己去试试。）</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>其他面过的公司：</td>
+</tr>
+<tr>
+<td></td>
+<td>SHEIN，金蝶信科，明源云，中国平安，万科下的万物云 ，用友，亚信，Oppo下的叶子，有车以后，乐信，等等</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>这几个公司，面试难度中等偏下，基本上都是八股文+开发经验的问题，没有卷算法，正常发挥就行。</td>
+</tr>
+<tr>
+<td></td>
+<td>•	JUC的并发包下的Automic类，已经底层的实现</td>
+</tr>
+<tr>
+<td></td>
+<td>•	CAS问题</td>
+</tr>
+<tr>
+<td></td>
+<td>•	多线程下实现代码的顺序执行</td>
+</tr>
+<tr>
+<td></td>
+<td>•	List 的两种线程安全模式？</td>
+</tr>
+<tr>
+<td></td>
+<td>•	HashMap的Put过程，以及扩容过程</td>
+</tr>
+<tr>
+<td></td>
+<td>•	Mybatis的插件式编程</td>
+</tr>
+<tr>
+<td></td>
+<td>•	MySQL的Join过程，</td>
+</tr>
+<tr>
+<td></td>
+<td>•	如何设计5000千万个用户发放6位数（字母+数字）的兑换码？</td>
+</tr>
+<tr>
+<td></td>
+<td>•	Redis 什么时候用Set，List</td>
+</tr>
+<tr>
+<td></td>
+<td>•	缓存一致性？</td>
+</tr>
+<tr>
+<td></td>
+<td>•	数据一致性？</td>
+</tr>
+<tr>
+<td></td>
+<td>•	分库分表？</td>
+</tr>
+<tr>
+<td></td>
+<td>•	分布式锁等？</td>
+</tr>
+<tr>
+<td></td>
+<td>•	自增主键等？</td>
+</tr>
+<tr>
+<td></td>
+<td>•	CodeReview等等</td>
+</tr>
+<tr>
+<td></td>
+<td>•	线程池原理等？</td>
+</tr>
+<tr>
+<td></td>
+<td>•	Bean的生命周期等，</td>
+</tr>
+<tr>
+<td></td>
+<td>•	IOC，AOP底层实现等。</td>
+</tr>
+<tr>
+<td></td>
+<td>•	MQ保证消息不丢失，保证幂等性，保证可靠性消息投递，保证消费顺序问题等等。</td>
+</tr>
+<tr>
+<td></td>
+<td>•	基本上，redoLog, undoLog, MySQL常见的优化，B+数据结构，索引优化，回表，聚簇索引，线程池，以及配置池子的时候需要注意的问题</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>对撞时候 顺序</p>
+<p>触发攻击前buff 步骤</p>
+<p>添加对撞 步骤</p>
+<p>计算对撞伤害</p>
+<p>触发攻击时 受击时buff</p>
+<p>受到伤害时</p>
+<p>结算对撞步骤 信息 4</p>
+<p>触发吸血不为零的时候buff</p>
+<p>攻击后buff</p>
+</article><div class="tag_share"><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E7%BB%8F%E6%B1%87%E6%80%BB-x2F-%E5%84%92%E7%8C%BF%E9%9D%A2%E7%BB%8F%E5%B9%BF%E5%91%8A%E9%B8%A1%E6%B1%A4-x2F-%E5%B9%BF%E6%B7%B1%E4%B8%AD%E5%B0%8F%E5%8E%82%E9%9D%A2%E7%BB%8F%E9%AA%8C"><span class="toc-number">1.</span> <span class="toc-text">面经汇总&#x2F;儒猿面经广告鸡汤&#x2F;广深中小厂面经验</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url('https://s2.loli.net/2022/10/31/U5JGEBcWmqsn1LV.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By 张三</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/9.4.0/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"></div><div id="rightside-config-show"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>

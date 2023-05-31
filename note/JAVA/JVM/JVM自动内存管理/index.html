@@ -1,0 +1,331 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>JVM自动内存管理 | CCWorld</title><meta name="author" content="张三"><meta name="copyright" content="张三"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="运行时数据区  JTNDbXhHcmFwaE1vZGVsJTNFJTNDcm9vdCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMCUyMiUyRiUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjAlMjIlMkYlM0UlM0NteENlbGwlMjBpZCUzRCUyMjIlMjIlMjB2YWx1ZSUzRCU">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM自动内存管理">
+<meta property="og:url" content="https://zhuansun.github.io/note/JAVA/JVM/JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="CCWorld">
+<meta property="og:description" content="运行时数据区  JTNDbXhHcmFwaE1vZGVsJTNFJTNDcm9vdCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMCUyMiUyRiUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjAlMjIlMkYlM0UlM0NteENlbGwlMjBpZCUzRCUyMjIlMjIlMjB2YWx1ZSUzRCU">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhuansun.github.io/JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/image-20230527161626806.png">
+<meta property="article:published_time" content="2023-05-27T16:28:06.000Z">
+<meta property="article:modified_time" content="2023-05-29T14:32:36.802Z">
+<meta property="article:author" content="张三">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="自动内存管理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhuansun.github.io/JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/image-20230527161626806.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhuansun.github.io/note/JAVA/JVM/JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.json","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'JVM自动内存管理',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-05-29 14:32:36'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="CCWorld" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">108</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">146</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">39</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/./JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/image-20230527161626806.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">CCWorld</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">JVM自动内存管理</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2023-05-27T16:28:06.000Z" title="发表于 2023-05-27 16:28:06">2023-05-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/JVM/">JVM</a></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p><img src="/JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/image-20230527161626806.png" alt="image-20230527161626806"></p>
+<h1 id="运行时数据区"><a href="#运行时数据区" class="headerlink" title="运行时数据区"></a>运行时数据区</h1><img src="JVM自动内存管理.assets/image-20230528132339486.png" alt="image-20230528132339486" style="zoom:67%;" />
+
+<pre class="line-numbers language-base64" data-language="base64"><code class="language-base64">JTNDbXhHcmFwaE1vZGVsJTNFJTNDcm9vdCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMCUyMiUyRiUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjAlMjIlMkYlM0UlM0NteENlbGwlMjBpZCUzRCUyMjIlMjIlMjB2YWx1ZSUzRCUyMiVFNiU4OSU4MCVFNiU5QyU4OSVFNyVCQSVCRiVFNyVBOCU4QiVFNSU4NSVCMSVFNCVCQSVBQiUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCdmVydGljYWxBbGlnbiUzRHRvcCUzQmZpbGxDb2xvciUzRCUyM2RhZThmYyUzQnN0cm9rZUNvbG9yJTNEJTIzNmM4ZWJmJTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi01ODQlMjIlMjB5JTNEJTIyMTc0LjUlMjIlMjB3aWR0aCUzRCUyMjEzMiUyMiUyMGhlaWdodCUzRCUyMjI4NiUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjMlMjIlMjB2YWx1ZSUzRCUyMiVFNiU5NiVCOSVFNiVCMyU5NSVFNSU4QyVCQSUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCdmVydGljYWxBbGlnbiUzRHRvcCUzQmZpbGxDb2xvciUzRCUyM2Y4Y2VjYyUzQnN0cm9rZUNvbG9yJTNEJTIzYjg1NDUwJTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi01NzMlMjIlMjB5JTNEJTIyMTkzLjUlMjIlMjB3aWR0aCUzRCUyMjEwOSUyMiUyMGhlaWdodCUzRCUyMjEyNiUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjQlMjIlMjB2YWx1ZSUzRCUyMiVFOCVCRiU5MCVFOCVBMSU4QyVFNiU5NyVCNiVFNSVCOCVCOCVFOSU4NyU4RiVFNiVCMSVBMCUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCdmVydGljYWxBbGlnbiUzRHRvcCUzQmZpbGxDb2xvciUzRCUyM2ZmZTZjYyUzQnN0cm9rZUNvbG9yJTNEJTIzZDc5YjAwJTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi01NjYlMjIlMjB5JTNEJTIyMjQ2LjUlMjIlMjB3aWR0aCUzRCUyMjk0JTIyJTIwaGVpZ2h0JTNEJTIyNjQlMjIlMjBhcyUzRCUyMmdlb21ldHJ5JTIyJTJGJTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjI1JTIyJTIwdmFsdWUlM0QlMjIlRTUlQUQlOTglRTUlODIlQThKVk0lRTUlOEElQTAlRTglQkQlQkQlRTclOUElODQlRTYlQUYlOEYlRTQlQjglODAlRTQlQjglQUElRTclQjElQkIlRTclOUElODQlRTclQkIlOTMlRTYlOUUlODQlRTQlQkYlQTElRTYlODElQUYlRUYlQkMlOEMlRTQlQjglQkIlRTglQTYlODElRTUlOEMlODUlRTYlOEIlQUMlRTglQkYlOTAlRTglQTElOEMlRTYlOTclQjYlRTUlQjglQjglRTklODclOEYlRTYlQjElQTAlRUYlQkMlOEMlRTUlQUQlOTclRTYlQUUlQjUlRTUlOTIlOEMlRTYlOTYlQjklRTYlQjMlOTUlRTYlOTUlQjAlRTYlOEQlQUUlMjIlMjBzdHlsZSUzRCUyMnRleHQlM0JodG1sJTNEMSUzQnN0cm9rZUNvbG9yJTNEbm9uZSUzQmZpbGxDb2xvciUzRG5vbmUlM0JhbGlnbiUzRGxlZnQlM0J2ZXJ0aWNhbEFsaWduJTNEbWlkZGxlJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0Jyb3VuZGVkJTNEMCUzQmZvbnRTaXplJTNENyUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItNTY1Ljg3JTIyJTIweSUzRCUyMjIwNi41JTIyJTIwd2lkdGglM0QlMjI5NS43NSUyMiUyMGhlaWdodCUzRCUyMjM2JTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyNiUyMiUyMHZhbHVlJTNEJTIyJUU1JUFEJTk4JUU1JTgyJUE4JUU3JUJDJTk2JUU4JUFGJTkxJUU1JTk5JUE4JUU1JThGJUFGJUU3JTlGJUE1JUU3JTlBJTg0JUU1JUFEJTk3JUU5JTlEJUEyJUU5JTg3JThGJUU1JTkyJThDJUU3JUFDJUE2JUU1JThGJUI3JUU1JUJDJTk1JUU3JTk0JUE4JUVGJUJDJThDJUU4JUJGJTkwJUU4JUExJThDJUU2JTlDJTlGJUU4JUE3JUEzJUU2JTlFJTkwJUU2JTk2JUI5JUU2JUIzJTk1JUU2JTg4JTk2JUU1JUFEJTk3JUU2JUFFJUI1JUU3JTlBJTg0JUU3JTlCJUI0JUU2JThFJUE1JUU1JUJDJTk1JUU3JTk0JUE4JUVGJUJDJThDJUU4JUJGJTkwJUU4JUExJThDJUU2JTk3JUI2JUU1JThGJUFGJUU4JTgzJUJEJUU1JTg4JTlCJUU1JUJCJUJBJUU3JTlBJTg0JUU2JTk2JUIwJUU1JUI4JUI4JUU5JTg3JThGJUU3JUFEJTg5JUU0JUJGJUExJUU2JTgxJUFGJTIyJTIwc3R5bGUlM0QlMjJ0ZXh0JTNCaHRtbCUzRDElM0JzdHJva2VDb2xvciUzRG5vbmUlM0JmaWxsQ29sb3IlM0Rub25lJTNCYWxpZ24lM0RsZWZ0JTNCdmVydGljYWxBbGlnbiUzRG1pZGRsZSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCcm91bmRlZCUzRDAlM0Jmb250U2l6ZSUzRDclM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTU2My4yNSUyMiUyMHklM0QlMjIyNjQuNSUyMiUyMHdpZHRoJTNEJTIyODkuNSUyMiUyMGhlaWdodCUzRCUyMjM3JTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyNyUyMiUyMHZhbHVlJTNEJTIySmF2YSUyMCVFNSVBMCU4NiUyMCVFRiVCQyU4OEphdmElMjBIZWFwJUVGJUJDJTg5JTIyJTIwc3R5bGUlM0QlMjJyb3VuZGVkJTNEMSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCaHRtbCUzRDElM0Jmb250U2l6ZSUzRDclM0J2ZXJ0aWNhbEFsaWduJTNEdG9wJTNCZmlsbENvbG9yJTNEJTIzZmZmMmNjJTNCc3Ryb2tlQ29sb3IlM0QlMjNkNmI2NTYlM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTU3MyUyMiUyMHklM0QlMjIzMzIuNSUyMiUyMHdpZHRoJTNEJTIyMTA5JTIyJTIwaGVpZ2h0JTNEJTIyMTIwJTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyOCUyMiUyMHZhbHVlJTNEJTIyJUU1JUFEJTk4JUU1JTgyJUE4JUU1JTg3JUEwJUU0JUI5JThFJUU2JTg5JTgwJUU2JTlDJTg5JUU1JUFGJUI5JUU4JUIxJUExJUU1JUFFJTlFJUU0JUJFJThCJTI2bHQlM0JiciUyNmd0JTNCJTI2bHQlM0JiciUyNmd0JTNCJUU5JTgwJTlBJUU4JUJGJTg3JUU1JTlFJTgzJUU1JTlDJUJFJUU1JTlCJTlFJUU2JTk0JUI2JUU1JTk5JUE4JUU3JUFFJUExJUU3JTkwJTg2JTIyJTIwc3R5bGUlM0QlMjJ0ZXh0JTNCaHRtbCUzRDElM0JzdHJva2VDb2xvciUzRG5vbmUlM0JmaWxsQ29sb3IlM0Rub25lJTNCYWxpZ24lM0RsZWZ0JTNCdmVydGljYWxBbGlnbiUzRG1pZGRsZSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCcm91bmRlZCUzRDAlM0Jmb250U2l6ZSUzRDclM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTU2Ny4yNSUyMiUyMHklM0QlMjIzNTMuNSUyMiUyMHdpZHRoJTNEJTIyMTA2LjI1JTIyJTIwaGVpZ2h0JTNEJTIyMzYlMjIlMjBhcyUzRCUyMmdlb21ldHJ5JTIyJTJGJTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjI5JTIyJTIwdmFsdWUlM0QlMjIlRTclQkElQkYlRTclQTglOEItMSUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCdmVydGljYWxBbGlnbiUzRHRvcCUzQmZpbGxDb2xvciUzRCUyM2Q1ZThkNCUzQnN0cm9rZUNvbG9yJTNEJTIzODJiMzY2JTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi00MjYlMjIlMjB5JTNEJTIyMTc1JTIyJTIwd2lkdGglM0QlMjIxMzIlMjIlMjBoZWlnaHQlM0QlMjIyODUlMjIlMjBhcyUzRCUyMmdlb21ldHJ5JTIyJTJGJTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjIxMCUyMiUyMHZhbHVlJTNEJTIyJUU3JUE4JThCJUU1JUJBJThGJUU4JUFFJUExJUU2JTk1JUIwJUU1JTk5JUE4JTIyJTIwc3R5bGUlM0QlMjJyb3VuZGVkJTNEMSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCaHRtbCUzRDElM0Jmb250U2l6ZSUzRDclM0J2ZXJ0aWNhbEFsaWduJTNEdG9wJTNCZmlsbENvbG9yJTNEJTIzMWJhMWUyJTNCZm9udENvbG9yJTNEJTIzZmZmZmZmJTNCc3Ryb2tlQ29sb3IlM0QlMjMwMDZFQUYlM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTQyMCUyMiUyMHklM0QlMjIyMDAlMjIlMjB3aWR0aCUzRCUyMjEyMCUyMiUyMGhlaWdodCUzRCUyMjQ4JTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMTElMjIlMjB2YWx1ZSUzRCUyMkphdmElRTglOTklOUElRTYlOEIlOUYlRTYlOUMlQkElRTYlQTAlODglMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItNDE3JTIyJTIweSUzRCUyMjI1NSUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI2NyUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjEyJTIyJTIwdmFsdWUlM0QlMjIlRTYlOUMlQUMlRTUlOUMlQjAlRTYlOTYlQjklRTYlQjMlOTUlRTYlQTAlODglMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMzUyJTIyJTIweSUzRCUyMjI1NSUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI2NiUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjEzJTIyJTIwdmFsdWUlM0QlMjIlMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItNDE3JTIyJTIweSUzRCUyMjMyMiUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI0MCUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjE0JTIyJTIwdmFsdWUlM0QlMjIlMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItNDE3JTIyJTIweSUzRCUyMjM2MiUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI0MCUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjE1JTIyJTIwdmFsdWUlM0QlMjIlRTYlQTAlODglRTUlQjglQTclMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItNDE3JTIyJTIweSUzRCUyMjQwMiUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI0MCUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjE2JTIyJTIwdmFsdWUlM0QlMjIlMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMzUyJTIyJTIweSUzRCUyMjMyMSUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI0MCUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjE3JTIyJTIwdmFsdWUlM0QlMjIlMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQmZvbnRDb2xvciUzRCUyM2ZmZmZmZiUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMzUyJTIyJTIweSUzRCUyMjM2MSUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI0MCUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjE4JTIyJTIwdmFsdWUlM0QlMjIlRTYlQTAlODglRTUlQjglQTclMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMzUyJTIyJTIweSUzRCUyMjQwMSUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI0MCUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjE5JTIyJTIwdmFsdWUlM0QlMjIlRTQlQkYlOUQlRTUlQUQlOThKVk0lRTYlQUQlQTMlRTUlOUMlQTglRTYlODklQTclRTglQTElOEMlRTclOUElODQlRTUlQUQlOTclRTglOEElODIlRTclQTAlODElRTYlOEMlODclRTQlQkIlQTQlRTclOUElODQlRTUlOUMlQjAlRTUlOUQlODAlMjIlMjBzdHlsZSUzRCUyMnRleHQlM0JodG1sJTNEMSUzQnN0cm9rZUNvbG9yJTNEbm9uZSUzQmZpbGxDb2xvciUzRG5vbmUlM0JhbGlnbiUzRGxlZnQlM0J2ZXJ0aWNhbEFsaWduJTNEbWlkZGxlJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0Jyb3VuZGVkJTNEMCUzQmZvbnRTaXplJTNENyUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItNDA0LjUlMjIlMjB5JTNEJTIyMjE1JTIyJTIwd2lkdGglM0QlMjI4OSUyMiUyMGhlaWdodCUzRCUyMjMwJTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMjAlMjIlMjB2YWx1ZSUzRCUyMiVFNCVCOCVCQUphdmElRTYlOTYlQjklRTYlQjMlOTUlRTYlOEYlOTAlRTQlQkUlOUIlRTYlOUMlOEQlRTUlOEElQTElMjZsdCUzQmJyJTI2Z3QlM0IlMjZsdCUzQmRpdiUyMHN0eWxlJTNEJTI2cXVvdCUzQiUyNnF1b3QlM0IlMjZndCUzQiUyNmx0JTNCc3BhbiUyMHN0eWxlJTNEJTI2cXVvdCUzQmJhY2tncm91bmQtY29sb3IlM0ElMjBpbml0aWFsJTNCJTI2cXVvdCUzQiUyNmd0JTNCJUU1JUFEJTk4JUU1JTgyJUE4JUU2JTk2JUI5JUU2JUIzJTk1JUU4JUEyJUFCJUU4JUIwJTgzJUU3JTk0JUE4JUU4JTgwJThDJUU0JUJBJUE3JUU3JTk0JTlGJUU3JTlBJTg0JUU2JUEwJTg4JUU1JUI4JUE3JTI2bHQlM0IlMkZzcGFuJTI2Z3QlM0IlMjZsdCUzQiUyRmRpdiUyNmd0JTNCJTIyJTIwc3R5bGUlM0QlMjJ0ZXh0JTNCaHRtbCUzRDElM0JzdHJva2VDb2xvciUzRG5vbmUlM0JmaWxsQ29sb3IlM0Rub25lJTNCYWxpZ24lM0RsZWZ0JTNCdmVydGljYWxBbGlnbiUzRG1pZGRsZSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCcm91bmRlZCUzRDAlM0Jmb250U2l6ZSUzRDclM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTQxMi41JTIyJTIweSUzRCUyMjI3MyUyMiUyMHdpZHRoJTNEJTIyNDMlMjIlMjBoZWlnaHQlM0QlMjIzOSUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjIxJTIyJTIwdmFsdWUlM0QlMjIlRTQlQjglQkFOYXRpdmUlRTYlOTYlQjklRTYlQjMlOTUlRTYlOUMlOEQlRTUlOEElQTElMjIlMjBzdHlsZSUzRCUyMnRleHQlM0JodG1sJTNEMSUzQnN0cm9rZUNvbG9yJTNEbm9uZSUzQmZpbGxDb2xvciUzRG5vbmUlM0JhbGlnbiUzRGxlZnQlM0J2ZXJ0aWNhbEFsaWduJTNEbWlkZGxlJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0Jyb3VuZGVkJTNEMCUzQmZvbnRTaXplJTNENyUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMzQ3LjUlMjIlMjB5JTNEJTIyMjczJTIyJTIwd2lkdGglM0QlMjI0MyUyMiUyMGhlaWdodCUzRCUyMjM5JTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMjIlMjIlMjB2YWx1ZSUzRCUyMiUyMiUyMHN0eWxlJTNEJTIyZW5kQXJyb3clM0RjbGFzc2ljJTNCaHRtbCUzRDElM0Jyb3VuZGVkJTNEMCUzQmZvbnRTaXplJTNENyUzQmN1cnZlZCUzRDElM0IlMjIlMjBlZGdlJTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIwd2lkdGglM0QlMjI1MCUyMiUyMGhlaWdodCUzRCUyMjUwJTIyJTIwcmVsYXRpdmUlM0QlMjIxJTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUzRSUzQ214UG9pbnQlMjB4JTNEJTIyLTM5OS4xODAwMDAwMDAwMDAwNiUyMiUyMHklM0QlMjIzODUlMjIlMjBhcyUzRCUyMnNvdXJjZVBvaW50JTIyJTJGJTNFJTNDbXhQb2ludCUyMHglM0QlMjItMzk5LjE4MDAwMDAwMDAwMDA2JTIyJTIweSUzRCUyMjMzOCUyMiUyMGFzJTNEJTIydGFyZ2V0UG9pbnQlMjIlMkYlM0UlM0MlMkZteEdlb21ldHJ5JTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjIyMyUyMiUyMHZhbHVlJTNEJTIyJTIyJTIwc3R5bGUlM0QlMjJlbmRBcnJvdyUzRGNsYXNzaWMlM0JodG1sJTNEMSUzQnJvdW5kZWQlM0QwJTNCZm9udFNpemUlM0Q3JTNCY3VydmVkJTNEMSUzQiUyMiUyMGVkZ2UlM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB3aWR0aCUzRCUyMjUwJTIyJTIwaGVpZ2h0JTNEJTIyNTAlMjIlMjByZWxhdGl2ZSUzRCUyMjElMjIlMjBhcyUzRCUyMmdlb21ldHJ5JTIyJTNFJTNDbXhQb2ludCUyMHglM0QlMjItMzgzLjE4MDAwMDAwMDAwMDA2JTIyJTIweSUzRCUyMjMzOCUyMiUyMGFzJTNEJTIyc291cmNlUG9pbnQlMjIlMkYlM0UlM0NteFBvaW50JTIweCUzRCUyMi0zODMuMTgwMDAwMDAwMDAwMDYlMjIlMjB5JTNEJTIyMzg1Ljk5OTk5OTk5OTk5OTklMjIlMjBhcyUzRCUyMnRhcmdldFBvaW50JTIyJTJGJTNFJTNDJTJGbXhHZW9tZXRyeSUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMjQlMjIlMjB2YWx1ZSUzRCUyMiVFNyVCQSVCRiVFNyVBOCU4Qi1OJTIyJTIwc3R5bGUlM0QlMjJyb3VuZGVkJTNEMSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCaHRtbCUzRDElM0Jmb250U2l6ZSUzRDclM0J2ZXJ0aWNhbEFsaWduJTNEdG9wJTNCZmlsbENvbG9yJTNEJTIzZDVlOGQ0JTNCc3Ryb2tlQ29sb3IlM0QlMjM4MmIzNjYlM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTI1OSUyMiUyMHklM0QlMjIxNzQuNSUyMiUyMHdpZHRoJTNEJTIyMTMyJTIyJTIwaGVpZ2h0JTNEJTIyMjg1JTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMjUlMjIlMjB2YWx1ZSUzRCUyMiVFNyVBOCU4QiVFNSVCQSU4RiVFOCVBRSVBMSVFNiU5NSVCMCVFNSU5OSVBOCUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCdmVydGljYWxBbGlnbiUzRHRvcCUzQmZpbGxDb2xvciUzRCUyMzFiYTFlMiUzQmZvbnRDb2xvciUzRCUyM2ZmZmZmZiUzQnN0cm9rZUNvbG9yJTNEJTIzMDA2RUFGJTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi0yNTMlMjIlMjB5JTNEJTIyMTk5LjUlMjIlMjB3aWR0aCUzRCUyMjEyMCUyMiUyMGhlaWdodCUzRCUyMjQ4JTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMjYlMjIlMjB2YWx1ZSUzRCUyMkphdmElRTglOTklOUElRTYlOEIlOUYlRTYlOUMlQkElRTYlQTAlODglMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMjUwJTIyJTIweSUzRCUyMjI1NC41JTIyJTIwd2lkdGglM0QlMjI1MiUyMiUyMGhlaWdodCUzRCUyMjY3JTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMjclMjIlMjB2YWx1ZSUzRCUyMiVFNiU5QyVBQyVFNSU5QyVCMCVFNiU5NiVCOSVFNiVCMyU5NSVFNiVBMCU4OCUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCdmVydGljYWxBbGlnbiUzRHRvcCUzQmZpbGxDb2xvciUzRCUyMzAwOGEwMCUzQmZvbnRDb2xvciUzRCUyM2ZmZmZmZiUzQnN0cm9rZUNvbG9yJTNEJTIzMDA1NzAwJTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi0xODUlMjIlMjB5JTNEJTIyMjU0LjUlMjIlMjB3aWR0aCUzRCUyMjUyJTIyJTIwaGVpZ2h0JTNEJTIyNjYlMjIlMjBhcyUzRCUyMmdlb21ldHJ5JTIyJTJGJTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjIyOCUyMiUyMHZhbHVlJTNEJTIyJTIyJTIwc3R5bGUlM0QlMjJyb3VuZGVkJTNEMSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCaHRtbCUzRDElM0Jmb250U2l6ZSUzRDclM0J2ZXJ0aWNhbEFsaWduJTNEdG9wJTNCZmlsbENvbG9yJTNEJTIzMDA4YTAwJTNCZm9udENvbG9yJTNEJTIzZmZmZmZmJTNCc3Ryb2tlQ29sb3IlM0QlMjMwMDU3MDAlM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTI1MCUyMiUyMHklM0QlMjIzMjEuNSUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI0MCUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjI5JTIyJTIwdmFsdWUlM0QlMjIlMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMjUwJTIyJTIweSUzRCUyMjM2MS41JTIyJTIwd2lkdGglM0QlMjI1MiUyMiUyMGhlaWdodCUzRCUyMjQwJTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMzAlMjIlMjB2YWx1ZSUzRCUyMiVFNiVBMCU4OCVFNSVCOCVBNyUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCdmVydGljYWxBbGlnbiUzRHRvcCUzQmZpbGxDb2xvciUzRCUyMzAwOGEwMCUzQmZvbnRDb2xvciUzRCUyM2ZmZmZmZiUzQnN0cm9rZUNvbG9yJTNEJTIzMDA1NzAwJTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi0yNTAlMjIlMjB5JTNEJTIyNDAxLjUlMjIlMjB3aWR0aCUzRCUyMjUyJTIyJTIwaGVpZ2h0JTNEJTIyNDAlMjIlMjBhcyUzRCUyMmdlb21ldHJ5JTIyJTJGJTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjIzMSUyMiUyMHZhbHVlJTNEJTIyJTIyJTIwc3R5bGUlM0QlMjJyb3VuZGVkJTNEMSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCaHRtbCUzRDElM0Jmb250U2l6ZSUzRDclM0J2ZXJ0aWNhbEFsaWduJTNEdG9wJTNCZmlsbENvbG9yJTNEJTIzMDA4YTAwJTNCZm9udENvbG9yJTNEJTIzZmZmZmZmJTNCc3Ryb2tlQ29sb3IlM0QlMjMwMDU3MDAlM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTE4NSUyMiUyMHklM0QlMjIzMjAuNSUyMiUyMHdpZHRoJTNEJTIyNTIlMjIlMjBoZWlnaHQlM0QlMjI0MCUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjMyJTIyJTIwdmFsdWUlM0QlMjIlMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQnZlcnRpY2FsQWxpZ24lM0R0b3AlM0JmaWxsQ29sb3IlM0QlMjMwMDhhMDAlM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzAwNTcwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMTg1JTIyJTIweSUzRCUyMjM2MC41JTIyJTIwd2lkdGglM0QlMjI1MiUyMiUyMGhlaWdodCUzRCUyMjQwJTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMzMlMjIlMjB2YWx1ZSUzRCUyMiVFNiVBMCU4OCVFNSVCOCVBNyUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCdmVydGljYWxBbGlnbiUzRHRvcCUzQmZpbGxDb2xvciUzRCUyMzAwOGEwMCUzQmZvbnRDb2xvciUzRCUyM2ZmZmZmZiUzQnN0cm9rZUNvbG9yJTNEJTIzMDA1NzAwJTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi0xODUlMjIlMjB5JTNEJTIyNDAwLjUlMjIlMjB3aWR0aCUzRCUyMjUyJTIyJTIwaGVpZ2h0JTNEJTIyNDAlMjIlMjBhcyUzRCUyMmdlb21ldHJ5JTIyJTJGJTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjIzNCUyMiUyMHZhbHVlJTNEJTIyJUU0JUJGJTlEJUU1JUFEJTk4SlZNJUU2JUFEJUEzJUU1JTlDJUE4JUU2JTg5JUE3JUU4JUExJThDJUU3JTlBJTg0JUU1JUFEJTk3JUU4JThBJTgyJUU3JUEwJTgxJUU2JThDJTg3JUU0JUJCJUE0JUU3JTlBJTg0JUU1JTlDJUIwJUU1JTlEJTgwJTIyJTIwc3R5bGUlM0QlMjJ0ZXh0JTNCaHRtbCUzRDElM0JzdHJva2VDb2xvciUzRG5vbmUlM0JmaWxsQ29sb3IlM0Rub25lJTNCYWxpZ24lM0RsZWZ0JTNCdmVydGljYWxBbGlnbiUzRG1pZGRsZSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCcm91bmRlZCUzRDAlM0Jmb250U2l6ZSUzRDclM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTIzNy41JTIyJTIweSUzRCUyMjIxNC41JTIyJTIwd2lkdGglM0QlMjI4OSUyMiUyMGhlaWdodCUzRCUyMjMwJTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMzUlMjIlMjB2YWx1ZSUzRCUyMiVFNCVCOCVCQUphdmElRTYlOTYlQjklRTYlQjMlOTUlRTYlOEYlOTAlRTQlQkUlOUIlRTYlOUMlOEQlRTUlOEElQTElMjZsdCUzQmJyJTI2Z3QlM0IlMjZsdCUzQmRpdiUyMHN0eWxlJTNEJTI2cXVvdCUzQiUyNnF1b3QlM0IlMjZndCUzQiUyNmx0JTNCc3BhbiUyMHN0eWxlJTNEJTI2cXVvdCUzQmJhY2tncm91bmQtY29sb3IlM0ElMjBpbml0aWFsJTNCJTI2cXVvdCUzQiUyNmd0JTNCJUU1JUFEJTk4JUU1JTgyJUE4JUU2JTk2JUI5JUU2JUIzJTk1JUU4JUEyJUFCJUU4JUIwJTgzJUU3JTk0JUE4JUU4JTgwJThDJUU0JUJBJUE3JUU3JTk0JTlGJUU3JTlBJTg0JUU2JUEwJTg4JUU1JUI4JUE3JTI2bHQlM0IlMkZzcGFuJTI2Z3QlM0IlMjZsdCUzQiUyRmRpdiUyNmd0JTNCJTIyJTIwc3R5bGUlM0QlMjJ0ZXh0JTNCaHRtbCUzRDElM0JzdHJva2VDb2xvciUzRG5vbmUlM0JmaWxsQ29sb3IlM0Rub25lJTNCYWxpZ24lM0RsZWZ0JTNCdmVydGljYWxBbGlnbiUzRG1pZGRsZSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCcm91bmRlZCUzRDAlM0Jmb250U2l6ZSUzRDclM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTI0NS41JTIyJTIweSUzRCUyMjI3Mi41JTIyJTIwd2lkdGglM0QlMjI0MyUyMiUyMGhlaWdodCUzRCUyMjM5JTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyMzYlMjIlMjB2YWx1ZSUzRCUyMiVFNCVCOCVCQU5hdGl2ZSVFNiU5NiVCOSVFNiVCMyU5NSVFNiU5QyU4RCVFNSU4QSVBMSUyMiUyMHN0eWxlJTNEJTIydGV4dCUzQmh0bWwlM0QxJTNCc3Ryb2tlQ29sb3IlM0Rub25lJTNCZmlsbENvbG9yJTNEbm9uZSUzQmFsaWduJTNEbGVmdCUzQnZlcnRpY2FsQWxpZ24lM0RtaWRkbGUlM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQnJvdW5kZWQlM0QwJTNCZm9udFNpemUlM0Q3JTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi0xODAuNSUyMiUyMHklM0QlMjIyNzIuNSUyMiUyMHdpZHRoJTNEJTIyNDMlMjIlMjBoZWlnaHQlM0QlMjIzOSUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjM3JTIyJTIwdmFsdWUlM0QlMjIlMjIlMjBzdHlsZSUzRCUyMmVuZEFycm93JTNEY2xhc3NpYyUzQmh0bWwlM0QxJTNCcm91bmRlZCUzRDAlM0Jmb250U2l6ZSUzRDclM0JjdXJ2ZWQlM0QxJTNCJTIyJTIwZWRnZSUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHdpZHRoJTNEJTIyNTAlMjIlMjBoZWlnaHQlM0QlMjI1MCUyMiUyMHJlbGF0aXZlJTNEJTIyMSUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlM0UlM0NteFBvaW50JTIweCUzRCUyMi0yMzIuMTgwMDAwMDAwMDAwMDYlMjIlMjB5JTNEJTIyMzg0LjUwMDAwMDAwMDAwMDElMjIlMjBhcyUzRCUyMnNvdXJjZVBvaW50JTIyJTJGJTNFJTNDbXhQb2ludCUyMHglM0QlMjItMjMyLjE4MDAwMDAwMDAwMDA2JTIyJTIweSUzRCUyMjMzNy41JTIyJTIwYXMlM0QlMjJ0YXJnZXRQb2ludCUyMiUyRiUzRSUzQyUyRm14R2VvbWV0cnklM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjM4JTIyJTIwdmFsdWUlM0QlMjIlMjIlMjBzdHlsZSUzRCUyMmVuZEFycm93JTNEY2xhc3NpYyUzQmh0bWwlM0QxJTNCcm91bmRlZCUzRDAlM0Jmb250U2l6ZSUzRDclM0JjdXJ2ZWQlM0QxJTNCJTIyJTIwZWRnZSUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHdpZHRoJTNEJTIyNTAlMjIlMjBoZWlnaHQlM0QlMjI1MCUyMiUyMHJlbGF0aXZlJTNEJTIyMSUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlM0UlM0NteFBvaW50JTIweCUzRCUyMi0yMTYuMTgwMDAwMDAwMDAwMyUyMiUyMHklM0QlMjIzMzcuNSUyMiUyMGFzJTNEJTIyc291cmNlUG9pbnQlMjIlMkYlM0UlM0NteFBvaW50JTIweCUzRCUyMi0yMTYuMTgwMDAwMDAwMDAwMyUyMiUyMHklM0QlMjIzODUuNSUyMiUyMGFzJTNEJTIydGFyZ2V0UG9pbnQlMjIlMkYlM0UlM0MlMkZteEdlb21ldHJ5JTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjIzOSUyMiUyMHZhbHVlJTNEJTIyJTI2bHQlM0Jmb250JTIwc3R5bGUlM0QlMjZxdW90JTNCZm9udC1zaXplJTNBJTIwMTZweCUzQiUyNnF1b3QlM0IlMjZndCUzQi4lMjAuJTIwLiUyNmFtcCUzQm5ic3AlM0IlMjZsdCUzQiUyRmZvbnQlMjZndCUzQiUyMiUyMHN0eWxlJTNEJTIydGV4dCUzQmh0bWwlM0QxJTNCYWxpZ24lM0RjZW50ZXIlM0J2ZXJ0aWNhbEFsaWduJTNEbWlkZGxlJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0Jyb3VuZGVkJTNEMCUzQmZvbnRTaXplJTNENyUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMjk0JTIyJTIweSUzRCUyMjMwMi41JTIyJTIwd2lkdGglM0QlMjIzNSUyMiUyMGhlaWdodCUzRCUyMjMwJTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyNDAlMjIlMjB2YWx1ZSUzRCUyMiVFNyU5QiVCNCVFNiU4RSVBNSVFNSU4NiU4NSVFNSVBRCU5OCUyMCVFRiVCQyU4OERpcmVjdCUyME1lbW9yeSVFRiVCQyU4OSUyNmx0JTNCYnIlMjZndCUzQiUyNmx0JTNCYnIlMjZndCUzQiVFNCVCRCVCRiVFNyU5NCVBOCUyME5hdGl2ZSUyMCVFNSU4NyVCRCVFNiU5NSVCMCVFNSVCQSU5MyVFNyU5QiVCNCVFNiU4RSVBNSVFNSU4OCU4NiVFOSU4NSU4RCVFNyU5QSU4NCVFNSVBMCU4NiVFNSVBNCU5NiVFNSU4NiU4NSVFNSVBRCU5OCUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCZmlsbENvbG9yJTNEJTIzZTFkNWU3JTNCc3Ryb2tlQ29sb3IlM0QlMjM5NjczYTYlM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTU4NCUyMiUyMHklM0QlMjI0NzMlMjIlMjB3aWR0aCUzRCUyMjQ1OCUyMiUyMGhlaWdodCUzRCUyMjM5JTIyJTIwYXMlM0QlMjJnZW9tZXRyeSUyMiUyRiUzRSUzQyUyRm14Q2VsbCUzRSUzQ214Q2VsbCUyMGlkJTNEJTIyNDElMjIlMjB2YWx1ZSUzRCUyMiVFNSVCMSU4MCVFOSU4MyVBOCVFNSU4RiU5OCVFOSU4NyU4RiVFOCVBMSVBOCUyMiUyMHN0eWxlJTNEJTIycm91bmRlZCUzRDElM0J3aGl0ZVNwYWNlJTNEd3JhcCUzQmh0bWwlM0QxJTNCZm9udFNpemUlM0Q3JTNCZmlsbENvbG9yJTNEJTIzNjBhOTE3JTNCZm9udENvbG9yJTNEJTIzZmZmZmZmJTNCc3Ryb2tlQ29sb3IlM0QlMjMyRDc2MDAlM0IlMjIlMjB2ZXJ0ZXglM0QlMjIxJTIyJTIwcGFyZW50JTNEJTIyMSUyMiUzRSUzQ214R2VvbWV0cnklMjB4JTNEJTIyLTM0NiUyMiUyMHklM0QlMjI0MTglMjIlMjB3aWR0aCUzRCUyMjQwJTIyJTIwaGVpZ2h0JTNEJTIyMTYlMjIlMjBhcyUzRCUyMmdlb21ldHJ5JTIyJTJGJTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjI0MiUyMiUyMHZhbHVlJTNEJTIyJUU1JUIxJTgwJUU5JTgzJUE4JUU1JThGJTk4JUU5JTg3JThGJUU4JUExJUE4JTIyJTIwc3R5bGUlM0QlMjJyb3VuZGVkJTNEMSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCaHRtbCUzRDElM0Jmb250U2l6ZSUzRDclM0JmaWxsQ29sb3IlM0QlMjM2MGE5MTclM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzJENzYwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItNDExJTIyJTIweSUzRCUyMjQxOCUyMiUyMHdpZHRoJTNEJTIyNDAlMjIlMjBoZWlnaHQlM0QlMjIxNiUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0NteENlbGwlMjBpZCUzRCUyMjQzJTIyJTIwdmFsdWUlM0QlMjIlRTUlQjElODAlRTklODMlQTglRTUlOEYlOTglRTklODclOEYlRTglQTElQTglMjIlMjBzdHlsZSUzRCUyMnJvdW5kZWQlM0QxJTNCd2hpdGVTcGFjZSUzRHdyYXAlM0JodG1sJTNEMSUzQmZvbnRTaXplJTNENyUzQmZpbGxDb2xvciUzRCUyMzYwYTkxNyUzQmZvbnRDb2xvciUzRCUyM2ZmZmZmZiUzQnN0cm9rZUNvbG9yJTNEJTIzMkQ3NjAwJTNCJTIyJTIwdmVydGV4JTNEJTIyMSUyMiUyMHBhcmVudCUzRCUyMjElMjIlM0UlM0NteEdlb21ldHJ5JTIweCUzRCUyMi0yNDUuNSUyMiUyMHklM0QlMjI0MTglMjIlMjB3aWR0aCUzRCUyMjQwJTIyJTIwaGVpZ2h0JTNEJTIyMTYlMjIlMjBhcyUzRCUyMmdlb21ldHJ5JTIyJTJGJTNFJTNDJTJGbXhDZWxsJTNFJTNDbXhDZWxsJTIwaWQlM0QlMjI0NCUyMiUyMHZhbHVlJTNEJTIyJUU1JUIxJTgwJUU5JTgzJUE4JUU1JThGJTk4JUU5JTg3JThGJUU4JUExJUE4JTIyJTIwc3R5bGUlM0QlMjJyb3VuZGVkJTNEMSUzQndoaXRlU3BhY2UlM0R3cmFwJTNCaHRtbCUzRDElM0Jmb250U2l6ZSUzRDclM0JmaWxsQ29sb3IlM0QlMjM2MGE5MTclM0Jmb250Q29sb3IlM0QlMjNmZmZmZmYlM0JzdHJva2VDb2xvciUzRCUyMzJENzYwMCUzQiUyMiUyMHZlcnRleCUzRCUyMjElMjIlMjBwYXJlbnQlM0QlMjIxJTIyJTNFJTNDbXhHZW9tZXRyeSUyMHglM0QlMjItMTc5JTIyJTIweSUzRCUyMjQxOCUyMiUyMHdpZHRoJTNEJTIyNDAlMjIlMjBoZWlnaHQlM0QlMjIxNiUyMiUyMGFzJTNEJTIyZ2VvbWV0cnklMjIlMkYlM0UlM0MlMkZteENlbGwlM0UlM0MlMkZyb290JTNFJTNDJTJGbXhHcmFwaE1vZGVsJTNF<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+
+<p>如上图， Java虚拟机规范定义了字节码执行期间使用的各种运行时数据区，即JVM在执行Java程序的过程中，会把它管理的内存划分为若干个不同的数据区域。</p>
+<p>从线程共享角度来说，可以分为两类：</p>
+<ul>
+<li>1、所有线程共享的数据区</li>
+</ul>
+<blockquote>
+<p>方法区，运行时常量池，Java堆</p>
+</blockquote>
+<p><strong>这些数据区域是在Java虚拟机启动时创建的，只有当Java虚拟机退出时才会被销毁</strong>；</p>
+<ul>
+<li>2、线程私有的数据区</li>
+</ul>
+<blockquote>
+<p>程序计数器，Java虚拟机栈，本地方法栈</p>
+</blockquote>
+<p><strong>这些数据区域是每个线程的私有数据区，每个线程都有，不与其他线程共享；</strong></p>
+<p><strong>每个线程的数据区在线程创建时创建，在线程退出时销毁；</strong></p>
+<ul>
+<li>3、另外，还有一种特殊的数据区</li>
+</ul>
+<p>直接内存——使用Native函数库直接分配的堆外内存；</p>
+<p>上面图片展示的是JVM规范定义的运行时数据概念模型，实际上JVM的实现可能有所差别，下面在介绍各内存数据区时会给出一些HotSpot虚拟机实现的不同点和调整参数。</p>
+<h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><p><img src="/JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/image-20230528132847634.png" alt="image-20230528132847634"></p>
+<p>是什么：是一块较小的内存空间，存储当前线程所执行字节码的行数</p>
+<p>存什么：存储当前线程所执行字节码的行数，如果是Java方法存的是字节码指令的地址，如果是Native方法，存的是空（undefined）</p>
+<p>规范是什么：在《java虚拟机规范》中是唯一一个没有规定任何OOM异常的区域</p>
+<p>有没有异常：在《java虚拟机规范》中是唯一一个没有规定任何OOM异常的区域</p>
+<p>我们知道Java是运行在JVM上的，Java程序在运行的时候，会被编译器编译成字节码文件，然后交给JVM运行。</p>
+<p>然后我们知道一个程序在操作系统层面是对应一个进程，而在进程内，又有很多个线程在运行。</p>
+<p>那么我们又知道 CPU会不停的在线程间切换</p>
+<p>那么就会有一个问题，CPU切走之后，在切回来，怎么知道我们的程序运行到了哪个地方呢？</p>
+<p>这就要求要把切换前后的上下文记录下来，简单的说，就是要记录在切换之前CPU执行到了哪一行。</p>
+<p>记录在哪里呢？对于JVM来说，就是记录在：程序计数器中。</p>
+<p>程序计数器中记录的是什么？ 简单的说就是我们的程序代码（编译后的汇编）对应执行到的那一行的行数。</p>
+<p>由于记录的是线程级别的行数，所以这个程序计数器是线程私有的。</p>
+<ul>
+<li>如果当前线程执行的是Java方法，程序计数器保存的就是：JVM正在执行的字节码指令的地址；</li>
+<li>如果执行的是Native方法，程序计数器保存的就是：空（undefined）（因为这里说的是程序计数器是JVM的内存区域，JVM可不知道Native方法执行到了哪一行，对于Native方法的程序技术，是交给对应的语言（比如C，C++）操作系统负责了）</li>
+</ul>
+<p>唯一一个JVM规范中没有规定会抛出 OOM 情况的区域；</p>
+<h2 id="Java虚拟机栈"><a href="#Java虚拟机栈" class="headerlink" title="Java虚拟机栈"></a>Java虚拟机栈</h2><p><img src="/JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/image-20230528132912936.png" alt="image-20230528132912936"></p>
+<p>是什么：我们常说堆栈堆栈，其中的栈就是指的： Java虚拟机栈； 堆指的就是Java堆（后面会说）；这俩部分是最重要的部分</p>
+<p>存什么：主要是针对Java方法服务，线程在运行过程中对Java方法的执行和结束就对应栈帧的入栈和出栈</p>
+<p>规范是什么：《Java虚拟机规范》对该部分规定了两个异常</p>
+<p>有没有异常：有 StackOverflowError 和 OOM</p>
+<p>我们常说堆栈堆栈，其中的栈就是指的： Java虚拟机栈； 堆指的就是Java堆（后面会说）；这俩部分是最重要的部分</p>
+<p>Java虚拟机栈：主要是为Java方法提供服务。</p>
+<p>对于Java方法的，从调用到执行结束，对应其栈帧在JVM栈上的入栈到出栈的过程；</p>
+<p>JVM规范中对该区域，规定了两种可能的异常状况：</p>
+<ul>
+<li>StackOverflowError: 如果线程请求分配的栈深度超过JVM栈允许的最大深度时抛出</li>
+<li>OOM：如果JVM栈可以动态扩展，当然扩展的动作目前无法申请到足够的内存去完成扩展，或者在建立新的线程时没有足够的内存去创建对应的虚拟机栈，那JVM将会抛出OOM异常</li>
+</ul>
+<h2 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h2><p><img src="/JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/image-20230528132936277.png" alt="image-20230528132936277"></p>
+<p>是什么：和Java虚拟机栈一样，只不过本地方法栈是对native方法服务</p>
+<p>存什么：主要是针对Native方法服务，线程在运行过程中对本地方法的执行和结束就对应栈帧的入栈和出栈</p>
+<p>规范是什么：《Java虚拟机规范》对该区域使用的语言，使用方式与数据结构没有任何强制规定，各厂商可自由实现</p>
+<p>有没有异常：与虚拟机栈一样，会有StackOverflowError和OOM</p>
+<p>本地方法栈（Native Method Stack）与 Java虚拟机栈类似；</p>
+<p>Java虚拟机栈为JVM执行Java方法（也就是字节码）服务；本地方法栈则为Native方法服务；</p>
+<p>《Java虚拟机规范》中对该部分没有强制规定，所以JVM可以自由实现；(HotSpot VM直接把本地方法栈和Java虚拟机栈合并为一个；)</p>
+<h2 id="Java堆"><a href="#Java堆" class="headerlink" title="Java堆"></a>Java堆</h2><p>是什么：我们常说堆栈堆栈，其中的栈就是指的： Java虚拟机栈（上面已经说过）； 堆指的就是Java堆；这俩部分是最重要的部分</p>
+<p>存什么：用于存放几乎所有对象实例；(”几乎“是因为，随JIT编译技术和逃逸分析技术发展，栈上分配，标量替换，都可以不在堆上分配）；</p>
+<p>规范是什么：《Java虚拟机规范》并没有对堆进行分代划分；《Java虚拟机规范》规定堆的内存空间可以处于物理不连续的空间，但是逻辑上要是连续的空间。Java堆可以动态扩展。</p>
+<p>有没有异常：如果实际所需的堆超过了垃圾收集器能提供的最大容量，那Java虚拟机将会抛出一个OutOfMemoryError异常；</p>
+<p>动态扩容：《Java虚拟机规范》中说堆需要实现可以动态扩容。</p>
+<p>JVM调优：我们常说的JVM调优调优：其实就是对GC堆以及GC的参数设置调整，就是JVM调优的主要内容；</p>
+<p>分代收集理论：</p>
+<p>从回收内存的角度看，由于现代垃圾收集器大部分都是基于分代收集理论设计的，所以Java堆中经常会出现“新生代”“老年代”“永久代”“Eden空间”“From Survivor空间”“To Survivor空间”等名词，这些概念在本书后续章节中还会反复登场亮相，在这里笔者想先说明的是这些区域划分仅仅是一部分垃圾收集器的共同特性或者说设计风格而已，而非某个Java虚拟机具体实现的固有内存布局，更不是《Java虚拟机规范》里对Java堆的进一步细致划分。</p>
+<p>不少资料上经常写着类似于“Java虚拟机的堆内存分为新生代、老年代、永久代、Eden、Survivor……”这样的内容。在十年之前（以G1收集器的出现为分界），作为业界绝对主流的HotSpot虚拟机，它内部的垃圾收集器全部都基于“经典分代（新生代（Eden+2个Survivor）+老年代）”来设计，需要新生代、老年代收集器搭配才能工作，在这种背景下，上述说法还算是不会产生太大歧义。</p>
+<p>但是到了今天，垃圾收集器技术与十年前已不可同日而语，HotSpot里面也出现了不采用分代设计的新垃圾收集器（ZGC），再按照上面的提法就有很多需要商榷的地方了。</p>
+<p>不过无论从什么角度，无论如何划分，都不会改变Java堆中存储的都只能是对象的实例这一特性，将Java堆细分的目的只是为了更好地回收内存，或者更快地分配内存。</p>
+<p><strong>内存分配（连续空间）</strong></p>
+<p>和JVM栈一样，Java堆所使用的物理内存不需要保证是连续的，逻辑连续即可；</p>
+<p>JVM规范允许Java堆被实现成固定大小的或者是根据计算动态扩展和收缩的：</p>
+<p>不论是固定大小还是动态展缩，JVM实现都应当提供调节JJava堆初始内存空间大小的手段； 并且在动态展缩的情况下，还应该提供调节最大和最小内存空间的手段；</p>
+<p>为什么要求逻辑上是连续的？</p>
+<p>主要是为了提高内存利用率，想象一下，如果内存不是连续的，现在有两块不是连续的内存空间，一个大小是10KB，一个大小是3KB；现在我创建了两个对象，一个大小是4KB，一个大小是7KB； 怎么存呢？ 没法存吧。但是如果内存是连续的？就可以存下来。</p>
+<p><strong>HotSpot VM相关参数</strong></p>
+<p>目前主流的JVM都把Java堆实现成动态扩展的，如HotSpot VM：</p>
+<ul>
+<li>初始空间大小</li>
+</ul>
+<p>通过”-Xms”或”-XX:InitialHeapSize”参数指定Java堆初始空间大小；（默认为1&#x2F;64的物理内存空间；）</p>
+<ul>
+<li>最大空间大小</li>
+</ul>
+<p>通过”-Xmx”或”-XX:MaxHeapSize”参数指定ava堆内存分配池的最大空间大小；（默认为1&#x2F;4的物理内存空间；）</p>
+<p>Parallel垃圾收集器默认的最大堆大小是当小于等于192MB物理内存时，为物理内存的一半，否则为物理内存的四分之一；</p>
+<ul>
+<li>各年代内存的占用空间与可用空间的比例</li>
+</ul>
+<p>通过”-XX:MinHeapFreeRatio”和”-XX:MaxHeapFreeRatio”参数设置堆中各年代内存的占用空间与可用空间的比例保持在特定范围内；</p>
+<p>默认：</p>
+<p>“-XX:MinHeapFreeRatio&#x3D;40”：即一个年代（新生代或老年代）内存空余小于40%时，JVM会从未分配的堆内存中分配给该年代，以保持该年代40%的空余内存，直到分配完”-Xmx”指定的堆内存最大限制；</p>
+<p>“-XX:MaxHeapFreeRatio&#x3D;70”：即一个年代（新生代或老年代）内存空余大于70%时，JVM会缩减该年代内存，以保持该年代70%的空余内存，直到缩减到”-Xms”指定的堆内存最小限制；</p>
+<p>这两个参数不适用于Parallel垃圾收集器（通过“-XX:YoungGenerationSizeIncrement”、“-XX:TenuredGenerationSizeIncrement”能及“-XX:AdaptiveSizeDecrementScaleFactor”调节）</p>
+<ul>
+<li>年轻代与老年代的大小比例</li>
+</ul>
+<p>通过”-XX:NewRatio”：控制年轻代与老年代的大小比例；</p>
+<p>默认设置”-XX:NewRatio&#x3D;2”表新生代和老年代之间的比例为1：2；</p>
+<p>换句话说，eden和survivor空间组合的年轻代大小将是总堆大小的三分之一；</p>
+<ul>
+<li>年轻代空间大小</li>
+</ul>
+<p>通过”-Xmn”参数指定年轻代（nursery）的堆的初始和最大大小；</p>
+<p>或通过”-XX：NewSize”和”-XX：MaxNewSize”限制年轻代的最小大小和最大大小；</p>
+<ul>
+<li>永久代空间大小</li>
+</ul>
+<p>通过”-XX：MaxPermSize（JDK7）”或”-XX：MaxMetaspaceSize（JDK8）”参数指定永久代的最大内存大小；</p>
+<p>通过”-XX：PermSize（JDK7）”或”-XX：MetaspaceSize（JDK8）”参数指定永久代的内存阈值–超过将触发垃圾回收；</p>
+<p>注：JDK8中永久代已被删除，类元数据存储空间在本地内存中分配；(<a target="_blank" rel="noopener" href="http://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/considerations.html#sthref62">http://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/considerations.html#sthref62</a>)</p>
+<h2 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h2><p>是什么：在《Java虚拟机规范》中是将方法区作为堆的一个逻辑部分。但是它有一个别名“非堆”，目的是为了与Java堆区分开。</p>
+<p>存什么：主要保存的是：运行时常量池；类的结构信息（字段，方法，接口等）等</p>
+<p>规范是什么：在《Java虚拟机规范》中是将方法区作为堆的一个逻辑部分；《Java虚拟机规范》对方法去的约束是非常宽松的，除了和堆一样可以不适用连续的物理内存和可以实现动态扩展之外，还可以选择不实现垃圾回收。</p>
+<p>有没有异常：如果方法区的内存空间不能满足内存分配请求，那Java虚拟机将抛出一个OutOfMemoryError异常；</p>
+<p><strong>方法区与永久代</strong></p>
+<p>说到方法区，不得不提一下“永久代”这个概念，尤其是在JDK 8以前，许多Java程序员都习惯在HotSpot虚拟机上开发、部署程序，很多人都更愿意把方法区称呼为“永久代”（PermanentGeneration），或将两者混为一谈。</p>
+<p>本质上，“方法区”与”永久代“这两者并不是等价的，因为仅仅是当时的HotSpot虚拟机设计团队选择把收集器的分代设计扩展至方法区，或者说使用永久代来实现方法区而已，这样使得HotSpot的垃圾收集器能够像管理Java堆一样管理这部分内存，省去专门为方法区编写内存管理代码的工作。</p>
+<p>但是对于其他虚拟机实现，譬如BEA JRockit、IBM J9等来说，是不存在永久代的概念的。</p>
+<p>原则上如何实现方法区属于虚拟机实现细节，不受《Java虚拟机规范》管束，并不要求统一。</p>
+<p>但现在回头来看，当年使用永久代来实现方法区的决定并不是一个好主意，这种设计导致了Java应用更容易遇到内存溢出的问题（永久代有-XX：MaxPermSize的上限，即使不设置也有默认大小，而J9和JRockit只要没有触碰到进程可用内存的上限，例如32位系统中的4GB限制，就不会出问题），而且有极少数方法（例如String::intern()）会因永久代的原因而导致不同虚拟机下有不同的表现。</p>
+<p>当Oracle收购BEA获得了JRockit的所有权后，准备把JRockit中的优秀功能，譬如Java M ission Control管理工具，移植到HotSpot虚拟机时，但因为两者对方法区实现的差异而面临诸多困难。</p>
+<p>考虑到HotSpot未来的发展，在JDK 6的时候HotSpot开发团队就有放弃永久代，逐步改为采用本地内存（Native Memory）来实现方法区的计划了，到了JDK 7的HotSpot，已经把原本放在永久代的字符串常量池、静态变量等移出，而到了JDK 8，终于完全废弃了永久代的概念，改用与JRockit、J9一样在本地内存中实现的元空间（Meta-space）来代替，把JDK 7中永久代还剩余的内容（主要是类型信息）全部移到元空间中。</p>
+<h2 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h2><p>是什么：运行常量池(Runtime Constant Pool）是方法区的一部分；</p>
+<p>存什么：方法区：存储的内容是类的结构信息（字段，方法，接口等），还有运行时常量池；运行时常量池主要保存：在编译期间出现的常量。</p>
+<p>规范是什么：《java虚拟机规范》对该区域没有做任何细节的要求，各厂商可自由实现</p>
+<p>有没有异常：如果方法区无法满足新的内存分配需求时，会抛出OOM异常</p>
+<h2 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h2><p><strong>是什么</strong>：直接内存(Direct Memory）不是JVM运行时数据区，也不是JVM规范中定义的内存区域；是使用Native函数库直接分配的堆外内存；</p>
+<p><strong>存什么</strong>：由程序员手动申请，手动存储，手动释放，存什么由程序员定。</p>
+<p><strong>规范是什么</strong>：不属于《java虚拟机规范》的内容</p>
+<p><strong>有没有异常</strong>：使用直接内存（堆外内存）这容易导致各个内存区域总和大于物理内存限制，导致JVM出现OOM异常；  </p>
+<p><strong>为啥要有</strong>：因为避免了在Java堆中来回复制数据，能在一些场景中显著提高性能；</p>
+<h1 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h1></article><div class="tag_share"><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA"><span class="toc-number">1.</span> <span class="toc-text">运行时数据区</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="toc-number">1.1.</span> <span class="toc-text">程序计数器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A0%88"><span class="toc-number">1.2.</span> <span class="toc-text">Java虚拟机栈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%A0%88"><span class="toc-number">1.3.</span> <span class="toc-text">本地方法栈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java%E5%A0%86"><span class="toc-number">1.4.</span> <span class="toc-text">Java堆</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E5%8C%BA"><span class="toc-number">1.5.</span> <span class="toc-text">方法区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%97%B6%E5%B8%B8%E9%87%8F%E6%B1%A0"><span class="toc-number">1.6.</span> <span class="toc-text">运行时常量池</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98"><span class="toc-number">1.7.</span> <span class="toc-text">直接内存</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">垃圾收集器</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url('/./JVM%E8%87%AA%E5%8A%A8%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/image-20230527161626806.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By 张三</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/9.4.0/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"></div><div id="rightside-config-show"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>
