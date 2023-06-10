@@ -48,7 +48,7 @@
   isHome: true,
   isHighlightShrink: false,
   isToc: false,
-  postUpdate: '2023-05-31 14:13:58'
+  postUpdate: '2023-06-10 04:50:11'
 }</script><noscript><style type="text/css">
   #nav {
     opacity: 1
@@ -138,101 +138,7 @@
     }
     detectApple()
     })(window)</script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="CCWorld" type="application/atom+xml">
-</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">101</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">139</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">37</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header" style="background-image: url('https://s2.loli.net/2022/10/31/Q62x91KYcZVXDhL.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">CCWorld</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="site-info"><h1 id="site-title">CCWorld</h1><div id="site-subtitle"><span id="subtitle"></span></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/" title="mysql的性能调优从入门到入土"><img class="post_bg" src="https://s2.loli.net/2022/10/31/S1vyrfI4oTP8a7A.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mysql的性能调优从入门到入土"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/" title="mysql的性能调优从入门到入土">mysql的性能调优从入门到入土</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:37.063Z" title="发表于 2023-05-29 14:32:37">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">
-资料：打开
-7.MySQL中 in 和 exists 的区别？MySQL中的in语句是把外表和内表作hash 连接，而exists语句是对外表作loop循环，每次loop循环再对内表进行查询。我们可能认为exists比in语句的效率要高，这种说法其实是不准确的，要区分情景：
-1、如果查询的两个表大小相当，那么用in和exists差别不大。
-2、如果两个表中一个较小，一个是大表，则子查询表大的用exists，子查询表小的用in。
-3、not in 和not exists：如果查询语句使用了not in，那么内外表都进行全表扫描，没有用到索引；而not extsts的子查询依然能用到表上的索引。所以无论那个表大，用not exists都比not in要快。
-mysql的索引优化，联合索引使用的时候，时间+站点+code， 通过时间筛选之后，数据还比较多，此时效率很低。可以把所以改成：站点+时间+code，这样通过站点筛选之后的数据，就剩下很少了，此时效率很高。
-事务中，行锁是在语句执行时才加上的，不是事务开始就加上，但释放是统一在事务结束时才释放。根据这个特性，对于高并发的行记录的操作语 ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%BA%8B%E5%8A%A1%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/" title="mysql的事务从入门到入土"><img class="post_bg" src="https://s2.loli.net/2022/10/31/8Lg6tEBWjdkDRul.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mysql的事务从入门到入土"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%BA%8B%E5%8A%A1%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/" title="mysql的事务从入门到入土">mysql的事务从入门到入土</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:37.038Z" title="发表于 2023-05-29 14:32:37">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">#### 事务相关 * 
-03 | 事务隔离：为什么你改了我还看不见？ * 
-08 | 事务到底是隔离的还是不隔离的？ * 
-20 | 幻读是什么，幻读有什么问题？
-undo log
-undolog只会记录 insert delete update 的语句，DDL不会记录undo log；这个和undo log 的作用有关
-以下摘录自官网：14.6.7 Undo Logs
-A transaction is assigned up to four undo logs, one for each of the following operation types:
-
-	INSERT operations on user-defined tables
-
-	UPDATE and DELETE operations on user-defined tables
-
-	INSERT operations on user-defined temporary tables
-
-	UPDATE and DELETE operations on user-defined temporary tables
-
-
-
-</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%B8%BB%E5%A4%87%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/" title="mysql的主备从入门到入土"><img class="post_bg" src="https://s2.loli.net/2022/10/31/WrKaMyAfxkGH74l.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mysql的主备从入门到入土"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%B8%BB%E5%A4%87%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/" title="mysql的主备从入门到入土">mysql的主备从入门到入土</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:37.013Z" title="发表于 2023-05-29 14:32:37">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">本文有xmind，配合观看，效果更佳：Mysql主备从入门到入土.xmind
-binlog 可以用来归档，也可以用来做主备同步，那么具体是怎么做主备同步的呢？为什么备库执行了 binlog 就可以跟主库保持一致了呢？
-什么是主备传统的单机架构在目前的应用场景中不足以应对，后来才衍生出高可用，解决单点问题。mysql也不例外
-主备同步（主备一致）的流程flowchart LR
-开始((开始))-->undologmem[undologmem]
-subgraph masterA
-undologmem-->datamem[datamem]
-datamem-->redologprepare[redologprepare]
-redologprepare-->binlog[binlog]
-binlog-->redologcommit[redologcommit]
-binlog-->dump_thread[dump_thread]
-bg_thread[bg_thread]-->undologdisk[undologdisk]
-undologdisk-->datadisk[datadisk]
-end
- ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%B8%B4%E6%97%B6%E8%A1%A8%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/" title="mysql的临时表从入门到入土"><img class="post_bg" src="https://s2.loli.net/2022/10/31/TmXH91fskqar4tN.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mysql的临时表从入门到入土"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84%E4%B8%B4%E6%97%B6%E8%A1%A8%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/" title="mysql的临时表从入门到入土">mysql的临时表从入门到入土</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:37.007Z" title="发表于 2023-05-29 14:32:37">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">mysql临时表的xmind，点击下载
-#### 临时表相关 
-
-17 | 如何正确地显示随机消息？ 
-34 | 到底可不可以使用join？ 
-35 | join语句怎么优化？ 
-36 | 为什么临时表可以重名？
-37 | 什么时候会使用内部临时表？
-43 | 要不要使用分区表？
-
-
-本文的内容，是mysql中关于sql优化，比较重要的一部分内容，涉及到：
-
-mysql的排序：就是我们日常sql语句中经常写的 order by
-
-还涉及到：
-
-临时文件，为什么会涉及临时文件，因为：排序的时候会有内部排序和外部排序
-排序的记录比较多的时候，就会用到外部排序，外部排序就会用到临时文件，使用归并排序算法
-
-还涉及到：
-
-JOIN 语句的优化：就是我们日常开发中 a left join b 等等
-临时表，因为涉及到JOIN的优化
-
-这些都是很日常的开发工作中，就会用到的部分，所以这篇文章要好好掌握以下，对实战的能力提升很大
-mysql的排序这部分在 Mysql的索引从入门到入土 已经介绍过了，这里我再总结一下
-
-
-
-
-在日常的开发过程中，经常会使用order by语句，那么排序的原理是什么呢？ ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E6%8E%92%E5%BA%8F%E5%AD%97%E6%AE%B5%E7%9B%B8%E5%90%8C%E5%AF%BC%E8%87%B4%E7%BB%93%E6%9E%9C%E4%B8%8D%E4%B8%80%E8%87%B4/" title="mysql排序字段相同导致结果不一致"><img class="post_bg" src="https://s2.loli.net/2022/10/31/RVuNaA9irH4DtpM.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mysql排序字段相同导致结果不一致"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E6%8E%92%E5%BA%8F%E5%AD%97%E6%AE%B5%E7%9B%B8%E5%90%8C%E5%AF%BC%E8%87%B4%E7%BB%93%E6%9E%9C%E4%B8%8D%E4%B8%80%E8%87%B4/" title="mysql排序字段相同导致结果不一致">mysql排序字段相同导致结果不一致</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:36.998Z" title="发表于 2023-05-29 14:32:36">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">mysql排序字段相同导致结果不一致前言最近公司业务有这么一个功能：对5000条数据进行批量导入，然后通过表格的形式展示在前端，需要根据创建时间进行排序。
-所以，很简单的我们会想到
-ORDER BY gmt_create DESC;
-
-但是在实际的使用中，我发现一个问题，就是当时间相同的时候，这个排序是不确定的，是随机的。
-我们看一个例子：
-
-首先这两条sql语句是一样的，只不过一个查询 * 一个只查询id。那么理所当然的：他们的结果应该是一样的。
-
-SELECT * FROM customer WHERE employee_id&#x3D;39 AND assigned&#x3D;1 and status&#x3D;0 ORDER BY gmt_last_transfer DESC ;
-
-SELECT id FROM customer WHERE employee_id&#x3D;39 AND assigned&#x3D;1 and status&#x3D;0 ORDER BY gmt_last_transfer DESC ;
-
-
-
-
-
-
-
-
-
-
-
-我们可以看到两次的查询结果是不一样 ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84SQL%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/" title="mysql的SQL优化实战"><img class="post_bg" src="https://s2.loli.net/2022/10/31/U5JGEBcWmqsn1LV.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mysql的SQL优化实战"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84SQL%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/" title="mysql的SQL优化实战">mysql的SQL优化实战</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:36.998Z" title="发表于 2023-05-29 14:32:36">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">mysql的SQL优化实战以下是公司实际业务上的SQL调优实战
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">101</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">139</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">37</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header" style="background-image: url('https://s2.loli.net/2022/10/31/Q62x91KYcZVXDhL.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">CCWorld</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="site-info"><h1 id="site-title">CCWorld</h1><div id="site-subtitle"><span id="subtitle"></span></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84SQL%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/" title="mysql的SQL优化实战"><img class="post_bg" src="https://s2.loli.net/2022/10/31/l9TKFCEASqHPMhg.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mysql的SQL优化实战"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E7%9A%84SQL%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/" title="mysql的SQL优化实战">mysql的SQL优化实战</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.681Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">mysql的SQL优化实战以下是公司实际业务上的SQL调优实战
 金铎项目金铎项目是一个异常汇总平台，属于半路接手的项目，其中有很多sql都是比较复杂的，可读性差，维护性差，正好拿来练练手
 表结构一下是涉及的相关表结构
 amp_event_log-- auto-generated definition
@@ -242,30 +148,7 @@ create table amp_event_log
         primary key,
     event_id                   bigint                             not null comment '事件ID',
     event_code                 varchar(250)                       null comment '事件代码',
-    event_name                 varchar(250)             ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E4%B8%AD%E7%9A%84%E4%BA%A4%E9%9B%86%E5%B7%AE%E9%9B%86%E5%B9%B6%E9%9B%86/" title="mysql中的交集差集并集"><img class="post_bg" src="https://s2.loli.net/2022/10/31/H5FmRDth8zEyPrb.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mysql中的交集差集并集"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E4%B8%AD%E7%9A%84%E4%BA%A4%E9%9B%86%E5%B7%AE%E9%9B%86%E5%B9%B6%E9%9B%86/" title="mysql中的交集差集并集">mysql中的交集差集并集</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:36.992Z" title="发表于 2023-05-29 14:32:36">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">mysql中的交集差集并集前言首先要知道，mysql并不直接支持。
-也就是没有什么 INTERSECT，EXCEPT等等等等（oracle中有）。
-那么mysql怎么取交集并集和差集呢？
-正文那么mysql怎么取交集并集和差集呢？
-注意： mysql仅仅支持 UNION 和 UNION ALL 这两个操作。
-所以，我们只能通过其他的手段对两个结果进行取交集差集和并集。
-并集可以直接使用 UNION 和 UNION ALL 这两个操作。
-UNION 和 UNION ALL 运算：将查询的返回组合成一个结果
-
-UNION  合并结果并且将重复的内容取唯一
-UNION ALL  合并结果并且没有过滤重复内容，速度更快
-
-交集使用 UNION ALL 配合 GROUP BY 和 HAVING 进行查询
-
-两个集合的结构要一致,对应的字段数,字段类型
-将两个集合用 UNION ALL 关键字合并,这里的结果是有重复的所有集
-将上面的所有集 GROUP BY id
-最后 HAVING COUNT(id)&#x3D;1,等于1的意思是只出现了一次,所以这个是差集,如果等于2,那么就是交集
-
-使用方法 ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E5%BB%BA%E8%A1%A8%E7%9A%84utf8%E5%92%8Cutf8mb4%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB/" title="mysql建表的utf8和utf8mb4有什么区别"><img class="post_bg" src="https://s2.loli.net/2022/10/31/siLZrCmA6MvBdkb.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mysql建表的utf8和utf8mb4有什么区别"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E5%BB%BA%E8%A1%A8%E7%9A%84utf8%E5%92%8Cutf8mb4%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB/" title="mysql建表的utf8和utf8mb4有什么区别">mysql建表的utf8和utf8mb4有什么区别</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:36.992Z" title="发表于 2023-05-29 14:32:36">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">mysql建表的utf8和utf8mb4有什么区别前言最近自己搞了一个项目，买了一套腾讯云的数据库，很便宜。但是配置也很低。勉强够用吧。
-然后在创建数据库的过程中，观察到了一个现象，mysql内置的编码集包含了utf8和utf8mb4，于是做了一下比较。
-正文可以简单的理解 utf8mb4 是目前最大的一个字符编码,支持任意文字.
-为什么会有UTF8MB4？既然utf8应付日常使用完全没有问题，那为什么还要使用utf8mb4呢?低版本的MySQL支持的utf8编码，最大字符长度为 3 字节，如果遇到 4字节的字符就会出现错误了。三个字节的 UTF-8 最大能编码的 Unicode 字符是0xFFFF，也就是Unicode中的基本多文平面（BMP）。也就是说，任何不在基本多文平面的 Unicode字符，都无法使用MySQL原有的 utf8字符集存储。这些不在BMP中的字符包括哪些呢？最常见的就是Emoji 表情（Emoji 是一种特殊的 Unicode 编码，常见于 ios 和 android手机上），和一些不常用的汉字，以及任何新增的 Unicode 字符等等。
-UTF-8编码理论上讲 ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E4%B8%AD+%E5%8F%B7%E7%9A%84%E4%BD%9C%E7%94%A8/" title="+号在java中作用"><img class="post_bg" src="https://s2.loli.net/2022/10/31/TmXH91fskqar4tN.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="+号在java中作用"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E4%B8%AD+%E5%8F%B7%E7%9A%84%E4%BD%9C%E7%94%A8/" title="+号在java中作用">+号在java中作用</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:36.991Z" title="发表于 2023-05-29 14:32:36">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">+号在java中作用
+    event_name                 varchar(250)             ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E4%B8%AD+%E5%8F%B7%E7%9A%84%E4%BD%9C%E7%94%A8/" title="+号在java中作用"><img class="post_bg" src="https://s2.loli.net/2022/10/31/siLZrCmA6MvBdkb.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="+号在java中作用"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/mysql%E4%B8%AD+%E5%8F%B7%E7%9A%84%E4%BD%9C%E7%94%A8/" title="+号在java中作用">+号在java中作用</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.678Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/">MYSQL</a></span></div><div class="content">+号在java中作用
 作为运算符，当作用于数值型的时候，是运算符
 
 作为连接符，当作用于字符串的时候，是连接符
@@ -323,7 +206,168 @@ select &#39;120&#39;+20;
 
 
 
-两个操作数都 ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/SSM/%E3%80%90mybatis%E3%80%91%E8%A7%A3%E5%86%B3mybatis-plus%E7%9A%84%E5%88%86%E9%A1%B5%E9%97%AE%E9%A2%98/" title="【mybatis】解决mybatis-plus的分页问题"><img class="post_bg" src="https://s2.loli.net/2022/10/31/JCPQ9ogz7USpYlb.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【mybatis】解决mybatis-plus的分页问题"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/SSM/%E3%80%90mybatis%E3%80%91%E8%A7%A3%E5%86%B3mybatis-plus%E7%9A%84%E5%88%86%E9%A1%B5%E9%97%AE%E9%A2%98/" title="【mybatis】解决mybatis-plus的分页问题">【mybatis】解决mybatis-plus的分页问题</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-05-29T14:32:36.909Z" title="发表于 2023-05-29 14:32:36">2023-05-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/SSM/">SSM</a></span></div><div class="content">现象mybatis-plus的分页插件：
+两个操作数都 ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/SYSTEM/IO/IO%E7%B2%BE%E8%AE%B2/" title="无题"><img class="post_bg" src="https://s2.loli.net/2022/10/31/CEFMPBZKRt1LUAJ.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="无题"></a></div><div class="recent-post-info"><a class="article-title" href="/note/SYSTEM/IO/IO%E7%B2%BE%E8%AE%B2/" title="无题">无题</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.671Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span></div><div class="content">
+
+一切且文件
+虚拟文件系统
+任何文件都有 0 1 2 三个文件描述符：标准输入，标准输出，错误输出
+文件描述符
+
+cd &#x2F;proc&#x2F;$$&#x2F;fd
+
+两个程序可以打开同一个文件，但是对于两个程序来说，分别是不同的fd，也就是不同的指针
+&#x2F;proc
+关机之后看硬盘，里面是啥都没有的。只有在系统运行的时候，一些进程会被映射成文件，放在这里。
+$$
+是一个特殊的环境变量，表示当前bash的pid
+lsof -op $$
+当前bash的pid的一些详细数据
+重定向：不是命令，而是一种机制
+pstree：查看的进程的父子关系
+socket
+pipline：管道两边分别是两个子进程，一个子进程在写，一个子进程再读，进程与进程之间是隔离的，通过管道可以实现进程间的通信
+int 0x80 
+
+int：是cpu的一个指令
+0x80：对应二进制 1000 0000 ；是对应 中断描述符表 中的128这个位置的callback方法。
+
+在程序和物理内存之间，会有一个虚拟地址的概念，程序以为我是独占所有内存的。
+汇通一个MMU单元进行管理，会将程序的虚拟地址映射到物理内存 ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/TOOLS/HEXO/%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%8A%E4%B8%80%E9%94%AE%E9%83%A8%E7%BD%B2hexo/" title="在页面上一键部署hexo"><img class="post_bg" src="https://s2.loli.net/2022/10/31/dZfpJsAbCDF6xz4.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="在页面上一键部署hexo"></a></div><div class="recent-post-info"><a class="article-title" href="/note/TOOLS/HEXO/%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%8A%E4%B8%80%E9%94%AE%E9%83%A8%E7%BD%B2hexo/" title="在页面上一键部署hexo">在页面上一键部署hexo</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.548Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/TOOLS/">TOOLS</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/TOOLS/hexo/">hexo</a></span></div><div class="content">https://github.com/msoap/shell2http
+</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/TOOLS/HEXO/hexo+butterfly%E6%9B%B4%E6%96%B0mermaid%E7%89%88%E6%9C%AC/" title="hexo+butterfly更新mermaid版本"><img class="post_bg" src="https://s2.loli.net/2022/10/31/siLZrCmA6MvBdkb.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo+butterfly更新mermaid版本"></a></div><div class="recent-post-info"><a class="article-title" href="/note/TOOLS/HEXO/hexo+butterfly%E6%9B%B4%E6%96%B0mermaid%E7%89%88%E6%9C%AC/" title="hexo+butterfly更新mermaid版本">hexo+butterfly更新mermaid版本</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.545Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/TOOLS/">TOOLS</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/TOOLS/hexo/">hexo</a></span></div><div class="content">hexo+butterfly更新mermaid版本怎么使用的mermaid，可以参考butterfly的官网：https://butterfly.js.org/posts/4aa8abbe/#mermaid
+最近在本地重新编辑一篇文章之后，部署起来，发现有一个mermaid图表不支持了。
+原因是因为：我的 hexo 引用的 butterfly 主题默认使用的 mermaid 版本是 8.13.8
+而我本地是使用 typora 编辑的，typora 版本是 1.5.8，引用的 mermaid 版本是 9.2.0
+所以我是用了 新版本的特性之后，在低版本中就无法渲染了。
+
+
+
+
+解决办法
+更新 hexo+butterfly 的 mermaid 版本
+mermaid 版本是主题引入的，其实就是主题引入了一个js
+我们找到这个 js ，给它升级了就完事了
+找到主题目录
+
+…&#x2F;你的主题目录&#x2F;hexo-theme-butterfly&#x2F;layout&#x2F;includes&#x2F;footer.pug
+
+
+
+打开footer.pug文件，将引入的低版本mermai ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/TOOLS/HEXO/docker+hexo+gitee%E9%83%A8%E7%BD%B2%E5%AE%8C%E7%BE%8E%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" title="docker+hexo+gitee部署完美个人博客"><img class="post_bg" src="https://s2.loli.net/2022/10/31/fHwqAdtivuWLGQj.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="docker+hexo+gitee部署完美个人博客"></a></div><div class="recent-post-info"><a class="article-title" href="/note/TOOLS/HEXO/docker+hexo+gitee%E9%83%A8%E7%BD%B2%E5%AE%8C%E7%BE%8E%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" title="docker+hexo+gitee部署完美个人博客">docker+hexo+gitee部署完美个人博客</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.542Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/TOOLS/">TOOLS</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/TOOLS/hexo/">hexo</a></span></div><div class="content">引用因为引用的文章在下面都说到了，可以先看看
+Docker + Git 部署Hexo发布
+【hexo指南】hexo配置ER图流程图时序图插件
+前言本文仅适用：x86_64架构
+因为平时使用typora写文章，除了基本的MD语法之外，还使用了
+
+本地图片
+mermaid
+
+就是上面两点，导致部署hexo比较麻烦，特别是第一点。
+为什么呢？
+hexo新版本不是支持了本地图片吗？
+但是支持的前提是：图片的文件夹和MD文件名一致，像下面这样
+
+xxxxx.md （MD文件）
+xxxxx （图片文件夹）
+
+而我的图片存储方式是：
+
+xxxxx.md（MD文件）
+xxxxx.assets（图片文件夹）
+
+对应typora的设置就是：
+
+
+所以hexo就不支持了，我就很难受
+第一步：准备hexo文件你需要准备你的所有笔记文件：比如我的是放在gitee的，大致有下面这些笔记
+
+
+然后需要准备一个hexo的主题，我推荐是 butterfly，把主题下载下来
+然后需要准备hexo的配置文件_config.yml，配置好你所需要的所有内容
+然后准备下面的脚本，命名为：hexo-img-move.js
+con ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/TOOLS/DSM/%E9%BB%91%E7%BE%A4%E6%99%96%E4%BD%BF%E7%94%A8DNSPod%E8%AE%BE%E7%BD%AE%E5%A4%96%E7%BD%91%E8%AE%BF%E9%97%AE/" title="黑群晖使用DNSPod设置外网访问"><img class="post_bg" src="https://s2.loli.net/2022/10/31/C8gKdeILb2EhnT1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="黑群晖使用DNSPod设置外网访问"></a></div><div class="recent-post-info"><a class="article-title" href="/note/TOOLS/DSM/%E9%BB%91%E7%BE%A4%E6%99%96%E4%BD%BF%E7%94%A8DNSPod%E8%AE%BE%E7%BD%AE%E5%A4%96%E7%BD%91%E8%AE%BF%E9%97%AE/" title="黑群晖使用DNSPod设置外网访问">黑群晖使用DNSPod设置外网访问</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.539Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/TOOLS/">TOOLS</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/TOOLS/DSM/">DSM</a></span></div><div class="content">黑群晖使用DNSPod设置外网访问我折腾群辉的 DDNS 已经很久了，之前使用的是花生壳，虽然能用，但是我觉得并不好用，所以使用了腾讯云的 DSNPod 做 DDNS
+步骤1:  注册域名
+登录 DNSPod 管理控制台，进行购买
+
+完成购买后，即可进入 我的域名 管理页面查看您注册的域名。
+
+
+步骤2：启用 DDNS
+在 “我的域名” 管理页面，单击您已注册的域名，即可进入【记录管理】页面。
+
+单击【添加记录】，添加一条主机记录为 @，记录值为 0.0.0.0  的 A 记录。如下图所示：
+
+
+注意：记录值可以填写为任意IP地址，完成操作步骤后将会自动更新为您的公网IP地址。此处以 0.0.0.0记录值为例。
+
+
+
+
+
+进入 密钥管理 页面，单击【创建密钥】，输入自定义的密钥名称后并单击【确定】。如下图所示：
+
+
+
+
+
+
+请妥善保管对话框中的 ID 与 Token。如下图所示：
+
+
+
+
+
+
+请使用具有管理员权限的账号登录您的群晖（Synology） NAS，依次单击【控制面板】&gt;【外部访问】。如下图所示
+
+
+
+
+
+
+在【DDNS】页签中，单击【新增】。如下图所示：
+
+
+
+
+
+
+ ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/TOOLS/DSM/%E7%BE%A4%E8%BE%89%E8%AE%B0%E5%BD%95/" title="群辉记录"><img class="post_bg" src="https://s2.loli.net/2022/10/31/siLZrCmA6MvBdkb.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="群辉记录"></a></div><div class="recent-post-info"><a class="article-title" href="/note/TOOLS/DSM/%E7%BE%A4%E8%BE%89%E8%AE%B0%E5%BD%95/" title="群辉记录">群辉记录</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.536Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/TOOLS/">TOOLS</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/TOOLS/DSM/">DSM</a></span></div><div class="content">
+  8c00d3d27fb3c22fd589b44480636208283bc4f252b9d9a315fe285b7e6fdd7f930a20fa3f69a5692dc74a7bfb3323d7e419308d04e4d1b2c69d6ce874d15309d9b162fc742adecea1031d6df21b4970298cac3e5f2c75a9773931a94ddbd44d82b561c49a1b41237030cec8a279f390d19b6c0e8e9445c6208e1dd88fdd5bd073919cb914a7302022c8b7134022ff8d8ffd9e17841462ef970cc3a330c9ed4b9e221ce8a1c472a795238e964e6a9bd39568d3ffb023b9bc150a23e5b94b3e472d35e981d51e9b1572cc8b2fab654670b4de33ec8ac492d501ec51ea8df2ef5b5d2b46cd2510351b4efc93ef1de3567119a316f11dcb488fa ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/%E7%9B%91%E6%8E%A7/promethues%E5%A6%82%E4%BD%95%E6%B7%BB%E5%8A%A0%E9%85%8D%E7%BD%AE/" title="promethues如何添加配置"><img class="post_bg" src="https://s2.loli.net/2022/10/31/Ds1pc4HTNxezk2r.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="promethues如何添加配置"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/%E7%9B%91%E6%8E%A7/promethues%E5%A6%82%E4%BD%95%E6%B7%BB%E5%8A%A0%E9%85%8D%E7%BD%AE/" title="promethues如何添加配置">promethues如何添加配置</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.533Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/%E7%9B%91%E6%8E%A7/">监控</a></span></div><div class="content">修改promethues.yml文件
+
+
+
+
+比如我要添加一个kafka的监控，使用kafka-expoter: 进行如下配置：
+
+
+
+
+首次启动
+nohup ./prometheus --config.file=prometheus.yml &amp;
+
+
+
+热部署
+
+只加载配置文件，不重启promethues的进程
+找到promethues的进程ID： lsof -i:9090
+kill -HUP pid
+观察日志，或者刷新promethus的页面，可以看到新的配置被加载
+
+
+
+
+
+
+
+
+
+使用kafka-expoter指定端口号：
+nohup ./kafka_exporter --kafka.server=10.13.70.4:9092 --web.listen-address=:9309 &amp;
+
+
+
+</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/note/JAVA/SSM/%E3%80%90mybatis%E3%80%91%E8%A7%A3%E5%86%B3mybatis-plus%E7%9A%84%E5%88%86%E9%A1%B5%E9%97%AE%E9%A2%98/" title="【mybatis】解决mybatis-plus的分页问题"><img class="post_bg" src="https://s2.loli.net/2022/10/31/C8gKdeILb2EhnT1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【mybatis】解决mybatis-plus的分页问题"></a></div><div class="recent-post-info"><a class="article-title" href="/note/JAVA/SSM/%E3%80%90mybatis%E3%80%91%E8%A7%A3%E5%86%B3mybatis-plus%E7%9A%84%E5%88%86%E9%A1%B5%E9%97%AE%E9%A2%98/" title="【mybatis】解决mybatis-plus的分页问题">【mybatis】解决mybatis-plus的分页问题</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2023-06-01T10:14:17.524Z" title="发表于 2023-06-01 10:14:17">2023-06-01</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/JAVA/SSM/">SSM</a></span></div><div class="content">现象mybatis-plus的分页插件：
 
 默认只支持一页500条；
 但凡是在代码中指定分页大于500的，统一当做500处理；
@@ -352,7 +396,7 @@ public class MybatisPlusConfig extends MybatisPlusBaseConfig &#123;
             </div>
             <ul class="card-category-list" id="aside-cat-list">
             <li class="card-category-list-item parent"><a class="card-category-list-link" href="/categories/ALGORITHM/"><span class="card-category-list-name">ALGORITHM</span><span class="card-category-list-count">3</span><i class="fas fa-caret-left "></i></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/ALGORITHM/SORT/"><span class="card-category-list-name">SORT</span><span class="card-category-list-count">3</span></a></li></ul></li><li class="card-category-list-item parent"><a class="card-category-list-link" href="/categories/JAVA/"><span class="card-category-list-name">JAVA</span><span class="card-category-list-count">80</span><i class="fas fa-caret-left "></i></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/CLOUD/"><span class="card-category-list-name">CLOUD</span><span class="card-category-list-count">1</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/CLOUD/SENTINEL/"><span class="card-category-list-name">SENTINEL</span><span class="card-category-list-count">1</span></a></li></ul></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/DDD/"><span class="card-category-list-name">DDD</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/GIT/"><span class="card-category-list-name">GIT</span><span class="card-category-list-count">6</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/JUC/"><span class="card-category-list-name">JUC</span><span class="card-category-list-count">6</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/JVM/"><span class="card-category-list-name">JVM</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/MQ/"><span class="card-category-list-name">MQ</span><span class="card-category-list-count">1</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/MQ/KAFKA/"><span class="card-category-list-name">KAFKA</span><span class="card-category-list-count">1</span></a></li></ul></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/RPC/"><span class="card-category-list-name">RPC</span><span class="card-category-list-count">1</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/RPC/FEIGN/"><span class="card-category-list-name">FEIGN</span><span class="card-category-list-count">1</span></a></li></ul></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/SSM/"><span class="card-category-list-name">SSM</span><span class="card-category-list-count">4</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="card-category-list-name">数据库</span><span class="card-category-list-count">35</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/DORIS/"><span class="card-category-list-name">DORIS</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MONGO/"><span class="card-category-list-name">MONGO</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYCAT/"><span class="card-category-list-name">MYCAT</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/MYSQL/"><span class="card-category-list-name">MYSQL</span><span class="card-category-list-count">18</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/ORACLE/"><span class="card-category-list-name">ORACLE</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E6%95%B0%E6%8D%AE%E5%BA%93/REDIS/"><span class="card-category-list-name">REDIS</span><span class="card-category-list-count">11</span></a></li></ul></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E7%9B%91%E6%8E%A7/"><span class="card-category-list-name">监控</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/"><span class="card-category-list-name">部署与容器</span><span class="card-category-list-count">1</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E9%83%A8%E7%BD%B2%E4%B8%8E%E5%AE%B9%E5%99%A8/DOCKER/"><span class="card-category-list-name">DOCKER</span><span class="card-category-list-count">1</span></a></li></ul></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E9%9D%A2%E8%AF%95/"><span class="card-category-list-name">面试</span><span class="card-category-list-count">21</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/JAVA/%E9%9D%A2%E8%AF%95/%E6%88%91%E8%A6%81%E8%BF%9B%E5%A4%A7%E5%8E%82/"><span class="card-category-list-name">我要进大厂</span><span class="card-category-list-count">21</span></a></li></ul></li></ul></li><li class="card-category-list-item parent"><a class="card-category-list-link" href="/categories/SYSTEM/"><span class="card-category-list-name">SYSTEM</span><span class="card-category-list-count">5</span><i class="fas fa-caret-left "></i></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/SYSTEM/CENTOS/"><span class="card-category-list-name">CENTOS</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/SYSTEM/MACOS/"><span class="card-category-list-name">MACOS</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/SYSTEM/OPERATE/"><span class="card-category-list-name">OPERATE</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/SYSTEM/WINDOWS/"><span class="card-category-list-name">WINDOWS</span><span class="card-category-list-count">1</span></a></li></ul></li><li class="card-category-list-item parent"><a class="card-category-list-link" href="/categories/TOOLS/"><span class="card-category-list-name">TOOLS</span><span class="card-category-list-count">11</span><i class="fas fa-caret-left "></i></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/TOOLS/DSM/"><span class="card-category-list-name">DSM</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/TOOLS/MARKDOWN/"><span class="card-category-list-name">MARKDOWN</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/TOOLS/VSCODE/"><span class="card-category-list-name">VSCODE</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/TOOLS/hexo/"><span class="card-category-list-name">hexo</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/TOOLS/idea/"><span class="card-category-list-name">idea</span><span class="card-category-list-count">3</span></a></li></ul></li>
-            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/AOF/" style="font-size: 1.1em; color: #999">AOF</a> <a href="/tags/AOP/" style="font-size: 1.1em; color: #999">AOP</a> <a href="/tags/AQS/" style="font-size: 1.1em; color: #999">AQS</a> <a href="/tags/DDD/" style="font-size: 1.1em; color: #999">DDD</a> <a href="/tags/Dubbo/" style="font-size: 1.1em; color: #999">Dubbo</a> <a href="/tags/ElasticSearch/" style="font-size: 1.1em; color: #999">ElasticSearch</a> <a href="/tags/GTID/" style="font-size: 1.1em; color: #999">GTID</a> <a href="/tags/IO%E5%8E%9F%E7%90%86/" style="font-size: 1.1em; color: #999">IO原理</a> <a href="/tags/IO%E6%A8%A1%E5%9E%8B/" style="font-size: 1.1em; color: #999">IO模型</a> <a href="/tags/JMM/" style="font-size: 1.1em; color: #999">JMM</a> <a href="/tags/JUC/" style="font-size: 1.4em; color: #99a5b6">JUC</a> <a href="/tags/JVM/" style="font-size: 1.2em; color: #999da3">JVM</a> <a href="/tags/JVM%E6%80%BB%E8%A7%88/" style="font-size: 1.1em; color: #999">JVM总览</a> <a href="/tags/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" style="font-size: 1.1em; color: #999">Java内存模型</a> <a href="/tags/Java%E5%9F%BA%E7%A1%80/" style="font-size: 1.1em; color: #999">Java基础</a> <a href="/tags/MVCC/" style="font-size: 1.1em; color: #999">MVCC</a> <a href="/tags/MySQL/" style="font-size: 1.1em; color: #999">MySQL</a> <a href="/tags/Mybatis/" style="font-size: 1.1em; color: #999">Mybatis</a> <a href="/tags/Netty/" style="font-size: 1.1em; color: #999">Netty</a> <a href="/tags/RDB/" style="font-size: 1.2em; color: #999da3">RDB</a> <a href="/tags/RPC/" style="font-size: 1.1em; color: #999">RPC</a> <a href="/tags/RabbitMQ/" style="font-size: 1.1em; color: #999">RabbitMQ</a> <a href="/tags/Redis/" style="font-size: 1.1em; color: #999">Redis</a> <a href="/tags/Redisson/" style="font-size: 1.1em; color: #999">Redisson</a> <a href="/tags/ReentrantLock/" style="font-size: 1.1em; color: #999">ReentrantLock</a> <a href="/tags/RocketMQ/" style="font-size: 1.1em; color: #999">RocketMQ</a> <a href="/tags/SQL%E4%BC%98%E5%8C%96/" style="font-size: 1.1em; color: #999">SQL优化</a> <a href="/tags/Spring/" style="font-size: 1.1em; color: #999">Spring</a> <a href="/tags/ThreadLocal/" style="font-size: 1.1em; color: #999">ThreadLocal</a> <a href="/tags/Zookeeper/" style="font-size: 1.1em; color: #999">Zookeeper</a> <a href="/tags/binlog/" style="font-size: 1.2em; color: #999da3">binlog</a> <a href="/tags/butterfly/" style="font-size: 1.1em; color: #999">butterfly</a> <a href="/tags/centos/" style="font-size: 1.1em; color: #999">centos</a> <a href="/tags/ddns/" style="font-size: 1.1em; color: #999">ddns</a> <a href="/tags/docker/" style="font-size: 1.2em; color: #999da3">docker</a> <a href="/tags/doris/" style="font-size: 1.1em; color: #999">doris</a> <a href="/tags/dsm/" style="font-size: 1.1em; color: #999">dsm</a> <a href="/tags/feign/" style="font-size: 1.1em; color: #999">feign</a> <a href="/tags/get%E8%AF%B7%E6%B1%82/" style="font-size: 1.1em; color: #999">get请求</a> <a href="/tags/git/" style="font-size: 1.5em; color: #99a9bf">git</a> <a href="/tags/git-stash/" style="font-size: 1.1em; color: #999">git stash</a> <a href="/tags/gitee/" style="font-size: 1.1em; color: #999">gitee</a> <a href="/tags/gitignore/" style="font-size: 1.1em; color: #999">gitignore</a> <a href="/tags/gitkrake/" style="font-size: 1.1em; color: #999">gitkrake</a> <a href="/tags/hexo/" style="font-size: 1.3em; color: #99a1ac">hexo</a> <a href="/tags/idea/" style="font-size: 1.2em; color: #999da3">idea</a> <a href="/tags/idea%E7%A0%B4%E8%A7%A3/" style="font-size: 1.1em; color: #999">idea破解</a> <a href="/tags/join/" style="font-size: 1.2em; color: #999da3">join</a> <a href="/tags/kafka/" style="font-size: 1.1em; color: #999">kafka</a> <a href="/tags/lua/" style="font-size: 1.1em; color: #999">lua</a></div></div></div></div></main><footer id="footer" style="background-image: url('https://s2.loli.net/2022/10/31/Q62x91KYcZVXDhL.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By 张三</div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/9.4.0/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"></div><div id="rightside-config-show"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/AOF/" style="font-size: 1.1em; color: #999">AOF</a> <a href="/tags/AOP/" style="font-size: 1.1em; color: #999">AOP</a> <a href="/tags/AQS/" style="font-size: 1.1em; color: #999">AQS</a> <a href="/tags/DDD/" style="font-size: 1.1em; color: #999">DDD</a> <a href="/tags/Dubbo/" style="font-size: 1.1em; color: #999">Dubbo</a> <a href="/tags/ElasticSearch/" style="font-size: 1.1em; color: #999">ElasticSearch</a> <a href="/tags/GTID/" style="font-size: 1.1em; color: #999">GTID</a> <a href="/tags/IO%E5%8E%9F%E7%90%86/" style="font-size: 1.1em; color: #999">IO原理</a> <a href="/tags/IO%E6%A8%A1%E5%9E%8B/" style="font-size: 1.1em; color: #999">IO模型</a> <a href="/tags/JMM/" style="font-size: 1.1em; color: #999">JMM</a> <a href="/tags/JUC/" style="font-size: 1.4em; color: #99a5b6">JUC</a> <a href="/tags/JVM/" style="font-size: 1.2em; color: #999da3">JVM</a> <a href="/tags/JVM%E6%80%BB%E8%A7%88/" style="font-size: 1.1em; color: #999">JVM总览</a> <a href="/tags/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" style="font-size: 1.1em; color: #999">Java内存模型</a> <a href="/tags/Java%E5%9F%BA%E7%A1%80/" style="font-size: 1.1em; color: #999">Java基础</a> <a href="/tags/MVCC/" style="font-size: 1.1em; color: #999">MVCC</a> <a href="/tags/MySQL/" style="font-size: 1.1em; color: #999">MySQL</a> <a href="/tags/Mybatis/" style="font-size: 1.1em; color: #999">Mybatis</a> <a href="/tags/Netty/" style="font-size: 1.1em; color: #999">Netty</a> <a href="/tags/RDB/" style="font-size: 1.2em; color: #999da3">RDB</a> <a href="/tags/RPC/" style="font-size: 1.1em; color: #999">RPC</a> <a href="/tags/RabbitMQ/" style="font-size: 1.1em; color: #999">RabbitMQ</a> <a href="/tags/Redis/" style="font-size: 1.1em; color: #999">Redis</a> <a href="/tags/Redisson/" style="font-size: 1.1em; color: #999">Redisson</a> <a href="/tags/ReentrantLock/" style="font-size: 1.1em; color: #999">ReentrantLock</a> <a href="/tags/RocketMQ/" style="font-size: 1.1em; color: #999">RocketMQ</a> <a href="/tags/SQL%E4%BC%98%E5%8C%96/" style="font-size: 1.1em; color: #999">SQL优化</a> <a href="/tags/Spring/" style="font-size: 1.1em; color: #999">Spring</a> <a href="/tags/ThreadLocal/" style="font-size: 1.1em; color: #999">ThreadLocal</a> <a href="/tags/Zookeeper/" style="font-size: 1.1em; color: #999">Zookeeper</a> <a href="/tags/binlog/" style="font-size: 1.2em; color: #999da3">binlog</a> <a href="/tags/butterfly/" style="font-size: 1.1em; color: #999">butterfly</a> <a href="/tags/centos/" style="font-size: 1.1em; color: #999">centos</a> <a href="/tags/ddns/" style="font-size: 1.1em; color: #999">ddns</a> <a href="/tags/docker/" style="font-size: 1.2em; color: #999da3">docker</a> <a href="/tags/doris/" style="font-size: 1.1em; color: #999">doris</a> <a href="/tags/dsm/" style="font-size: 1.1em; color: #999">dsm</a> <a href="/tags/feign/" style="font-size: 1.1em; color: #999">feign</a> <a href="/tags/get%E8%AF%B7%E6%B1%82/" style="font-size: 1.1em; color: #999">get请求</a> <a href="/tags/git/" style="font-size: 1.5em; color: #99a9bf">git</a> <a href="/tags/git-stash/" style="font-size: 1.1em; color: #999">git stash</a> <a href="/tags/gitee/" style="font-size: 1.1em; color: #999">gitee</a> <a href="/tags/gitignore/" style="font-size: 1.1em; color: #999">gitignore</a> <a href="/tags/gitkrake/" style="font-size: 1.1em; color: #999">gitkrake</a> <a href="/tags/hexo/" style="font-size: 1.3em; color: #99a1ac">hexo</a> <a href="/tags/idea/" style="font-size: 1.2em; color: #999da3">idea</a> <a href="/tags/idea%E7%A0%B4%E8%A7%A3/" style="font-size: 1.1em; color: #999">idea破解</a> <a href="/tags/join/" style="font-size: 1.2em; color: #999da3">join</a> <a href="/tags/kafka/" style="font-size: 1.1em; color: #999">kafka</a> <a href="/tags/lua/" style="font-size: 1.1em; color: #999">lua</a></div></div></div></div></main><footer id="footer" style="background-image: url('https://s2.loli.net/2022/10/31/Q62x91KYcZVXDhL.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By 张三</div><div class="footer_custom_text"><a href="https://beian.miit.gov.cn/" target="_blank">浙ICP备2023014267号</a></div></div><script src="https://cdn.bootcdn.net/ajax/libs/mermaid/9.4.0/mermaid.min.js"></script></footer></div><div id="rightside"><div id="rightside-config-hide"></div><div id="rightside-config-show"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
   if (typeof pangu === 'object') pangu.autoSpacingPage()
   else {
     getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
